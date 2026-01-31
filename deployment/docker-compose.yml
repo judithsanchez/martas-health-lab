@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  app:
+    image: ghcr.io/judithsanchez/martas-health-lab:latest
+    container_name: martas-lab
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - C:/martas-lab/data:/app/data
+    environment:
+      - DATABASE_URL=file:/app/data/prod.db
+      - NEXT_PUBLIC_APP_URL=http://trainer-pc:3000
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}

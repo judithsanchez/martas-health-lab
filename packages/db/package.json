@@ -1,0 +1,21 @@
+{
+  "name": "@martas-lab/db",
+  "version": "0.0.1",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "db:push": "drizzle-kit push:sqlite",
+    "db:studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.30.0",
+    "better-sqlite3": "^9.4.0",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.20.14",
+    "@types/better-sqlite3": "^7.6.9",
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0"
+  }
+}
