@@ -12,17 +12,20 @@ vi.mock("fs", () => ({
     writeFileSync: vi.fn(),
 }));
 
-vi.mock("papaparse", () => ({
-    default: {
-        parse: vi.fn((csv) => {
-            if (csv.includes("wrong")) {
-                return { data: [{ wrong: "data" }], meta: { fields: ["wrong"] } };
-            } else {
-                return { data: [{ number: "10", age: "20" }], meta: { fields: ["number", "age"] } };
-            }
-        }),
-    }
-}));
+vi.mock("papaparse", () => {
+    const parseMock = vi.fn((csv) => {
+        if (typeof csv === 'string' && csv.includes("wrong")) {
+            return { data: [{ wrong: "data" }], meta: { fields: ["wrong"] } };
+        } else {
+            return { data: [{ number: "10", age: "20" }], meta: { fields: ["number", "age"] } };
+        }
+    });
+
+    return {
+        parse: parseMock,
+        default: { parse: parseMock },
+    };
+});
 
 describe("uploadCsv", () => {
     beforeEach(() => {
