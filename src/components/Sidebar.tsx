@@ -6,8 +6,7 @@ import {
     LayoutDashboard,
     Users,
     Upload,
-    Settings,
-    Star
+
 } from "lucide-react";
 
 export function Sidebar() {
@@ -22,12 +21,14 @@ export function Sidebar() {
     return (
         <aside className="w-72 flex flex-col sticky top-0 h-screen shadow-2xl z-20 bg-plum text-white">
             <div className="p-10 text-center">
-                <div className="w-16 h-16 mx-auto rounded-full border-2 border-gold p-1 flex items-center justify-center transition-transform hover:rotate-12 mb-4">
-                    <div className="w-full h-full rounded-full bg-white flex items-center justify-center text-3xl shadow-inner">
-                        🧪
+                <Link href="/" className="block">
+                    <div className="w-16 h-16 mx-auto rounded-full border-2 border-gold p-1 flex items-center justify-center transition-transform hover:rotate-12 mb-4">
+                        <div className="w-full h-full rounded-full bg-white flex items-center justify-center text-3xl shadow-inner">
+                            🧘🏻‍♀️
+                        </div>
                     </div>
-                </div>
-                <h1 className="text-xl font-serif font-bold tracking-tight text-white uppercase">Marta&apos;s Lab</h1>
+                    <h1 className="text-xl font-bold tracking-tight text-white uppercase">Marta&apos;s Lab</h1>
+                </Link>
                 <div className="h-0.5 w-12 mx-auto mt-2 rounded-full opacity-60 bg-gold"></div>
             </div>
 
@@ -36,37 +37,17 @@ export function Sidebar() {
                     href="/"
                     active={isActive("/")}
                     icon={<LayoutDashboard size={20} />}
-                    label="Dashboard Premium"
+                    label="Dashboard"
                 />
                 <NavItem
                     href="/clients"
                     active={isActive("/clients")}
                     icon={<Users size={20} />}
-                    label="Mis Pacientes"
-                />
-                <NavItem
-                    href="/upload"
-                    active={isActive("/upload")}
-                    icon={<Upload size={20} />}
-                    label="Importar Tanita"
-                />
-                <NavItem
-                    href="#"
-                    active={isActive("/settings")}
-                    icon={<Settings size={20} />}
-                    label="Configuración"
+                    label="Usuarios"
                 />
             </nav>
 
-            <div className="p-6 mb-4">
-                <div className="rounded-3xl p-6 text-center relative overflow-hidden group border border-white border-opacity-10 bg-[#5E3D5E]">
-                    <p className="text-white text-[10px] font-bold tracking-[0.2em] uppercase opacity-60 mb-3">Tu Asistente</p>
-                    <Star size={24} className="mx-auto mb-3 text-gold group-hover:scale-125 transition-transform" />
-                    <button className="w-full py-2.5 rounded-xl text-xs font-bold shadow-lg bg-gold text-plum">
-                        NUEVO PLAN
-                    </button>
-                </div>
-            </div>
+
         </aside>
     );
 }

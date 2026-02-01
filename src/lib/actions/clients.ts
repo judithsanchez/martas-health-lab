@@ -136,6 +136,8 @@ export async function getClientByUsername(username: string) {
     return result[0];
 }
 
+export type ClientWithLatestMeasurement = Awaited<ReturnType<typeof getClientsWithLatestMeasurement>>[number];
+
 export async function getClientsWithLatestMeasurement() {
     const allClients = await db.select().from(clients);
 
