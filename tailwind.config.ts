@@ -16,6 +16,10 @@ const config: Config = {
                 gold: "#c2a05b",
                 cream: "#f9f8f4",
             },
+            fontFamily: {
+                sans: ["var(--font-outfit)"],
+                serif: ["var(--font-playfair)"],
+            },
         },
     },
     plugins: [],
