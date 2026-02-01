@@ -40,6 +40,7 @@ export function RecordForm({ clientId, record, onClose, onSuccess }: RecordFormP
                 metabolicAge: num("metabolicAge"),
                 physiqueRatingScale: num("physiqueRatingScale"),
                 bodyType: num("bodyType"),
+                waist: num("waist"),
 
                 // Segmental Fat
                 fatArmRight: num("fatArmRight"),
@@ -132,6 +133,10 @@ export function RecordForm({ clientId, record, onClose, onSuccess }: RecordFormP
                             <div>
                                 <label className="text-xs font-bold text-slate-500 uppercase">Physique Rating</label>
                                 <input type="number" name="physiqueRatingScale" defaultValue={record?.physiqueRatingScale ?? ""} className="w-full p-2 border rounded" />
+                            </div>
+                            <div>
+                                <label className="text-xs font-bold text-slate-500 uppercase">Waist (cm)</label>
+                                <input type="number" step="0.1" name="waist" defaultValue={record?.waist ?? ""} className="w-full p-2 border rounded border-gold/30 focus:border-gold" />
                             </div>
                         </div>
                     </div>

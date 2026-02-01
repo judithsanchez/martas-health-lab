@@ -6,6 +6,7 @@ export const clients = sqliteTable("clients", {
     name: text("name").notNull(),
     lastname: text("lastname"),
     username: text("username").unique(),
+    gender: text("gender"), // 'male' | 'female'
     age: integer("age"),
     birthday: text("birthday"),
     height: real("height"),
@@ -24,6 +25,7 @@ export const measurements = sqliteTable("measurements", {
     date: text("date").notNull(), // ISO date string
     weight: real("weight").notNull(),
     height: real("height"),
+    waist: real("waist"), // Manual entry for WtHR
     fatPercent: real("fat_percent"),
     muscleMass: real("muscle_mass"),
     waterPercent: real("water_percent"),
@@ -34,7 +36,7 @@ export const measurements = sqliteTable("measurements", {
     metabolicAge: real("metabolic_age"),
     physiqueRatingScale: integer("physique_rating_scale"),
     bodyType: integer("body_type"),
-    gender: integer("gender"),
+    gender: text("gender"), // Keeping this for record consistency
     activityLevel: integer("activity_level"),
     bmi: real("bmi"),
 
