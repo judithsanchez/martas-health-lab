@@ -1,20 +1,46 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { measurements } from "@/lib/db/schema";
+import { measurements, clients } from "@/lib/db/schema";
 import { CsvRecord } from "./csv-upload";
 import { revalidatePath } from "next/cache";
 
-export async function persistMeasurements(clientId: number, records: CsvRecord[]) {
-    const values = records.map(record => ({
-        clientId,
-        date: new Date().toISOString(), // Defaulting to now, we can refine this
-        weight: parseFloat(record.number) || 0, // Mapping 'number' to 'weight' as a test case
-        notes: `Imported from CSV. Age: ${record.age}`,
-    }));
+export type RowAssignment = {
+    record: CsvRecord;
+    clientId?: number;
+    newClient?: {
+        name: string;
+        username: string;
+        age?: number;
+    };
+};
 
-    if (values.length === 0) return;
+export async function persistPerRowAssignments(assignments: RowAssignment[]) {
+    await db.transaction(async (tx) => {
+        for (const assignment of assignments) {
+            let finalClientId = assignment.clientId;
 
-    await db.insert(measurements).values(values);
+            // 1. Create new client if needed
+            if (!finalClientId && assignment.newClient) {
+                const newClientResult = await tx.insert(clients).values({
+                    name: assignment.newClient.name,
+                    username: assignment.newClient.username,
+                    age: assignment.newClient.age,
+                }).returning();
+                finalClientId = newClientResult[0].id;
+            }
+
+            // 2. Persist measurement if we have a client ID
+            if (finalClientId) {
+                await tx.insert(measurements).values({
+                    clientId: finalClientId,
+                    date: new Date().toISOString(),
+                    weight: parseFloat(assignment.record.number) || 0,
+                    notes: `Imported from CSV. Age: ${assignment.record.age}`,
+                });
+            }
+        }
+    });
+
     revalidatePath("/");
 }
