@@ -59,6 +59,16 @@ describe("TanitaParser", () => {
             const result4 = TanitaParser.parseRawRow(row4);
             expect(result4.timeRaw).toBe("12:30:00");
         });
+
+        it("should map gender integers to strings", () => {
+            const rowMale = ["GE", "1"];
+            const resultMale = TanitaParser.parseRawRow(rowMale);
+            expect(resultMale.gender).toBe("male");
+
+            const rowFemale = ["GE", "2"];
+            const resultFemale = TanitaParser.parseRawRow(rowFemale);
+            expect(resultFemale.gender).toBe("female");
+        });
     });
 
     describe("Edge Cases & Garbage Handling", () => {
