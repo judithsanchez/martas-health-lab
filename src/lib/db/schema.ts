@@ -16,13 +16,35 @@ export const measurements = sqliteTable("measurements", {
     clientId: integer("client_id").references(() => clients.id).notNull(),
     date: text("date").notNull(), // ISO date string
     weight: real("weight").notNull(),
+    height: real("height"),
     fatPercent: real("fat_percent"),
     muscleMass: real("muscle_mass"),
     waterPercent: real("water_percent"),
     boneMass: real("bone_mass"),
     visceralFat: real("visceral_fat"),
-    bmr: real("bmr"),
+    dciKcal: integer("dci_kcal"), // Daily Caloric Intake (rD)
+    bmr: real("bmr"), // Calculated BMR
     metabolicAge: real("metabolic_age"),
+    physiqueRatingScale: integer("physique_rating_scale"),
+    bodyType: integer("body_type"),
+    gender: integer("gender"),
+    activityLevel: integer("activity_level"),
+    bmi: real("bmi"),
+
+    // Segmental Fat %
+    fatArmRight: real("fat_arm_right"),
+    fatArmLeft: real("fat_arm_left"),
+    fatLegRight: real("fat_leg_right"),
+    fatLegLeft: real("fat_leg_left"),
+    fatTrunk: real("fat_trunk"),
+
+    // Segmental Muscle Mass (kg)
+    muscleArmRight: real("muscle_arm_right"),
+    muscleArmLeft: real("muscle_arm_left"),
+    muscleLegRight: real("muscle_leg_right"),
+    muscleLegLeft: real("muscle_leg_left"),
+    muscleTrunk: real("muscle_trunk"),
+
     notes: text("notes"),
     createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
