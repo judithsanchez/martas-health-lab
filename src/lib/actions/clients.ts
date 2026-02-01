@@ -1,9 +1,30 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { clients } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { clients, measurements } from "@/lib/db/schema";
+import { eq, desc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+
+export async function getMeasurements() {
+    return await db.select({
+        id: measurements.id,
+        date: measurements.date,
+        weight: measurements.weight,
+        fatPercent: measurements.fatPercent,
+        muscleMass: measurements.muscleMass,
+        waterPercent: measurements.waterPercent,
+        boneMass: measurements.boneMass,
+        visceralFat: measurements.visceralFat,
+        bmr: measurements.bmr,
+        metabolicAge: measurements.metabolicAge,
+        notes: measurements.notes,
+        clientName: clients.name,
+        clientUsername: clients.username,
+    })
+        .from(measurements)
+        .leftJoin(clients, eq(measurements.clientId, clients.id))
+        .orderBy(desc(measurements.date));
+}
 
 export async function getClients() {
     return await db.select().from(clients);
