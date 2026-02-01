@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    transpilePackages: ["@martas-lab/ui"],
+    output: 'standalone',
 };
 
 module.exports = nextConfig;

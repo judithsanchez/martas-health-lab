@@ -1,16 +1,44 @@
 {
-    "name": "martas-health-lab-monorepo",
+    "name": "martas-health-lab",
+    "version": "0.1.0",
     "private": true,
     "engines": {
         "node": ">=20"
     },
     "scripts": {
-        "dev": "pnpm --filter web dev",
-        "build": "pnpm --filter web build",
-        "db:push": "pnpm --filter db db:push",
-        "db:studio": "pnpm --filter db db:studio",
-        "lint": "pnpm --recursive exec eslint .",
-        "format": "pnpm --recursive exec prettier --write ."
+        "dev": "next dev",
+        "build": "next build",
+        "start": "next start",
+        "lint": "next lint",
+        "app:dev": "next dev",
+        "app:build": "next build",
+        "app:start": "next start",
+        "db:push": "drizzle-kit push:sqlite",
+        "db:studio": "drizzle-kit studio",
+        "db:view": "drizzle-kit studio",
+        "format": "prettier --write ."
+    },
+    "dependencies": {
+        "next": "14.1.0",
+        "react": "^18",
+        "react-dom": "^18",
+        "drizzle-orm": "^0.30.0",
+        "better-sqlite3": "^9.4.0",
+        "dotenv": "^16.4.5"
+    },
+    "devDependencies": {
+        "@types/node": "^20",
+        "@types/react": "^18",
+        "@types/react-dom": "^18",
+        "@types/better-sqlite3": "^7.6.9",
+        "autoprefixer": "^10.0.1",
+        "postcss": "^8",
+        "tailwindcss": "^3.3.0",
+        "typescript": "^5",
+        "eslint": "^8",
+        "eslint-config-next": "14.1.0",
+        "drizzle-kit": "^0.20.14",
+        "prettier": "^3.0.0"
     },
     "packageManager": "pnpm@10.28.2"
 }
