@@ -1,0 +1,10 @@
+{
+    "*.{ts,tsx}": [
+        "eslint --fix",
+        "bash -c 'pnpm type-check'",
+        "vitest related --run --passWithNoTests"
+    ],
+    "*.{js,jsx,json,md}": [
+        "prettier --write"
+    ]
+}
