@@ -21,13 +21,10 @@ export default async function Home() {
 
     return (
         <div className="bg-cream min-h-screen">
-            <header className="h-24 px-12 flex items-center justify-between sticky top-0 bg-white/70 backdrop-blur-md z-10 border-b border-gray-100">
+            <div className="px-12 py-10 space-y-12 max-w-7xl mx-auto">
                 <div>
                     <h2 className="text-2xl font-bold text-plum">¡Bienvenida, Marta! 👋</h2>
                 </div>
-            </header>
-
-            <div className="px-12 py-10 space-y-12 max-w-7xl mx-auto">
                 {/* Hero Section */}
                 <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 rounded-[2.5rem] p-12 text-white shadow-xl flex items-center justify-between relative overflow-hidden bg-gradient-to-br from-plum to-[#5E3D5E]">
