@@ -15,7 +15,9 @@ import {
     Droplets,
     Dna,
     AlertCircle,
-    CheckCircle2
+    CheckCircle2,
+    Zap as Flash,
+    ArrowUpRight
 } from 'lucide-react';
 import Link from 'next/link';
 import {
@@ -48,8 +50,18 @@ export default function ReportDetailView({
     const ffmi = calculateFFMI(measurement.weight, measurement.fatPercent || 0, measurement.height || client.height, client.gender || 'male');
     const visceral = interpretVisceralFat(measurement.visceralFat || 0);
 
-    const MetricCard = ({ title, value, unit, label, description, color, icon: Icon }: any) => (
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col h-full hover:shadow-md transition-shadow">
+    const Tooltip = ({ text }: { text: string }) => (
+        <div className="group relative inline-block ml-1">
+            <Info size={14} className="text-gray-300 cursor-help hover:text-plum transition-colors" />
+            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block w-48 p-2 bg-plum text-white text-[10px] rounded-lg shadow-xl z-50 leading-tight">
+                {text}
+                <div className="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-plum"></div>
+            </div>
+        </div>
+    );
+
+    const MetricCard = ({ title, value, unit, label, description, color, icon: Icon, fullTitle }: any) => (
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col h-full hover:shadow-md transition-shadow group/card">
             <div className="flex justify-between items-start mb-4">
                 <div className={`p-3 rounded-2xl bg-gray-50 ${color}`}>
                     <Icon size={24} />
@@ -60,7 +72,10 @@ export default function ReportDetailView({
                     </span>
                 )}
             </div>
-            <h4 className="text-gray-500 text-xs font-bold uppercase tracking-widest mb-1">{title}</h4>
+            <div className="flex items-center mb-1">
+                <h4 className="text-gray-500 text-xs font-bold uppercase tracking-widest">{title}</h4>
+                {fullTitle && <Tooltip text={fullTitle} />}
+            </div>
             <div className="flex items-baseline gap-1 mb-2">
                 <span className="text-3xl font-bold text-plum">{value}</span>
                 <span className="text-sm font-medium text-gray-400">{unit}</span>
@@ -124,6 +139,7 @@ export default function ReportDetailView({
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <MetricCard
                             title="IMC Ajustado"
+                            fullTitle="Índice de Masa Corporal (Ethnic Specific)"
                             value={bmi.value}
                             unit="kg/m²"
                             label={bmi.label}
@@ -133,6 +149,7 @@ export default function ReportDetailView({
                         />
                         <MetricCard
                             title="Índice ASMI"
+                            fullTitle="Appendicular Skeletal Muscle Index (Músculo en extremidades)"
                             value={asmi.value}
                             unit="kg/m²"
                             label={asmi.label}
@@ -142,6 +159,7 @@ export default function ReportDetailView({
                         />
                         <MetricCard
                             title="Relación WtHR"
+                            fullTitle="Waist-to-Height Ratio (Relación Cintura-Estatura)"
                             value={wthr?.value || '--'}
                             unit="ratio"
                             label={wthr?.label || 'Falta medida cintura'}
@@ -151,6 +169,7 @@ export default function ReportDetailView({
                         />
                         <MetricCard
                             title="Índice FFMI"
+                            fullTitle="Fat-Free Mass Index (Índice de Masa Libre de Grasa)"
                             value={ffmi.value}
                             unit="kg/m²"
                             label={ffmi.label}
@@ -195,8 +214,29 @@ export default function ReportDetailView({
                         </div>
                         <div className="bg-white p-6 rounded-3xl border border-gray-100 flex flex-col items-center">
                             <Calendar className="text-gold mb-2" size={20} />
-                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Edad Met.</span>
+                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 text-center">Edad Met.</span>
                             <span className="text-xl font-bold text-plum">{measurement.metabolicAge}</span>
+                        </div>
+                        <div className="bg-white p-6 rounded-3xl border border-gray-100 flex flex-col items-center">
+                            <Flame className="text-plum mb-2" size={20} />
+                            <div className="flex items-center mb-1">
+                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">BMR</span>
+                                <Tooltip text="Basal Metabolic Rate (Tasa Metabólica Basal)" />
+                            </div>
+                            <span className="text-xl font-bold text-plum">{measurement.bmr} <span className="text-[10px] font-normal opacity-50">kcal</span></span>
+                        </div>
+                        <div className="bg-white p-6 rounded-3xl border border-gray-100 flex flex-col items-center">
+                            <Zap className="text-sage mb-2" size={20} />
+                            <div className="flex items-center mb-1">
+                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">DCI</span>
+                                <Tooltip text="Daily Caloric Intake (Ingesta Calórica Diaria rD)" />
+                            </div>
+                            <span className="text-xl font-bold text-plum">{measurement.dciKcal} <span className="text-[10px] font-normal opacity-50">kcal</span></span>
+                        </div>
+                        <div className="bg-white p-6 rounded-3xl border border-gray-100 flex flex-col items-center">
+                            <Scale className="text-gold mb-2" size={20} />
+                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 text-center">Physique</span>
+                            <span className="text-xl font-bold text-plum">{measurement.physiqueRatingScale}</span>
                         </div>
                     </div>
                 </section>
