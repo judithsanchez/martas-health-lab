@@ -49,14 +49,83 @@ export async function getClients() {
     return await db.select().from(clients);
 }
 
-export async function createClient(data: { name: string; username: string; age?: number; email?: string; phone?: string }) {
+export async function createClient(data: {
+    name: string;
+    lastname?: string;
+    username?: string;
+    birthday?: string;
+    height?: number;
+    activityLevel?: number;
+    sessionsPerWeek?: number;
+    startDate?: string;
+    email?: string;
+    phone?: string;
+}) {
     const result = await db.insert(clients).values({
         name: data.name,
+        lastname: data.lastname,
         username: data.username,
-        age: data.age,
+        birthday: data.birthday,
+        height: data.height,
+        activityLevel: data.activityLevel,
+        sessionsPerWeek: data.sessionsPerWeek,
+        startDate: data.startDate,
         email: data.email,
         phone: data.phone,
     }).returning();
+
+    revalidatePath("/");
+    return result[0];
+}
+
+export async function updateClient(
+    id: number,
+    data: {
+        name?: string;
+        lastname?: string;
+        username?: string;
+        birthday?: string;
+        height?: number;
+        activityLevel?: number;
+        sessionsPerWeek?: number;
+        startDate?: string;
+        email?: string;
+        phone?: string;
+    }
+) {
+    const result = await db.update(clients)
+        .set(data)
+        .where(eq(clients.id, id))
+        .returning();
+
+    revalidatePath("/");
+    return result[0];
+}
+
+export async function toggleClientStatus(id: number, isActive: boolean) {
+    const result = await db.update(clients)
+        .set({ isActive })
+        .where(eq(clients.id, id))
+        .returning();
+
+    revalidatePath("/");
+    return result[0];
+}
+
+export async function deleteClient(id: number) {
+    // Check for existing measurements
+    const existingRecords = await db.select({ id: measurements.id })
+        .from(measurements)
+        .where(eq(measurements.clientId, id))
+        .limit(1);
+
+    if (existingRecords.length > 0) {
+        throw new Error("Cannot delete client with existing records. Please archive/deactivate instead.");
+    }
+
+    const result = await db.delete(clients)
+        .where(eq(clients.id, id))
+        .returning();
 
     revalidatePath("/");
     return result[0];
