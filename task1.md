@@ -193,6 +193,28 @@ environment:
     *   If he tries `git commit` with bad code, **Husky** will yell at him and block the commit.
     *   He must fix the errors (or run `pnpm format`) before he can push.
 
+### 7.2 Critical Environment Notes (Troubleshooting)
+*Read this if `better-sqlite3` crashes or builds fail.*
+
+1.  **Node Version is Critical:**
+    *   This project **requires Node.js v20 (LTS)**.
+    *   We use `.nvmrc` to enforce this. Always run `nvm use` or `nvm use 20` before starting.
+    *   *Why?* Native modules like `better-sqlite3` are compiled for a specific Node version. If you switch versions, they break.
+
+2.  **Fixing "Module not found" or Crashes:**
+    *   If you see errors about `NODE_MODULE_VERSION` mismatch:
+        1.  Stop the app.
+        2.  Run `nvm use 20`.
+        3.  Run `rm -rf node_modules` (and in sub-packages).
+        4.  Run `pnpm install` + `pnpm approve-builds`.
+
+3.  **Database URL Formatting:**
+    *   **Do NOT** use the `file:` prefix in `.env` (e.g., `file:./dev.db`).
+    *   `better-sqlite3` expects a plain path: `../../data/dev.db`.
+
+4.  **PNPM Installation:**
+    *   If `pnpm` is missing after switching Node versions, run `npm install -g pnpm`.
+
 ## 8. Development vs. Production Logic Table
 
 | Feature | Development (His Terminal) | Production (Background Docker) |
