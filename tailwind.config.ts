@@ -10,7 +10,11 @@ const config: Config = {
     theme: {
         extend: {
             colors: {
-                primary: "#e11d48", // Example premium color
+                primary: "#e11d48",
+                plum: "#4a304b",
+                sage: "#a4b9bc",
+                gold: "#c2a05b",
+                cream: "#f9f8f4",
             },
         },
     },

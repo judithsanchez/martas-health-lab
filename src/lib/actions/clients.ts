@@ -135,3 +135,38 @@ export async function getClientByUsername(username: string) {
     const result = await db.select().from(clients).where(eq(clients.username, username)).limit(1);
     return result[0];
 }
+
+export async function getClientsWithLatestMeasurement() {
+    const allClients = await db.select().from(clients);
+
+    // For each client, fetch latest 2 measurements to determine trend
+    const clientsWithData = await Promise.all(allClients.map(async (client) => {
+        const history = await db.select()
+            .from(measurements)
+            .where(eq(measurements.clientId, client.id))
+            .orderBy(desc(measurements.date))
+            .limit(2);
+
+        const latest = history[0];
+        const previous = history[1];
+
+        return {
+            ...client,
+            latestMeasurement: latest || null,
+            trends: {
+                weight: calculateTrend(latest?.weight, previous?.weight),
+                fatPercent: calculateTrend(latest?.fatPercent, previous?.fatPercent),
+                muscleMass: calculateTrend(latest?.muscleMass, previous?.muscleMass),
+            }
+        };
+    }));
+
+    return clientsWithData;
+}
+
+function calculateTrend(current?: number | null, previous?: number | null): 'up' | 'down' | 'stable' | null {
+    if (typeof current !== 'number' || typeof previous !== 'number') return null;
+    if (current > previous) return 'up';
+    if (current < previous) return 'down';
+    return 'stable';
+}

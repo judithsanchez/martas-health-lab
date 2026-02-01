@@ -1,5 +1,6 @@
 import "./globals.css";
 import type { Metadata } from "next";
+import { NavBar } from "@/components/NavBar";
 
 export const metadata: Metadata = {
     title: "Marta's Lab",
@@ -13,7 +14,10 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en">
-            <body className="bg-gray-50 min-h-screen text-slate-900">{children}</body>
+            <body className="bg-cream min-h-screen text-slate-900">
+                <NavBar />
+                {children}
+            </body>
         </html>
     );
 }
