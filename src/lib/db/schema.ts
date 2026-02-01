@@ -4,6 +4,8 @@ import { sql } from "drizzle-orm";
 export const clients = sqliteTable("clients", {
     id: integer("id").primaryKey({ autoIncrement: true }),
     name: text("name").notNull(),
+    username: text("username").unique(),
+    age: integer("age"),
     email: text("email"),
     phone: text("phone"),
     createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),

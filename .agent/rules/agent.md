@@ -2,6 +2,8 @@
 trigger: always_on
 ---
 
+- Every task needs to be also a Github issue
+- When an implementation plan is created automatically create a github Issue
 - Use Github CLI or MCP
 - Always create a new brach per task
 - Before creating a new branch pull the latest master
