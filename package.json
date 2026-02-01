@@ -1,0 +1,16 @@
+{
+    "name": "martas-health-lab-monorepo",
+    "private": true,
+    "engines": {
+        "node": ">=20"
+    },
+    "scripts": {
+        "dev": "pnpm --filter web dev",
+        "build": "pnpm --filter web build",
+        "db:push": "pnpm --filter db db:push",
+        "db:studio": "pnpm --filter db db:studio",
+        "lint": "pnpm --recursive exec eslint .",
+        "format": "pnpm --recursive exec prettier --write ."
+    },
+    "packageManager": "pnpm@10.28.2"
+}
