@@ -19,80 +19,80 @@ export default function ClientDetailsView({ client, measurements }: { client: an
     }
 
     return (
-        <main className="min-h-screen bg-slate-50 p-8">
+        <main className="min-h-screen bg-cream p-8">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
-                <div className="flex justify-between items-start mb-8">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                     <div>
-                        <div className="flex items-center gap-2 mb-2">
-                            <Link href="/clients" className="text-slate-500 hover:text-slate-700 text-sm">
-                                ← Back to Clients
+                        <div className="flex items-center gap-2 mb-3">
+                            <Link href="/" className="text-sage hover:text-plum transition-colors text-sm font-medium flex items-center gap-1">
+                                ← Back to Dashboard
                             </Link>
                         </div>
-                        <h1 className="text-3xl font-bold text-slate-900">{client.name} {client.lastname}</h1>
-                        <div className="flex gap-4 text-slate-600 mt-1 text-sm">
-                            <span>@{client.username}</span>
+                        <h1 className="text-4xl font-serif font-bold text-plum">{client.name} {client.lastname}</h1>
+                        <div className="flex flex-wrap gap-4 text-slate-500 mt-2 text-sm items-center">
+                            <span className="bg-white px-2 py-1 rounded shadow-sm">@{client.username}</span>
                             <span>•</span>
-                            <span>{client.activityLevel ? `Activity Lvl ${client.activityLevel}` : 'No Activity Level'}</span>
+                            <span>Activity Lvl {client.activityLevel?.toString() ?? '-'}</span>
                             <span>•</span>
                             <span>{client.height ? `${client.height} cm` : 'No Height'}</span>
                         </div>
                     </div>
                     <button
                         onClick={() => setIsCreating(true)}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition font-medium shadow-sm"
+                        className="px-6 py-3 bg-plum text-cream rounded-lg hover:bg-slate-800 transition font-medium shadow-md hover:shadow-lg flex items-center gap-2"
                     >
-                        + Add Record
+                        <span>+</span> Add Record
                     </button>
                 </div>
 
                 {/* Measurements Table */}
-                <div className="bg-white rounded-lg shadow overflow-hidden">
-                    <div className="p-4 border-b bg-slate-50 flex justify-between items-center">
-                        <h2 className="font-semibold text-slate-700">Measurement History</h2>
-                        <span className="text-xs text-slate-500">{measurements.length} Records</span>
+                <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div className="p-6 border-b border-slate-100 bg-white flex justify-between items-center">
+                        <h2 className="text-xl font-bold text-plum font-serif">Measurement History</h2>
+                        <span className="px-3 py-1 bg-sage/10 text-sage rounded-full text-xs font-bold uppercase tracking-wider">{measurements.length} Records</span>
                     </div>
                     <div className="overflow-x-auto">
-                        <table className="w-full text-left">
-                            <thead className="bg-slate-100 text-slate-600 uppercase text-xs font-semibold">
+                        <table className="w-full text-left border-collapse">
+                            <thead className="bg-cream text-plum uppercase text-xs font-bold tracking-wider">
                                 <tr>
-                                    <th className="p-4 border-b">Date</th>
-                                    <th className="p-4 border-b">Weight</th>
-                                    <th className="p-4 border-b">Fat %</th>
-                                    <th className="p-4 border-b">Muscle</th>
-                                    <th className="p-4 border-b">Visceral</th>
-                                    <th className="p-4 border-b">Met. Age</th>
-                                    <th className="p-4 border-b text-right">Actions</th>
+                                    <th className="p-5 border-b border-slate-100">Date</th>
+                                    <th className="p-5 border-b border-slate-100">Weight</th>
+                                    <th className="p-5 border-b border-slate-100">Fat %</th>
+                                    <th className="p-5 border-b border-slate-100">Muscle</th>
+                                    <th className="p-5 border-b border-slate-100">Visceral</th>
+                                    <th className="p-5 border-b border-slate-100">Met. Age</th>
+                                    <th className="p-5 border-b border-slate-100 text-right">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100">
+                            <tbody className="divide-y divide-slate-50">
                                 {measurements.length === 0 ? (
                                     <tr>
-                                        <td colSpan={7} className="p-8 text-center text-slate-500">
-                                            No measurements recorded yet.
+                                        <td colSpan={7} className="p-12 text-center text-slate-400">
+                                            No measurements recorded yet. Add one to get started.
                                         </td>
                                     </tr>
                                 ) : (
                                     measurements.map((record) => (
-                                        <tr key={record.id} className="hover:bg-slate-50 transition">
-                                            <td className="p-4 text-slate-900 font-medium">
+                                        <tr key={record.id} className="hover:bg-cream/30 transition duration-150 group">
+                                            <td className="p-5 text-slate-800 font-semibold group-hover:text-plum transition-colors">
                                                 {new Date(record.date).toLocaleDateString()}
                                             </td>
-                                            <td className="p-4 text-slate-600">{record.weight} kg</td>
-                                            <td className="p-4 text-slate-600">{record.fatPercent}%</td>
-                                            <td className="p-4 text-slate-600">{record.muscleMass} kg</td>
-                                            <td className="p-4 text-slate-600">{record.visceralFat}</td>
-                                            <td className="p-4 text-slate-600">{record.metabolicAge}</td>
-                                            <td className="p-4 text-right space-x-2">
+                                            <td className="p-5 text-slate-600 font-medium">{record.weight} kg</td>
+                                            <td className="p-5 text-slate-600">{record.fatPercent}%</td>
+                                            <td className="p-5 text-slate-600">{record.muscleMass} kg</td>
+                                            <td className="p-5 text-slate-600">{record.visceralFat}</td>
+                                            <td className="p-5 text-slate-600">{record.metabolicAge}</td>
+                                            <td className="p-5 text-right space-x-3 opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <button
                                                     onClick={() => setEditingRecord(record)}
-                                                    className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                                                    className="text-sage hover:text-plum text-sm font-semibold transition-colors"
                                                 >
                                                     Edit
                                                 </button>
                                                 <button
                                                     onClick={() => handleDelete(record.id)}
-                                                    className="text-red-600 hover:text-red-800 text-sm font-medium"
+                                                    className="text-red-400 hover:text-red-600 text-sm font-semibold transition-colors"
                                                 >
                                                     Delete
                                                 </button>
