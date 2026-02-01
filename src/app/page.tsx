@@ -12,12 +12,20 @@ export default async function Home() {
                         <h1 className="text-3xl font-bold text-slate-900">Marta&apos;s Health Lab</h1>
                         <p className="text-slate-500">Dashboard</p>
                     </div>
-                    <Link
-                        href="/upload"
-                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition font-medium"
-                    >
-                        Import CSV
-                    </Link>
+                    <div className="flex gap-3">
+                        <Link
+                            href="/clients"
+                            className="px-4 py-2 border border-slate-300 text-slate-700 rounded-md hover:bg-slate-50 transition font-medium"
+                        >
+                            Manage Clients
+                        </Link>
+                        <Link
+                            href="/upload"
+                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition font-medium"
+                        >
+                            Import CSV
+                        </Link>
+                    </div>
                 </div>
 
                 <div className="bg-white rounded-lg shadow overflow-hidden">
