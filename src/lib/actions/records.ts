@@ -20,9 +20,10 @@ export type MeasurementData = {
     metabolicAge?: number;
     physiqueRatingScale?: number;
     bodyType?: number;
-    gender?: number;
     activityLevel?: number;
     bmi?: number;
+    waist?: number;
+    gender?: string;
 
     // Segmental Fat
     fatArmRight?: number;
@@ -41,8 +42,13 @@ export type MeasurementData = {
     notes?: string;
 };
 
+export async function getRecord(id: number) {
+    const result = await db.select().from(measurements).where(eq(measurements.id, id)).limit(1);
+    return result[0] || null;
+}
+
 export async function createRecord(data: MeasurementData) {
-    const result = await db.insert(measurements).values(data).returning();
+    const result = await db.insert(measurements).values(data as any).returning();
     revalidatePath("/");
     return result[0];
 }

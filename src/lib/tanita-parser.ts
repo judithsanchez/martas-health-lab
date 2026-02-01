@@ -87,7 +87,13 @@ export class TanitaParser {
     }
 
     private static parseValue(value: string, config: any): any {
-        if (config.type === 'int') return parseInt(value, 10);
+        if (config.type === 'int') {
+            const intVal = parseInt(value, 10);
+            if (config.field === 'gender') {
+                return intVal === 1 ? 'male' : 'female';
+            }
+            return intVal;
+        }
         if (config.type === 'float') return parseFloat(value);
         if (config.type === 'date') {
             // MO/DD/YYYY

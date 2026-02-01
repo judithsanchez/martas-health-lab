@@ -10,6 +10,7 @@ type ClientFormProps = {
         lastname?: string | null;
         username?: string | null;
         birthday?: string | null;
+        gender?: string | null;
         height?: number | null;
         activityLevel?: number | null;
         sessionsPerWeek?: number | null;
@@ -35,6 +36,7 @@ export function ClientForm({ client, onClose, onSuccess }: ClientFormProps) {
                 lastname: formData.get("lastname") as string,
                 username: formData.get("username") as string,
                 birthday: formData.get("birthday") as string,
+                gender: formData.get("gender") as string,
                 height: formData.get("height") ? parseFloat(formData.get("height") as string) : undefined,
                 activityLevel: formData.get("activityLevel") ? parseInt(formData.get("activityLevel") as string) : undefined,
                 sessionsPerWeek: formData.get("sessionsPerWeek") ? parseInt(formData.get("sessionsPerWeek") as string) : undefined,
@@ -104,6 +106,17 @@ export function ClientForm({ client, onClose, onSuccess }: ClientFormProps) {
                                 defaultValue={client?.birthday || ""}
                                 className="w-full px-3 py-2 border rounded-md"
                             />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-slate-700">Gender</label>
+                            <select
+                                name="gender"
+                                defaultValue={client?.gender || "female"}
+                                className="w-full px-3 py-2 border rounded-md"
+                            >
+                                <option value="female">Female</option>
+                                <option value="male">Male</option>
+                            </select>
                         </div>
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-slate-700">Height (cm)</label>

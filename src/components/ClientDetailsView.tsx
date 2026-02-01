@@ -83,7 +83,13 @@ export default function ClientDetailsView({ client, measurements }: { client: an
                                             <td className="p-5 text-slate-600">{record.muscleMass} kg</td>
                                             <td className="p-5 text-slate-600">{record.visceralFat}</td>
                                             <td className="p-5 text-slate-600">{record.metabolicAge}</td>
-                                            <td className="p-5 text-right space-x-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <td className="p-5 text-right space-x-3">
+                                                <Link
+                                                    href={`/clients/${client.id}/reports/${record.id}`}
+                                                    className="px-3 py-1 bg-gold text-plum rounded-lg text-xs font-bold hover:bg-white transition shadow-sm inline-block"
+                                                >
+                                                    Ver Reporte
+                                                </Link>
                                                 <button
                                                     onClick={() => setEditingRecord(record)}
                                                     className="text-sage hover:text-plum text-sm font-semibold transition-colors"

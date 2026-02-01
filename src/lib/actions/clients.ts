@@ -60,12 +60,14 @@ export async function createClient(data: {
     startDate?: string;
     email?: string;
     phone?: string;
+    gender?: string;
 }) {
     const result = await db.insert(clients).values({
         name: data.name,
         lastname: data.lastname,
         username: data.username,
         birthday: data.birthday,
+        gender: data.gender,
         height: data.height,
         activityLevel: data.activityLevel,
         sessionsPerWeek: data.sessionsPerWeek,
@@ -91,6 +93,7 @@ export async function updateClient(
         startDate?: string;
         email?: string;
         phone?: string;
+        gender?: string;
     }
 ) {
     const result = await db.update(clients)
