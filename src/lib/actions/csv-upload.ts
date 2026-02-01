@@ -3,13 +3,9 @@
 import fs from "fs";
 import path from "path";
 import * as Papa from "papaparse";
-import { revalidatePath } from "next/cache";
+import { TanitaParser } from "../tanita-parser";
 
-export type CsvRecord = {
-    number: string;
-    age: string;
-    [key: string]: string;
-};
+export type CsvRecord = Record<string, any>;
 
 export async function uploadCsv(formData: FormData) {
     const file = formData.get("file") as File;
@@ -32,23 +28,30 @@ export async function uploadCsv(formData: FormData) {
 
     // 2. CSV Parsing
     const csvContent = buffer.toString();
-    const parsed = Papa.parse<CsvRecord>(csvContent, {
-        header: true,
+    const parsed = Papa.parse<string[]>(csvContent, {
+        header: false, // Tanita uses Tag-Value pairs in a single row
         skipEmptyLines: true,
     });
 
-    // 3. Validation
-    const headers = parsed.meta.fields || [];
-    const requiredHeaders = ["number", "age"];
-    const missingHeaders = requiredHeaders.filter(h => !headers.includes(h));
+    // 3. Transform & Validate
+    const data: CsvRecord[] = parsed.data
+        .map(row => TanitaParser.parseRawRow(row))
+        .filter(record => record.date && record.weight !== undefined);
 
-    if (missingHeaders.length > 0) {
-        // We might want to handle this better in the UI, but for now we throw
-        throw new Error(`Missing required headers: ${missingHeaders.join(", ")}`);
+    // Basic validation: Check if we got at least some data
+    if (data.length === 0) {
+        throw new Error("No data found in CSV");
+    }
+
+    // Check if first row has valid date/weight (essential fields)
+    if (!data[0].date || !data[0].weight) {
+        // It might be that the parser failed or format is wrong
+        // But let's allow it to pass for now, the UI will just show empties if logic fails
+        console.warn("Parsed data might be missing core fields", data[0]);
     }
 
     return {
         fileName,
-        data: parsed.data,
+        data: data,
     };
 }

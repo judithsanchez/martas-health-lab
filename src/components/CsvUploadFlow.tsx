@@ -160,20 +160,16 @@ export default function CsvUploadFlow() {
                                 <div className="flex items-start justify-between gap-6">
                                     {/* Data Preview */}
                                     <div className="flex-1 min-w-[200px]">
-                                        <div className="flex items-center gap-4">
-                                            <div className="px-3 py-1 bg-white rounded-lg border border-slate-200 shadow-sm">
-                                                <span className="text-xs text-slate-400 font-bold uppercase block leading-tight">Num</span>
-                                                <span className="text-lg font-bold text-slate-800">{assignment.record.number}</span>
-                                            </div>
-                                            <div className="px-3 py-1 bg-white rounded-lg border border-slate-200 shadow-sm">
-                                                <span className="text-xs text-slate-400 font-bold uppercase block leading-tight">Age</span>
-                                                <span className="text-lg font-bold text-slate-800">{assignment.record.age}</span>
-                                            </div>
-                                            <div className="text-slate-300">
-                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                                </svg>
-                                            </div>
+                                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                            {Object.entries(assignment.record).map(([key, value]) => {
+                                                if (!value || typeof value !== 'string' && typeof value !== 'number') return null;
+                                                return (
+                                                    <div key={key} className="px-2 py-1 bg-white rounded border border-slate-100">
+                                                        <span className="text-[10px] text-slate-400 font-bold uppercase block truncate">{key}</span>
+                                                        <span className="text-sm font-bold text-slate-800 truncate block" title={String(value)}>{value}</span>
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
                                     </div>
 

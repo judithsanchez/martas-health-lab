@@ -1,0 +1,124 @@
+{
+  "metadata": {
+    "{0": {
+      "field": "deviceId",
+      "type": "int",
+      "description": "Unique hardware identifier"
+    },
+    "~0": {
+      "field": "unitHeight",
+      "type": "int",
+      "description": "1=inches, 2=cm"
+    },
+    "~1": {
+      "field": "unitWeight",
+      "type": "int",
+      "description": "1=lbs, 2=kg, 6=st-lb"
+    },
+    "~2": {
+      "field": "userSlot",
+      "type": "int",
+      "description": "Scale user profile (1-4)"
+    },
+    "~3": {
+      "field": "physiqueRatingScale",
+      "type": "int",
+      "description": "Hardware-calculated rating (1-9)"
+    }
+  },
+  "metrics": {
+    "MO": {
+      "field": "modelName",
+      "type": "string"
+    },
+    "DT": {
+      "field": "date",
+      "type": "date",
+      "format": "MM/DD/YYYY"
+    },
+    "Ti": {
+      "field": "timeRaw",
+      "type": "string",
+      "note": "Contains localized AM/PM. Convert to 24h ISO format."
+    },
+    "Bt": {
+      "field": "bodyType",
+      "type": "int",
+      "description": "0=Standard, 1=Athlete"
+    },
+    "GE": {
+      "field": "gender",
+      "type": "int",
+      "description": "1=Male, 2=Female"
+    },
+    "AG": {
+      "field": "age",
+      "type": "int"
+    },
+    "Hm": {
+      "field": "height",
+      "type": "float"
+    },
+    "AL": {
+      "field": "activityLevel",
+      "type": "int",
+      "description": "1-3"
+    },
+    "Wk": {
+      "field": "weight",
+      "type": "float"
+    },
+    "MI": {
+      "field": "bmi",
+      "type": "float"
+    },
+    "FW": {
+      "field": "fatPercent",
+      "type": "float"
+    },
+    "mW": {
+      "field": "muscleMass",
+      "type": "float"
+    },
+    "bW": {
+      "field": "boneMass",
+      "type": "float"
+    },
+    "IF": {
+      "field": "visceralFat",
+      "type": "int"
+    },
+    "rD": {
+      "field": "dciKcal",
+      "type": "int",
+      "note": "Adjusted BMR"
+    },
+    "rA": {
+      "field": "metabolicAge",
+      "type": "int"
+    },
+    "ww": {
+      "field": "waterPercent",
+      "type": "float"
+    }
+  },
+  "segmental": {
+    "Fr": "fatArmRight",
+    "Fl": "fatArmLeft",
+    "FR": "fatLegRight",
+    "FL": "fatLegLeft",
+    "FT": "fatTrunk",
+    "mr": "muscleArmRight",
+    "ml": "muscleArmLeft",
+    "mR": "muscleLegRight",
+    "mL": "muscleLegLeft",
+    "mT": "muscleTrunk"
+  },
+  "system": {
+    "CS": {
+      "field": "checksum",
+      "type": "string",
+      "action": "verify_integrity"
+    }
+  }
+}

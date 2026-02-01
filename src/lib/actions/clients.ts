@@ -17,6 +17,25 @@ export async function getMeasurements() {
         visceralFat: measurements.visceralFat,
         bmr: measurements.bmr,
         metabolicAge: measurements.metabolicAge,
+        physiqueRatingScale: measurements.physiqueRatingScale,
+        bodyType: measurements.bodyType,
+        dciKcal: measurements.dciKcal,
+        bmi: measurements.bmi,
+
+        // Segmental Fat
+        fatArmRight: measurements.fatArmRight,
+        fatArmLeft: measurements.fatArmLeft,
+        fatLegRight: measurements.fatLegRight,
+        fatLegLeft: measurements.fatLegLeft,
+        fatTrunk: measurements.fatTrunk,
+
+        // Segmental Muscle
+        muscleArmRight: measurements.muscleArmRight,
+        muscleArmLeft: measurements.muscleArmLeft,
+        muscleLegRight: measurements.muscleLegRight,
+        muscleLegLeft: measurements.muscleLegLeft,
+        muscleTrunk: measurements.muscleTrunk,
+
         notes: measurements.notes,
         clientName: clients.name,
         clientUsername: clients.username,
