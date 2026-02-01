@@ -119,7 +119,7 @@ export default function CsvUploadFlow() {
 
                     <label className="w-full relative flex flex-col items-center px-4 py-16 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 cursor-pointer hover:bg-slate-100 hover:border-slate-300 transition-all group">
                         <span className="text-sm font-semibold text-slate-600 group-hover:text-slate-700">Choose file or drag & drop</span>
-                        <span className="text-xs text-slate-400 mt-2">Only .csv files with 'number' and 'age' columns</span>
+                        <span className="text-xs text-slate-400 mt-2">Only .csv files with &apos;number&apos; and &apos;age&apos; columns</span>
                         <input type="file" className="hidden" accept=".csv" onChange={handleFileUpload} disabled={loading} />
                     </label>
 
@@ -143,6 +143,7 @@ export default function CsvUploadFlow() {
                         <div className="flex items-center gap-3">
                             <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">Bulk Apply:</span>
                             <select
+                                data-testid="bulk-select"
                                 className="text-xs font-medium border-slate-200 rounded-lg focus:ring-slate-900 focus:border-slate-900 p-2 pr-8 bg-slate-50"
                                 onChange={(e) => handleApplyToAll(parseInt(e.target.value))}
                                 defaultValue=""
@@ -155,7 +156,7 @@ export default function CsvUploadFlow() {
 
                     <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
                         {assignments.map((assignment, idx) => (
-                            <div key={idx} className="p-4 bg-slate-50 rounded-2xl border border-slate-200 hover:border-slate-300 transition-colors">
+                            <div key={idx} data-testid="csv-row" className="p-4 bg-slate-50 rounded-2xl border border-slate-200 hover:border-slate-300 transition-colors">
                                 <div className="flex items-start justify-between gap-6">
                                     {/* Data Preview */}
                                     <div className="flex-1 min-w-[200px]">

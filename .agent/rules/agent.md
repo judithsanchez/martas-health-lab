@@ -9,3 +9,11 @@ trigger: always_on
 - Before creating a new branch pull the latest master
 - Never commit code with type or lint issues without my approval
 - Before creatinig a PR rebase the branch
+- Write Happy Path tests always
+- Run periodically these checks
+
+# Quality Control Commands
+
+pnpm test # Run all tests
+pnpm type-check # Run TypeScript validation
+pnpm lint # Run ESlint checks
