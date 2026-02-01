@@ -28,13 +28,26 @@ import {
     interpretVisceralFat,
     CalculationResult
 } from '@/lib/utils/health-calculations';
+import {
+    LineChart,
+    Line,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip as RechartsTooltip,
+    ResponsiveContainer,
+    AreaChart,
+    Area
+} from 'recharts';
 
 export default function ReportDetailView({
     client,
-    measurement
+    measurement,
+    history = []
 }: {
     client: any,
-    measurement: any
+    measurement: any,
+    history?: any[]
 }) {
     // Perform calculations
     const bmi = calculateBMI(measurement.weight, measurement.height || client.height);
@@ -89,9 +102,74 @@ export default function ReportDetailView({
             <h3 className="text-2xl font-bold text-plum flex items-center gap-2">
                 {title}
             </h3>
-            {subtitle && <p className="text-gray-400 text-sm mt-1">{subtitle}</p>}
+            {subtitle && <p className="text-gray-400 text-sm mt-1 leading-relaxed max-w-2xl">{subtitle}</p>}
         </div>
     );
+
+    const ProgressChart = ({ data, dataKey, color, title, unit }: any) => (
+        <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm flex flex-col h-[300px]">
+            <h5 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-6">{title} ({unit})</h5>
+            <div className="flex-1 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={data}>
+                        <defs>
+                            <linearGradient id={`grad-${dataKey}`} x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor={color} stopOpacity={0.1} />
+                                <stop offset="95%" stopColor={color} stopOpacity={0} />
+                            </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                        <XAxis
+                            dataKey="date"
+                            hide
+                        />
+                        <YAxis
+                            hide
+                            domain={['dataMin - 1', 'dataMax + 1']}
+                        />
+                        <RechartsTooltip
+                            contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', fontSize: '12px' }}
+                            labelFormatter={(date) => new Date(date).toLocaleDateString()}
+                        />
+                        <Area
+                            type="monotone"
+                            dataKey={dataKey}
+                            stroke={color}
+                            strokeWidth={3}
+                            fillOpacity={1}
+                            fill={`url(#grad-${dataKey})`}
+                        />
+                    </AreaChart>
+                </ResponsiveContainer>
+            </div>
+        </div>
+    );
+
+    const HealthScale = ({ value, min, max, markers, title, unit }: any) => {
+        const percentage = Math.min(Math.max(((value - min) / (max - min)) * 100, 0), 100);
+        return (
+            <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
+                <div className="flex justify-between items-center mb-4">
+                    <h5 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{title}</h5>
+                    <span className="text-xl font-bold text-plum">{value}<span className="text-[10px] ml-1 opacity-50">{unit}</span></span>
+                </div>
+                <div className="relative h-2 bg-gray-100 rounded-full overflow-hidden mb-2">
+                    <div
+                        className="absolute top-0 left-0 h-full bg-plum transition-all duration-1000 ease-out"
+                        style={{ width: `${percentage}%` }}
+                    />
+                </div>
+                <div className="flex justify-between">
+                    {markers.map((m: any, i: number) => (
+                        <div key={i} className="flex flex-col items-center">
+                            <div className="w-px h-1 bg-gray-300 mb-1" />
+                            <span className="text-[8px] font-bold text-gray-300 uppercase tracking-tighter">{m.label}</span>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    };
 
     return (
         <main className="min-h-screen bg-cream pb-20">
@@ -137,16 +215,20 @@ export default function ReportDetailView({
                         subtitle="Indicadores avanzados de salud basados en consensos médicos internacionales."
                     />
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <MetricCard
-                            title="IMC Ajustado"
-                            fullTitle="Índice de Masa Corporal (Ethnic Specific)"
-                            value={bmi.value}
-                            unit="kg/m²"
-                            label={bmi.label}
-                            description={bmi.description}
-                            color={bmi.color}
-                            icon={Scale}
-                        />
+                        <div className="lg:col-span-2">
+                            <HealthScale
+                                title="Indice de Masa Corporal"
+                                value={bmi.value}
+                                unit="kg/m²"
+                                min={15} max={40}
+                                markers={[
+                                    { label: 'Bajo', val: 18.5 },
+                                    { label: 'Normal', val: 24.9 },
+                                    { label: 'Sobrepeso', val: 29.9 },
+                                    { label: 'Obeso', val: 40 }
+                                ]}
+                            />
+                        </div>
                         <MetricCard
                             title="Índice ASMI"
                             fullTitle="Appendicular Skeletal Muscle Index (Músculo en extremidades)"
@@ -158,16 +240,6 @@ export default function ReportDetailView({
                             icon={Activity}
                         />
                         <MetricCard
-                            title="Relación WtHR"
-                            fullTitle="Waist-to-Height Ratio (Relación Cintura-Estatura)"
-                            value={wthr?.value || '--'}
-                            unit="ratio"
-                            label={wthr?.label || 'Falta medida cintura'}
-                            description={wthr?.description || 'Ingrese la circunferencia de cintura para ver este indicador.'}
-                            color={wthr?.color || 'text-gray-300'}
-                            icon={TrendingUp}
-                        />
-                        <MetricCard
                             title="Índice FFMI"
                             fullTitle="Fat-Free Mass Index (Índice de Masa Libre de Grasa)"
                             value={ffmi.value}
@@ -177,8 +249,68 @@ export default function ReportDetailView({
                             color={ffmi.color}
                             icon={Zap}
                         />
+                        <div className="lg:col-span-2">
+                            <HealthScale
+                                title="Porcentaje de Grasa"
+                                value={measurement.fatPercent}
+                                unit="%"
+                                min={5} max={45}
+                                markers={[
+                                    { label: 'Atlético', val: 13 },
+                                    { label: 'Fitness', val: 17 },
+                                    { label: 'Aceptable', val: 24 },
+                                    { label: 'Riesgo', val: 30 }
+                                ]}
+                            />
+                        </div>
+                        <div className="lg:col-span-2">
+                            <HealthScale
+                                title="Grasa Visceral"
+                                value={measurement.visceralFat}
+                                unit="lvl"
+                                min={1} max={20}
+                                markers={[
+                                    { label: 'Saludable', val: 9 },
+                                    { label: 'Exceso', val: 12 },
+                                    { label: 'Alto Riesgo', val: 15 }
+                                ]}
+                            />
+                        </div>
                     </div>
                 </section>
+
+                {/* Section: Progress History */}
+                {history.length >= 2 && (
+                    <section>
+                        <SectionHeader
+                            title="Evolución Histórica"
+                            subtitle="Seguimiento visual de tu progreso a lo largo del tiempo."
+                        />
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <ProgressChart
+                                title="Peso"
+                                data={history}
+                                dataKey="weight"
+                                color="#4a304b" // Plum
+                                unit="kg"
+                            />
+                            <ProgressChart
+                                title="Grasa Corporal"
+                                data={history}
+                                dataKey="fatPercent"
+                                color="#c2a05b" // Gold
+                                unit="%"
+                            />
+                            <ProgressChart
+                                title="Masa Muscular"
+                                data={history}
+                                dataKey="muscleMass"
+                                color="#a4b9bc" // Sage
+                                unit="kg"
+                            />
+                        </div>
+                    </section>
+                )}
 
                 {/* Section 2: Tanita Raw Data */}
                 <section>
@@ -237,6 +369,24 @@ export default function ReportDetailView({
                             <Scale className="text-gold mb-2" size={20} />
                             <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 text-center">Physique</span>
                             <span className="text-xl font-bold text-plum">{measurement.physiqueRatingScale}</span>
+                        </div>
+                        <div className="bg-white p-6 rounded-3xl border border-gray-100 flex flex-col shadow-inner bg-gray-50/30">
+                            <div className="flex items-center gap-2 mb-2">
+                                <User size={14} className="text-plum" />
+                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Tipo Bio</span>
+                            </div>
+                            <span className="text-xs font-bold text-plum">
+                                {measurement.bodyType === 1 ? 'Atleta' : 'Estándar'}
+                            </span>
+                        </div>
+                        <div className="bg-white p-6 rounded-3xl border border-gray-100 flex flex-col shadow-inner bg-gray-50/30">
+                            <div className="flex items-center gap-2 mb-2">
+                                <Activity size={14} className="text-sage" />
+                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Actividad</span>
+                            </div>
+                            <span className="text-xs font-bold text-plum">
+                                Nivel {measurement.activityLevel || client.activityLevel || '--'}
+                            </span>
                         </div>
                     </div>
                 </section>

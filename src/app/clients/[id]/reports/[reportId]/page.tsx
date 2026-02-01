@@ -13,9 +13,18 @@ async function getReportData(clientId: number, reportId: number) {
         )
     ).limit(1);
 
+    const history = await db.select()
+        .from(measurements)
+        .where(eq(measurements.clientId, clientId))
+        .orderBy(measurements.date);
+
     if (!client.length || !measurement.length) return null;
 
-    return { client: client[0], measurement: measurement[0] };
+    return {
+        client: client[0],
+        measurement: measurement[0],
+        history
+    };
 }
 
 export default async function ReportPage({
@@ -31,5 +40,5 @@ export default async function ReportPage({
     const data = await getReportData(clientId, reportId);
     if (!data) notFound();
 
-    return <ReportDetailView client={data.client} measurement={data.measurement} />;
+    return <ReportDetailView client={data.client} measurement={data.measurement} history={data.history} />;
 }
