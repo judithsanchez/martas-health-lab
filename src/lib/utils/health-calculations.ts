@@ -11,23 +11,27 @@ export function calculateBMI(weight: number, heightCm: number): CalculationResul
     const bmi = weight / (heightM * heightM);
 
     let level: CalculationResult['level'] = 'optimal';
-    let label = 'Normal';
+    let label = 'Óptimo';
     let color = 'text-green-500';
 
-    if (bmi >= 27.5) {
-        level = 'high';
-        label = 'Riesgo Alto (OMS)';
+    if (bmi >= 30.0) {
+        level = 'risk';
+        label = 'Obesidad';
         color = 'text-red-500';
-    } else if (bmi >= 23.0) {
+    } else if (bmi >= 25.0) {
         level = 'increased';
-        label = 'Riesgo Incrementado';
+        label = 'Elevado';
         color = 'text-orange-500';
+    } else if (bmi < 18.5) {
+        level = 'increased';
+        label = 'Bajo Peso';
+        color = 'text-blue-400';
     }
 
     return {
         value: Number(bmi.toFixed(1)),
         label,
-        description: "Puntos de acción étnico-específicos (OMS) para riesgo cardiovascular.",
+        description: "Clasificación Internacional de la OMS para el peso.",
         level,
         color
     };
@@ -164,5 +168,61 @@ export function interpretVisceralFat(value: number): CalculationResult {
         description: "Grasa rodeando órganos vitales. Principal motor de resistencia a la insulina.",
         level,
         color
+    };
+}
+
+export function calculateBMR(weight: number, heightCm: number, age: number, gender: 'male' | 'female' | string): CalculationResult {
+    // Mifflin-St Jeor Equation
+    let bmr = (10 * weight) + (6.25 * heightCm) - (5 * age);
+    if (gender === 'male') {
+        bmr += 5;
+    } else {
+        bmr -= 161;
+    }
+
+    return {
+        value: Math.round(bmr),
+        label: 'Activo',
+        description: "Tasa Metabólica Basal (BMR). Calorías que tu cuerpo quema en reposo absoluto.",
+        level: 'optimal',
+        color: 'text-green-500' // BMR is a baseline, usually marked as active/optimal if healthy
+    };
+}
+
+export function interpretMetabolicAge(metAge: number, chronAge: number): CalculationResult {
+    const diff = metAge - chronAge;
+    const isOptimal = diff <= 0;
+
+    return {
+        value: metAge,
+        label: isOptimal ? 'Óptimo' : 'Atención',
+        description: "Comparación de tu BMR con el promedio de otros grupos de edad.",
+        level: isOptimal ? 'optimal' : 'increased',
+        color: isOptimal ? 'text-green-500' : 'text-orange-500'
+    };
+}
+
+export function interpretBoneMass(boneMass: number, weight: number, gender: 'male' | 'female' | string): CalculationResult {
+    let target = 0;
+    const isFemale = gender === 'female';
+
+    if (isFemale) {
+        if (weight < 50) target = 1.95;
+        else if (weight <= 75) target = 2.40;
+        else target = 2.90;
+    } else {
+        if (weight < 65) target = 2.65;
+        else if (weight <= 95) target = 3.29;
+        else target = 3.69;
+    }
+
+    const isStable = boneMass >= target * 0.9; // 10% tolerance for "stable"
+
+    return {
+        value: boneMass,
+        label: isStable ? 'Estable' : 'Bajo',
+        description: "Peso estimado del mineral óseo en el cuerpo.",
+        level: isStable ? 'optimal' : 'risk',
+        color: isStable ? 'text-green-500' : 'text-red-500'
     };
 }

@@ -28,6 +28,9 @@ import {
     calculateFFMI,
     calculateMFR,
     interpretVisceralFat,
+    calculateBMR,
+    interpretMetabolicAge,
+    interpretBoneMass,
     CalculationResult
 } from '@/lib/utils/health-calculations';
 import {
@@ -75,6 +78,10 @@ export default function ReportDetailView({
     const ffmi = calculateFFMI(measurement.weight, measurement.fatPercent || 0, measurement.height || client.height, client.gender || 'male');
     const mfr = calculateMFR(measurement.muscleMass || 0, measurement.weight, measurement.fatPercent || 0);
     const visceral = interpretVisceralFat(measurement.visceralFat || 0);
+
+    const bmrCalc = calculateBMR(measurement.weight, measurement.height || client.height, client.age || 0, client.gender || 'male');
+    const metAgeCalc = interpretMetabolicAge(measurement.metabolicAge || 0, client.age || 0);
+    const boneMassCalc = interpretBoneMass(measurement.boneMass || 0, measurement.weight, client.gender || 'male');
 
     const Tooltip = ({ text }: { text: string }) => (
         <div className="group relative inline-block ml-1">
@@ -184,6 +191,66 @@ export default function ReportDetailView({
         );
     };
 
+    const CircularProgress = ({ value, label, subValue, subLabel, unit, color, icon: Icon }: any) => {
+        const radius = 35;
+        const circumference = 2 * Math.PI * radius;
+        const offset = circumference - (value / 100) * circumference;
+
+        return (
+            <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 flex flex-col items-center flex-1 shadow-sm hover:shadow-md transition-shadow">
+                <div className="relative mb-6">
+                    <svg width="100" height="100" className="transform -rotate-90">
+                        <circle
+                            cx="50" cy="50" r={radius}
+                            className="stroke-gray-100 fill-none"
+                            strokeWidth="8"
+                        />
+                        <circle
+                            cx="50" cy="50" r={radius}
+                            className={`fill-none transition-all duration-1000 ease-out ${color}`}
+                            strokeWidth="8"
+                            strokeDasharray={circumference}
+                            strokeDashoffset={offset}
+                            strokeLinecap="round"
+                        />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="flex flex-baseline items-baseline">
+                            <span className="text-2xl font-black text-plum">{value}</span>
+                            <span className="text-[10px] font-bold text-gray-400 ml-0.5">{unit}</span>
+                        </div>
+                    </div>
+                </div>
+                <h4 className="text-base font-bold text-plum mb-1">{label}</h4>
+                {subValue && (
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tight">
+                        {subValue}{subLabel}
+                    </p>
+                )}
+            </div>
+        );
+    };
+
+    const StatusRow = ({ label, value, unit, status, statusColor, icon: Icon }: any) => (
+        <div className="bg-white/50 p-4 rounded-3xl flex items-center justify-between group hover:bg-white transition-all border border-transparent hover:border-gray-100">
+            <div className="flex items-center gap-4">
+                <div className="p-3 bg-white rounded-2xl shadow-sm group-hover:shadow-md transition-shadow">
+                    <Icon size={20} className="text-plum" />
+                </div>
+                <div>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">{label}</p>
+                    <div className="flex items-baseline gap-1">
+                        <span className="text-lg font-bold text-plum">{value}</span>
+                        <span className="text-[10px] text-gray-400 font-medium">{unit}</span>
+                    </div>
+                </div>
+            </div>
+            <span className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full ${statusColor} bg-white shadow-sm border border-gray-50`}>
+                {status}
+            </span>
+        </div>
+    );
+
     const Gauge = ({ value, min, max, unit, markers }: { value: number, min: number, max: number, unit: string, markers: { label: string, val: number }[] }) => {
         // Segment-based scaling logic
         const calculateSegmentPercentage = (v: number) => {
@@ -205,10 +272,10 @@ export default function ReportDetailView({
         const percentage = calculateSegmentPercentage(value);
         const strokeWidth = 10;
         const radius = 70;
-        const width = 340;
-        const height = 160;
+        const width = 280;
+        const height = 130;
         const centerX = width / 2;
-        const centerY = 130;
+        const centerY = 110;
 
         const circumference = Math.PI * radius;
         const strokeDashoffset = circumference - (percentage / 100) * circumference;
@@ -293,7 +360,7 @@ export default function ReportDetailView({
                             );
                         })}
                     </svg>
-                    <div className="absolute top-[95px] left-1/2 -translate-x-1/2 flex flex-col items-center w-full">
+                    <div className="absolute top-[75px] left-1/2 -translate-x-1/2 flex flex-col items-center w-full">
                         <span className="text-5xl font-black leading-tight">{value}</span>
                         <span className="text-[10px] font-bold opacity-40 uppercase tracking-widest -mt-1">{unit}</span>
                     </div>
@@ -371,16 +438,9 @@ export default function ReportDetailView({
                                         </div>
                                     </div>
                                 )}
-                                <div className="flex items-center gap-3">
-                                    <Weight size={20} className="text-white/50" />
-                                    <div>
-                                        <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Peso Actual</p>
-                                        <p className="font-semibold">{measurement.weight} kg</p>
-                                    </div>
-                                </div>
                             </div>
                         </div>
-                        <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20 h-fit min-w-[340px] flex flex-col items-center justify-center pt-8">
+                        <div className="bg-white/10 backdrop-blur-md rounded-3xl p-3 border border-white/20 h-fit min-w-[340px] flex flex-col items-center justify-center">
                             <Gauge
                                 value={ffmi.value}
                                 min={12} max={30}
@@ -404,95 +464,171 @@ export default function ReportDetailView({
                     </div>
                 </div>
 
-                {/* Section 1: Clinical Insights */}
-                <section>
-                    <SectionHeader
-                        title="Metas Clínicas y Riesgos"
-                        subtitle="Indicadores avanzados de salud basados en consensos médicos internacionales."
-                    />
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div className="lg:col-span-2">
-                            <HealthScale
-                                title="Fat-Free Mass Index (FFMI)"
-                                value={ffmi.value}
-                                unit="kg/m²"
-                                min={12} max={30}
-                                markers={client.gender === 'female' ? [
-                                    { label: 'Bajo', val: 15 },
-                                    { label: 'Promedio', val: 18 },
-                                    { label: 'Excelente', val: 22 },
-                                    { label: 'Superior', val: 30 }
-                                ] : [
-                                    { label: 'Bajo', val: 18 },
-                                    { label: 'Promedio', val: 21 },
-                                    { label: 'Excelente', val: 25 },
-                                    { label: 'Superior', val: 30 }
-                                ]}
-                            />
+                {/* New Section 2: Fragmented Dashboard Layout */}
+                <div className="space-y-8 mb-12">
+                    {/* 1) Top Horizontal Card: Core Composition */}
+                    <div className="bg-white rounded-[3rem] p-10 border border-gray-100 shadow-xl">
+                        <div className="flex justify-between items-center mb-10">
+                            <div className="flex items-center gap-4">
+                                <div className="p-3 bg-sage/10 rounded-2xl">
+                                    <Activity className="text-sage" size={24} />
+                                </div>
+                                <h3 className="text-2xl font-bold text-plum">Composición Corporal</h3>
+                            </div>
+                            <div className="flex items-center gap-2 text-gray-400">
+                                <CheckCircle2 size={16} />
+                                <span className="text-[10px] font-bold uppercase tracking-widest">Estándar Global</span>
+                            </div>
                         </div>
-                        <MetricCard
-                            title="Índice ASMI"
-                            fullTitle="Appendicular Skeletal Muscle Index (Músculo en extremidades)"
-                            value={asmi.value}
-                            unit="kg/m²"
-                            label={asmi.label}
-                            description={asmi.description}
-                            color={asmi.color}
-                            icon={Activity}
-                        />
-                        <MetricCard
-                            title="Índice FFMI"
-                            fullTitle="Fat-Free Mass Index (Índice de Masa Libre de Grasa)"
-                            value={ffmi.value}
-                            unit="kg/m²"
-                            label={ffmi.label}
-                            description={ffmi.description}
-                            color={ffmi.color}
-                            icon={Zap}
-                        />
-                        <div className="lg:col-span-2">
-                            <HealthScale
-                                title="Porcentaje de Grasa"
+
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            <CircularProgress
+                                label="Grasa Corporal"
                                 value={measurement.fatPercent}
                                 unit="%"
-                                min={5} max={45}
-                                markers={[
-                                    { label: 'Atlético', val: 13 },
-                                    { label: 'Fitness', val: 17 },
-                                    { label: 'Aceptable', val: 24 },
-                                    { label: 'Riesgo', val: 30 }
-                                ]}
+                                subValue={(measurement.weight * (measurement.fatPercent / 100)).toFixed(1)}
+                                subLabel="KG MASA GRASA"
+                                color="stroke-orange-500"
+                                icon={Flame}
                             />
-                        </div>
-                        <div className="lg:col-span-2">
-                            <HealthScale
-                                title="MFR (Muscle-to-Fat Ratio)"
-                                value={mfr.value}
-                                unit="ratio"
-                                min={0} max={6}
-                                markers={[
-                                    { label: 'Pobre', val: 1.5 },
-                                    { label: 'Aceptable', val: 2.5 },
-                                    { label: 'Bueno', val: 4.0 },
-                                    { label: 'Atlético', val: 6 }
-                                ]}
+                            <CircularProgress
+                                label="Masa Muscular"
+                                value={Math.min(100, (measurement.muscleMass / measurement.weight) * 100).toFixed(1)}
+                                unit="%"
+                                subValue={measurement.muscleMass}
+                                subLabel={`KG (${measurement.physiqueRatingScale || '--'} SCORE)`}
+                                color="stroke-sage"
+                                icon={Activity}
                             />
-                        </div>
-                        <div className="lg:col-span-2">
-                            <HealthScale
-                                title="Grasa Visceral"
-                                value={measurement.visceralFat}
-                                unit="lvl"
-                                min={1} max={20}
-                                markers={[
-                                    { label: 'Saludable', val: 12 },
-                                    { label: 'Exceso', val: 15 },
-                                    { label: 'Riesgo', val: 20 }
-                                ]}
+                            <CircularProgress
+                                label="Hidratación"
+                                value={measurement.waterPercent}
+                                unit="%"
+                                subValue={(measurement.weight * (measurement.waterPercent / 100)).toFixed(1)}
+                                subLabel="KG AGUA TOTAL"
+                                color="stroke-blue-500"
+                                icon={Droplets}
                             />
                         </div>
                     </div>
-                </section>
+
+                    {/* MFR Standalone Section (Horizontal Insert) */}
+                    <div className="bg-gold/10 rounded-[3rem] p-10 border border-gold/20 shadow-lg">
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="p-2 bg-white rounded-xl shadow-sm">
+                                <TrendingUp className="text-gold" size={20} />
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <h4 className="text-xl font-bold text-plum">Relación Músculo-Grasa (MFR)</h4>
+                                <Tooltip text="Muscle-to-Fat Ratio: Indica cuántos kg de músculo tienes por cada kg de grasa. Un valor > 2.5 es saludable, > 4.0 es ideal para atletas." />
+                            </div>
+                        </div>
+
+                        <HealthScale
+                            title=""
+                            value={mfr.value}
+                            unit="ratio"
+                            min={0} max={6}
+                            markers={[
+                                { label: 'Pobre', val: 1.5 },
+                                { label: 'Aceptable', val: 2.5 },
+                                { label: 'Bueno', val: 4.0 },
+                                { label: 'Atlético', val: 6 }
+                            ]}
+                        />
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        {/* 2) Metabolic Health Card */}
+                        <div className="bg-white rounded-[3rem] p-10 border border-gray-100 shadow-xl">
+                            <div className="flex items-center gap-3 mb-8">
+                                <div className="p-2 bg-gold/10 rounded-xl">
+                                    <Zap className="text-gold" size={18} />
+                                </div>
+                                <h4 className="text-sm font-bold text-gray-500 uppercase tracking-widest">Salud Metabólica</h4>
+                            </div>
+                            <div className="flex flex-col gap-4">
+                                <StatusRow
+                                    label="Tasa Metabólica Basal (BMR)"
+                                    value={bmrCalc.value}
+                                    unit="kcal/día (calc)"
+                                    status={bmrCalc.label}
+                                    statusColor={bmrCalc.color}
+                                    icon={Flame}
+                                />
+                                <StatusRow
+                                    label="Ingesta Calórica (DCI)"
+                                    value={measurement.dciKcal}
+                                    unit="kcal/día (med)"
+                                    status="SUGERIDO"
+                                    statusColor="text-blue-400"
+                                    icon={Zap}
+                                />
+                                <StatusRow
+                                    label="Edad Metabólica"
+                                    value={metAgeCalc.value}
+                                    unit="años"
+                                    status={metAgeCalc.label}
+                                    statusColor={metAgeCalc.color}
+                                    icon={Calendar}
+                                />
+                                <StatusRow
+                                    label="Índice ASMI"
+                                    value={asmi.value}
+                                    unit="kg/m²"
+                                    status={asmi.label.toUpperCase()}
+                                    statusColor={asmi.color}
+                                    icon={Activity}
+                                />
+                            </div>
+                        </div>
+
+                        {/* 3) Physical Indices Card */}
+                        <div className="bg-white rounded-[3rem] p-10 border border-gray-100 shadow-xl">
+                            <div className="flex items-center gap-3 mb-8">
+                                <div className="p-2 bg-plum/10 rounded-xl">
+                                    <Scale className="text-plum" size={18} />
+                                </div>
+                                <h4 className="text-sm font-bold text-gray-500 uppercase tracking-widest">Índices Físicos</h4>
+                            </div>
+                            <div className="flex flex-col gap-4">
+                                <StatusRow
+                                    label="Grasa Visceral"
+                                    value={measurement.visceralFat}
+                                    unit="Rating"
+                                    status={visceral.label}
+                                    statusColor={visceral.color}
+                                    icon={AlertCircle}
+                                />
+                                <StatusRow
+                                    label="Masa Ósea"
+                                    value={boneMassCalc.value}
+                                    unit="kg"
+                                    status={boneMassCalc.label}
+                                    statusColor={boneMassCalc.color}
+                                    icon={Dna}
+                                />
+                                <StatusRow
+                                    label="Peso"
+                                    value={measurement.weight}
+                                    unit="kg"
+                                    status="REG"
+                                    statusColor="text-plum"
+                                    icon={Weight}
+                                />
+                                <StatusRow
+                                    label="BMI (IMC)"
+                                    value={bmi.value}
+                                    unit="kg/m²"
+                                    status={bmi.label.toUpperCase()}
+                                    statusColor={bmi.color}
+                                    icon={Scale}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
 
                 {/* Section: Progress History */}
                 {history.length >= 2 && (
@@ -526,85 +662,6 @@ export default function ReportDetailView({
                         </div>
                     </section>
                 )}
-
-                {/* Section 2: Tanita Raw Data */}
-                <section>
-                    <SectionHeader
-                        title="Métricas de Composición"
-                        subtitle="Desglose detallado de los datos capturados por la báscula Tanita."
-                    />
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                        <div className="bg-white p-6 rounded-3xl border border-gray-100 flex flex-col items-center">
-                            <Droplets className="text-blue-500 mb-2" size={20} />
-                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Agua</span>
-                            <span className="text-xl font-bold text-plum">{measurement.waterPercent}%</span>
-                        </div>
-                        <div className="bg-white p-6 rounded-3xl border border-gray-100 flex flex-col items-center border-b-4 border-b-gold">
-                            <Flame className="text-orange-500 mb-2" size={20} />
-                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Grasa %</span>
-                            <span className="text-xl font-bold text-plum">{measurement.fatPercent}%</span>
-                        </div>
-                        <div className="bg-white p-6 rounded-3xl border border-gray-100 flex flex-col items-center">
-                            <Activity className="text-sage mb-2" size={20} />
-                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Músculo</span>
-                            <span className="text-xl font-bold text-plum">{measurement.muscleMass}kg</span>
-                        </div>
-                        <div className="bg-white p-6 rounded-3xl border border-gray-100 flex flex-col items-center">
-                            <Dna className="text-plum mb-2" size={20} />
-                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Hueso</span>
-                            <span className="text-xl font-bold text-plum">{measurement.boneMass}kg</span>
-                        </div>
-                        <div className="bg-white p-6 rounded-3xl border border-gray-100 flex flex-col items-center">
-                            <AlertCircle className={visceral.color?.includes('green') ? 'text-sage' : 'text-plum'} size={20} />
-                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Visceral</span>
-                            <span className="text-xl font-bold text-plum">{measurement.visceralFat}</span>
-                        </div>
-                        <div className="bg-white p-6 rounded-3xl border border-gray-100 flex flex-col items-center">
-                            <Calendar className="text-gold mb-2" size={20} />
-                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 text-center">Edad Met.</span>
-                            <span className="text-xl font-bold text-plum">{measurement.metabolicAge}</span>
-                        </div>
-                        <div className="bg-white p-6 rounded-3xl border border-gray-100 flex flex-col items-center">
-                            <Flame className="text-plum mb-2" size={20} />
-                            <div className="flex items-center mb-1">
-                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">BMR</span>
-                                <Tooltip text="Basal Metabolic Rate (Tasa Metabólica Basal)" />
-                            </div>
-                            <span className="text-xl font-bold text-plum">{measurement.bmr} <span className="text-[10px] font-normal opacity-50">kcal</span></span>
-                        </div>
-                        <div className="bg-white p-6 rounded-3xl border border-gray-100 flex flex-col items-center">
-                            <Zap className="text-sage mb-2" size={20} />
-                            <div className="flex items-center mb-1">
-                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">DCI</span>
-                                <Tooltip text="Daily Caloric Intake (Ingesta Calórica Diaria rD)" />
-                            </div>
-                            <span className="text-xl font-bold text-plum">{measurement.dciKcal} <span className="text-[10px] font-normal opacity-50">kcal</span></span>
-                        </div>
-                        <div className="bg-white p-6 rounded-3xl border border-gray-100 flex flex-col items-center">
-                            <Scale className="text-gold mb-2" size={20} />
-                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 text-center">Physique</span>
-                            <span className="text-xl font-bold text-plum">{measurement.physiqueRatingScale}</span>
-                        </div>
-                        <div className="bg-white p-6 rounded-3xl border border-gray-100 flex flex-col shadow-inner bg-gray-50/30">
-                            <div className="flex items-center gap-2 mb-2">
-                                <User size={14} className="text-plum" />
-                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Tipo Bio</span>
-                            </div>
-                            <span className="text-xs font-bold text-plum">
-                                {measurement.bodyType === 1 ? 'Atleta' : 'Estándar'}
-                            </span>
-                        </div>
-                        <div className="bg-white p-6 rounded-3xl border border-gray-100 flex flex-col shadow-inner bg-gray-50/30">
-                            <div className="flex items-center gap-2 mb-2">
-                                <Activity size={14} className="text-sage" />
-                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Actividad</span>
-                            </div>
-                            <span className="text-xs font-bold text-plum">
-                                Nivel {measurement.activityLevel || client.activityLevel || '--'}
-                            </span>
-                        </div>
-                    </div>
-                </section>
 
                 {/* Segmental Analysis */}
                 <section className="bg-white rounded-[3rem] p-12 border border-gray-100 shadow-xl">
