@@ -669,64 +669,31 @@ export default function ReportDetailView({
                         title="Análisis Segmental"
                         subtitle="Distribución muscular y de grasa por zonas corporales."
                     />
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                        {/* Muscle Map */}
-                        <div className="space-y-6">
-                            <h5 className="font-bold text-plum uppercase text-xs tracking-widest flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-sage"></div> Masa Muscular (kg)
-                            </h5>
-                            <div className="space-y-3">
-                                <div className="flex justify-between p-4 bg-cream rounded-2xl">
-                                    <span className="text-sm font-medium">Brazo Derecho</span>
-                                    <span className="font-bold">{measurement.muscleArmRight} kg</span>
-                                </div>
-                                <div className="flex justify-between p-4 bg-cream rounded-2xl">
-                                    <span className="text-sm font-medium">Brazo Izquierdo</span>
-                                    <span className="font-bold">{measurement.muscleArmLeft} kg</span>
-                                </div>
-                                <div className="flex justify-between p-4 bg-cream rounded-2xl">
-                                    <span className="text-sm font-medium">Pierna Derecha</span>
-                                    <span className="font-bold">{measurement.muscleLegRight} kg</span>
-                                </div>
-                                <div className="flex justify-between p-4 bg-cream rounded-2xl">
-                                    <span className="text-sm font-medium">Pierna Izquierda</span>
-                                    <span className="font-bold">{measurement.muscleLegLeft} kg</span>
-                                </div>
-                                <div className="flex justify-between p-4 bg-plum text-white rounded-2xl">
-                                    <span className="text-sm font-medium">Tronco</span>
-                                    <span className="font-bold">{measurement.muscleTrunk} kg</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Fat Map */}
-                        <div className="space-y-6">
-                            <h5 className="font-bold text-plum uppercase text-xs tracking-widest flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-gold"></div> Grasa Corporal (%)
-                            </h5>
-                            <div className="space-y-3">
-                                <div className="flex justify-between p-4 bg-cream rounded-2xl">
-                                    <span className="text-sm font-medium">Brazo Derecho</span>
-                                    <span className="font-bold">{measurement.fatArmRight}%</span>
-                                </div>
-                                <div className="flex justify-between p-4 bg-cream rounded-2xl">
-                                    <span className="text-sm font-medium">Brazo Izquierdo</span>
-                                    <span className="font-bold">{measurement.fatArmLeft}%</span>
-                                </div>
-                                <div className="flex justify-between p-4 bg-cream rounded-2xl">
-                                    <span className="text-sm font-medium">Pierna Derecha</span>
-                                    <span className="font-bold">{measurement.fatLegRight}%</span>
-                                </div>
-                                <div className="flex justify-between p-4 bg-cream rounded-2xl">
-                                    <span className="text-sm font-medium">Pierna Izquierda</span>
-                                    <span className="font-bold">{measurement.fatLegLeft}%</span>
-                                </div>
-                                <div className="flex justify-between p-4 bg-gold text-plum rounded-2xl">
-                                    <span className="text-sm font-medium">Tronco</span>
-                                    <span className="font-bold">{measurement.fatTrunk}%</span>
-                                </div>
-                            </div>
-                        </div>
+                    <div className="overflow-hidden bg-white/50 rounded-3xl border border-gray-100">
+                        <table className="w-full">
+                            <thead>
+                                <tr className="bg-plum/5 border-b border-plum/10">
+                                    <th className="py-4 px-6 text-left text-xs font-bold text-plum uppercase tracking-widest">Zona</th>
+                                    <th className="py-4 px-6 text-right text-xs font-bold text-sage uppercase tracking-widest">Masa Muscular (kg)</th>
+                                    <th className="py-4 px-6 text-right text-xs font-bold text-gold uppercase tracking-widest">Grasa Corporal (%)</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-50">
+                                {[
+                                    { label: 'Brazo Derecho', muscle: measurement.muscleArmRight, fat: measurement.fatArmRight },
+                                    { label: 'Brazo Izquierdo', muscle: measurement.muscleArmLeft, fat: measurement.fatArmLeft },
+                                    { label: 'Pierna Derecha', muscle: measurement.muscleLegRight, fat: measurement.fatLegRight },
+                                    { label: 'Pierna Izquierda', muscle: measurement.muscleLegLeft, fat: measurement.fatLegLeft },
+                                    { label: 'Tronco', muscle: measurement.muscleTrunk, fat: measurement.fatTrunk },
+                                ].map((row, idx) => (
+                                    <tr key={idx} className="hover:bg-plum/5 transition-colors">
+                                        <td className="py-4 px-6 text-sm font-bold text-plum">{row.label}</td>
+                                        <td className="py-4 px-6 text-right font-medium text-gray-600">{row.muscle} kg</td>
+                                        <td className="py-4 px-6 text-right font-medium text-gray-600">{row.fat}%</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 </section>
             </div>
