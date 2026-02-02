@@ -184,6 +184,46 @@ export default function ReportDetailView({
         );
     };
 
+    const Gauge = ({ value, min, max, unit }: { value: number, min: number, max: number, unit: string }) => {
+        const percentage = Math.min(Math.max(((value - min) / (max - min)) * 100, 0), 100);
+        const strokeWidth = 12;
+        const radius = 60;
+        const circumference = Math.PI * radius;
+        const strokeDashoffset = circumference - (percentage / 100) * circumference;
+
+        return (
+            <div className="flex flex-col items-center">
+                <div className="relative">
+                    <svg width="140" height="80" viewBox="0 0 140 80">
+                        {/* Background Path */}
+                        <path
+                            d="M 10 70 A 60 60 0 0 1 130 70"
+                            fill="none"
+                            stroke="rgba(255, 255, 255, 0.1)"
+                            strokeWidth={strokeWidth}
+                            strokeLinecap="round"
+                        />
+                        {/* Value Path */}
+                        <path
+                            d="M 10 70 A 60 60 0 0 1 130 70"
+                            fill="none"
+                            stroke="white"
+                            strokeWidth={strokeWidth}
+                            strokeLinecap="round"
+                            strokeDasharray={circumference}
+                            strokeDashoffset={strokeDashoffset}
+                            className="transition-all duration-1000 ease-out"
+                        />
+                    </svg>
+                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center">
+                        <span className="text-4xl font-black leading-none">{value}</span>
+                        <span className="text-[10px] font-bold opacity-50 uppercase tracking-widest">{unit}</span>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
     return (
         <main className="min-h-screen bg-cream pb-20">
             {/* Minimal Header */}
@@ -253,11 +293,21 @@ export default function ReportDetailView({
                                         </div>
                                     </div>
                                 )}
+                                <div className="flex items-center gap-3">
+                                    <Weight size={20} className="text-white/50" />
+                                    <div>
+                                        <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Peso Actual</p>
+                                        <p className="font-semibold">{measurement.weight} kg</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20 h-fit min-w-[200px]">
-                            <div className="text-xs font-bold uppercase tracking-widest opacity-50 mb-2 text-center">Peso Actual</div>
-                            <div className="text-6xl font-black text-center">{measurement.weight}<span className="text-2xl ml-1 opacity-50">kg</span></div>
+                        <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20 h-fit min-w-[240px] flex flex-col items-center justify-center">
+                            <div className="text-xs font-bold uppercase tracking-widest opacity-50 mb-4 text-center">FFMI</div>
+                            <Gauge value={ffmi.value} min={12} max={30} unit="kg/m²" />
+                            <div className="text-[10px] font-bold uppercase tracking-widest opacity-70 mt-4 text-center leading-tight">
+                                Índice de Masa<br />Libre de Grasa
+                            </div>
                         </div>
                     </div>
                 </div>
