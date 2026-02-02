@@ -17,8 +17,7 @@ import {
     AlertCircle,
     CheckCircle2,
     Zap as Flash,
-    ArrowUpRight,
-    Ruler
+    ArrowUpRight
 } from 'lucide-react';
 import Link from 'next/link';
 import {
@@ -44,6 +43,7 @@ import {
     AreaChart,
     Area
 } from 'recharts';
+import ReportHeader from '@/components/report/ReportHeader';
 
 export default function ReportDetailView({
     client,
@@ -55,16 +55,6 @@ export default function ReportDetailView({
     history?: any[]
 }) {
     // activeGroup and metricGroups removed as they are no longer used
-
-    const getActivityLevelLabel = (level: number | null) => {
-        if (!level) return '--';
-        const labels: Record<number, string> = {
-            1: 'Sedentario',
-            2: 'Moderadamente activo',
-            3: 'Muy activo / Atleta'
-        };
-        return labels[level] || `Nivel ${level}`;
-    };
 
     // Perform calculations
     const bmi = calculateBMI(measurement.weight, measurement.height || client.height);
@@ -289,123 +279,6 @@ export default function ReportDetailView({
         );
     };
 
-    const Gauge = ({ value, min, max, unit, markers }: { value: number, min: number, max: number, unit: string, markers: { label: string, val: number }[] }) => {
-        // Segment-based scaling logic
-        const calculateSegmentPercentage = (v: number) => {
-            const thresholds = [min, ...markers.map(m => m.val)];
-            const segmentCount = markers.length;
-            const segmentWidth = 100 / segmentCount;
-
-            for (let i = 0; i < segmentCount; i++) {
-                const s = thresholds[i];
-                const e = thresholds[i + 1];
-                if (v <= e) {
-                    const inner = (v - s) / (e - s);
-                    return (i + Math.min(Math.max(inner, 0), 1)) * segmentWidth;
-                }
-            }
-            return 100;
-        };
-
-        const percentage = calculateSegmentPercentage(value);
-        const strokeWidth = 10;
-        const radius = 70;
-        const width = 280;
-        const height = 130;
-        const centerX = width / 2;
-        const centerY = 110;
-
-        const circumference = Math.PI * radius;
-        const strokeDashoffset = circumference - (percentage / 100) * circumference;
-
-        return (
-            <a
-                href="https://pubmed.ncbi.nlm.nih.gov/7496846/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex flex-col items-center no-underline cursor-pointer group"
-            >
-                <div className="relative">
-                    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} className="overflow-visible">
-                        {/* Background Path */}
-                        <path
-                            d={`M ${centerX - radius} ${centerY} A ${radius} ${radius} 0 0 1 ${centerX + radius} ${centerY}`}
-                            fill="none"
-                            stroke="rgba(255, 255, 255, 0.15)"
-                            strokeWidth={strokeWidth}
-                            strokeLinecap="round"
-                        />
-                        {/* Value Path */}
-                        <path
-                            d={`M ${centerX - radius} ${centerY} A ${radius} ${radius} 0 0 1 ${centerX + radius} ${centerY}`}
-                            fill="none"
-                            stroke="white"
-                            strokeWidth={strokeWidth}
-                            strokeLinecap="round"
-                            strokeDasharray={circumference}
-                            strokeDashoffset={strokeDashoffset}
-                            className="transition-all duration-1000 ease-out"
-                        />
-
-                        {/* Segment Ticks (Equally spaced at 25%, 50%, 75%) */}
-                        {[25, 50, 75].map((p, i) => {
-                            const angle = Math.PI + (p / 100) * Math.PI;
-                            const x1 = centerX + (radius - 3) * Math.cos(angle);
-                            const y1 = centerY + (radius - 3) * Math.sin(angle);
-                            const x2 = centerX + (radius + 3) * Math.cos(angle);
-                            const y2 = centerY + (radius + 3) * Math.sin(angle);
-                            return (
-                                <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="white" strokeOpacity="0.5" strokeWidth="2" strokeLinecap="round" />
-                            );
-                        })}
-
-                        {/* Labels Positioning */}
-                        {markers.map((m, i) => {
-                            let p = 0;
-                            let textAnchor: "start" | "middle" | "end" = "middle";
-                            let labelRadius = radius + 25;
-                            let offsetY = 0;
-
-                            if (i === 0) {
-                                p = 0; // BAJO at the very start
-                                textAnchor = "end";
-                                labelRadius = radius + 30;
-                            } else if (i === markers.length - 1) {
-                                p = 100; // SUPERIOR at the very end
-                                textAnchor = "start";
-                                labelRadius = radius + 30;
-                            } else {
-                                // PROMEDIO and EXCELENTE
-                                p = i === 1 ? 8 : 92;
-                                labelRadius = radius + 20;
-                                offsetY = -35;
-                            }
-
-                            const angle = Math.PI + (p / 100) * Math.PI;
-                            const tx = centerX + labelRadius * Math.cos(angle);
-                            const ty = centerY + labelRadius * Math.sin(angle) + offsetY;
-
-                            return (
-                                <text
-                                    key={i}
-                                    x={tx}
-                                    y={ty}
-                                    textAnchor={textAnchor}
-                                    className="fill-white font-bold text-[9px] uppercase tracking-wider opacity-70"
-                                >
-                                    {m.label}
-                                </text>
-                            );
-                        })}
-                    </svg>
-                    <div className="absolute top-[75px] left-1/2 -translate-x-1/2 flex flex-col items-center w-full">
-                        <span className="text-5xl font-black leading-tight">{value}</span>
-                        <span className="text-[10px] font-bold opacity-40 uppercase tracking-widest -mt-1">{unit}</span>
-                    </div>
-                </div>
-            </a>
-        );
-    };
 
     return (
         <main className="min-h-screen bg-cream pb-20">
@@ -423,84 +296,7 @@ export default function ReportDetailView({
 
             <div className="px-12 max-w-7xl mx-auto space-y-16">
                 {/* Hero / Summary Area */}
-                <div className="bg-plum rounded-[3rem] p-12 text-white shadow-2xl relative overflow-hidden">
-                    <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
-                        <div className="flex-1">
-                            <h1 className="text-5xl font-bold mb-6">{client.name} {client.lastname}</h1>
-                            <div className="grid grid-cols-2 lg:grid-cols-3 gap-y-6 gap-x-8">
-                                <div className="flex items-center gap-3">
-                                    <User size={20} className="text-white/50" />
-                                    <div>
-                                        <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Género</p>
-                                        <p className="font-semibold">{client.gender === 'male' ? 'Hombre' : 'Mujer'}</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <Calendar size={20} className="text-white/50" />
-                                    <div>
-                                        <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Edad</p>
-                                        <p className="font-semibold">{client.age || '--'} años</p>
-                                    </div>
-                                </div>
-                                {client.birthday && (
-                                    <div className="flex items-center gap-3">
-                                        <Calendar size={20} className="text-white/50" />
-                                        <div>
-                                            <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Cumpleaños</p>
-                                            <p className="font-semibold">
-                                                {new Date(client.birthday).toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}
-                                            </p>
-                                        </div>
-                                    </div>
-                                )}
-                                <div className="flex items-center gap-3">
-                                    <Ruler size={20} className="text-white/50" />
-                                    <div>
-                                        <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Altura</p>
-                                        <p className="font-semibold">{measurement.height || client.height || '--'} cm</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <Activity size={20} className="text-white/50" />
-                                    <div>
-                                        <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Nivel de Actividad</p>
-                                        <p className="font-semibold">{getActivityLevelLabel(measurement.activityLevel || client.activityLevel)}</p>
-                                    </div>
-                                </div>
-                                {client.sessionsPerWeek && (
-                                    <div className="flex items-center gap-3">
-                                        <Zap size={20} className="text-white/50" />
-                                        <div>
-                                            <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Sesiones por semana</p>
-                                            <p className="font-semibold">{client.sessionsPerWeek} sesiones</p>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                        <div className="bg-white/10 backdrop-blur-md rounded-3xl p-3 border border-white/20 h-fit min-w-[340px] flex flex-col items-center justify-center">
-                            <Gauge
-                                value={ffmi.value}
-                                min={12} max={30}
-                                unit="kg/m²"
-                                markers={client.gender === 'female' ? [
-                                    { label: 'Bajo', val: 15 },
-                                    { label: 'Promedio', val: 18 },
-                                    { label: 'Excelente', val: 22 },
-                                    { label: 'Superior', val: 30 }
-                                ] : [
-                                    { label: 'Bajo', val: 18 },
-                                    { label: 'Promedio', val: 21 },
-                                    { label: 'Excelente', val: 25 },
-                                    { label: 'Superior', val: 30 }
-                                ]}
-                            />
-                            <div className="text-[10px] font-bold uppercase tracking-widest opacity-70 mt-4 text-center leading-tight">
-                                Índice de Masa<br />Libre de Grasa
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <ReportHeader client={client} measurement={measurement} ffmi={{ ...ffmi, color: ffmi.color || '' }} />
 
                 {/* Master History Chart (Option A) removed as requested */}
 
