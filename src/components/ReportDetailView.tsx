@@ -184,20 +184,26 @@ export default function ReportDetailView({
         );
     };
 
-    const Gauge = ({ value, min, max, unit }: { value: number, min: number, max: number, unit: string }) => {
+    const Gauge = ({ value, min, max, unit, markers }: { value: number, min: number, max: number, unit: string, markers: { label: string, val: number }[] }) => {
         const percentage = Math.min(Math.max(((value - min) / (max - min)) * 100, 0), 100);
-        const strokeWidth = 12;
+        const strokeWidth = 10;
         const radius = 60;
+        const width = 140;
+        const height = 80;
+        const centerX = 70;
+        const centerY = 70;
+
+        // Correct circumference for a semi-circle
         const circumference = Math.PI * radius;
         const strokeDashoffset = circumference - (percentage / 100) * circumference;
 
         return (
             <div className="flex flex-col items-center">
                 <div className="relative">
-                    <svg width="140" height="80" viewBox="0 0 140 80">
+                    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
                         {/* Background Path */}
                         <path
-                            d="M 10 70 A 60 60 0 0 1 130 70"
+                            d={`M ${centerX - radius} ${centerY} A ${radius} ${radius} 0 0 1 ${centerX + radius} ${centerY}`}
                             fill="none"
                             stroke="rgba(255, 255, 255, 0.1)"
                             strokeWidth={strokeWidth}
@@ -205,7 +211,7 @@ export default function ReportDetailView({
                         />
                         {/* Value Path */}
                         <path
-                            d="M 10 70 A 60 60 0 0 1 130 70"
+                            d={`M ${centerX - radius} ${centerY} A ${radius} ${radius} 0 0 1 ${centerX + radius} ${centerY}`}
                             fill="none"
                             stroke="white"
                             strokeWidth={strokeWidth}
@@ -214,6 +220,24 @@ export default function ReportDetailView({
                             strokeDashoffset={strokeDashoffset}
                             className="transition-all duration-1000 ease-out"
                         />
+                        {/* Labels along the arc */}
+                        {markers.map((m, i) => {
+                            const p = Math.min(Math.max(((m.val - min) / (max - min)) * 100, 0), 100);
+                            const angle = Math.PI + (p / 100) * Math.PI;
+                            const tx = centerX + (radius + 15) * Math.cos(angle);
+                            const ty = centerY + (radius + 15) * Math.sin(angle);
+                            return (
+                                <text
+                                    key={i}
+                                    x={tx}
+                                    y={ty}
+                                    textAnchor="middle"
+                                    className="fill-white/40 text-[7px] font-bold uppercase tracking-tighter"
+                                >
+                                    {m.label}
+                                </text>
+                            );
+                        })}
                     </svg>
                     <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center">
                         <span className="text-4xl font-black leading-none">{value}</span>
@@ -302,9 +326,23 @@ export default function ReportDetailView({
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20 h-fit min-w-[240px] flex flex-col items-center justify-center">
-                            <div className="text-xs font-bold uppercase tracking-widest opacity-50 mb-4 text-center">FFMI</div>
-                            <Gauge value={ffmi.value} min={12} max={30} unit="kg/m²" />
+                        <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20 h-fit min-w-[240px] flex flex-col items-center justify-center pt-10">
+                            <Gauge
+                                value={ffmi.value}
+                                min={12} max={30}
+                                unit="kg/m²"
+                                markers={client.gender === 'female' ? [
+                                    { label: 'Bajo', val: 14.9 },
+                                    { label: 'Promedio', val: 17.9 },
+                                    { label: 'Exc.', val: 21.9 },
+                                    { label: 'Sup.', val: 28 }
+                                ] : [
+                                    { label: 'Bajo', val: 17.9 },
+                                    { label: 'Promedio', val: 20.9 },
+                                    { label: 'Exc.', val: 24.9 },
+                                    { label: 'Sup.', val: 28 }
+                                ]}
+                            />
                             <div className="text-[10px] font-bold uppercase tracking-widest opacity-70 mt-4 text-center leading-tight">
                                 Índice de Masa<br />Libre de Grasa
                             </div>
