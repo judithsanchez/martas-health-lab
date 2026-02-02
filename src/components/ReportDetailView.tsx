@@ -189,20 +189,62 @@ export default function ReportDetailView({
                 {/* Hero / Summary Area */}
                 <div className="bg-plum rounded-[3rem] p-12 text-white shadow-2xl relative overflow-hidden">
                     <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
-                        <div>
-                            <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold tracking-widest bg-white/20 uppercase mb-4">Reporte de Salud Clínico</span>
-                            <h1 className="text-5xl font-bold mb-4">{client.name} {client.lastname}</h1>
-                            <div className="flex gap-6 opacity-70">
-                                <div className="flex items-center gap-2">
-                                    <User size={18} /> {client.gender === 'male' ? 'Hombre' : 'Mujer'}
+                        <div className="flex-1">
+                            <h1 className="text-5xl font-bold mb-6">{client.name} {client.lastname}</h1>
+                            <div className="grid grid-cols-2 lg:grid-cols-3 gap-y-6 gap-x-8">
+                                <div className="flex items-center gap-3 bg-white/10 px-4 py-2 rounded-2xl">
+                                    <div className="p-2 rounded-xl bg-white/10">
+                                        <User size={20} className="text-white" />
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Género</p>
+                                        <p className="font-semibold">{client.gender === 'male' ? 'Hombre' : 'Mujer'}</p>
+                                    </div>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <TrendingUp size={18} /> {measurement.height || client.height} cm
+                                <div className="flex items-center gap-3 bg-white/10 px-4 py-2 rounded-2xl">
+                                    <div className="p-2 rounded-xl bg-white/10">
+                                        <Calendar size={20} className="text-white" />
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Edad / Cumpleaños</p>
+                                        <p className="font-semibold">
+                                            {client.age || '--'} años {client.birthday ? `(${new Date(client.birthday).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })})` : ''}
+                                        </p>
+                                    </div>
                                 </div>
+                                <div className="flex items-center gap-3 bg-white/10 px-4 py-2 rounded-2xl">
+                                    <div className="p-2 rounded-xl bg-white/10">
+                                        <TrendingUp size={20} className="text-white" />
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Altura</p>
+                                        <p className="font-semibold">{measurement.height || client.height || '--'} cm</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-3 bg-white/10 px-4 py-2 rounded-2xl">
+                                    <div className="p-2 rounded-xl bg-white/10">
+                                        <Activity size={20} className="text-white" />
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Nivel de Actividad</p>
+                                        <p className="font-semibold">Nivel {measurement.activityLevel || client.activityLevel || '--'}</p>
+                                    </div>
+                                </div>
+                                {client.sessionsPerWeek && (
+                                    <div className="flex items-center gap-3 bg-white/10 px-4 py-2 rounded-2xl">
+                                        <div className="p-2 rounded-xl bg-white/10">
+                                            <Zap size={20} className="text-white" />
+                                        </div>
+                                        <div>
+                                            <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Sesiones / Sem</p>
+                                            <p className="font-semibold">{client.sessionsPerWeek} sesiones</p>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
-                        <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20">
-                            <div className="text-xs font-bold uppercase tracking-widest opacity-50 mb-2">Peso Actual</div>
+                        <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20 h-fit">
+                            <div className="text-xs font-bold uppercase tracking-widest opacity-50 mb-2 text-center">Peso Actual</div>
                             <div className="text-6xl font-black">{measurement.weight}<span className="text-2xl ml-1 opacity-50">kg</span></div>
                         </div>
                     </div>
