@@ -33,27 +33,29 @@ export default function ReportHeader({ client, measurement, ffmi }: ReportHeader
     // --- Gauge Controller Configuration ---
     // Adjust these variables to control the gauge appearance
     const gaugeController = {
+        width: 340, // Reduced width to tighten horizontal space (was 340)
+        height: 140,
         ticks: [25, 50, 75], // Partitions at 25%, 50%, 75%
         female: {
             min: 12,
             max: 30,
             unit: "kg/m²",
             markers: [
-                { label: 'Bajo', val: 15, position: { percentage: 0, radiusOffset: 30, textAnchor: 'end' } },
-                { label: 'Promedio', val: 18, position: { percentage: 8, radiusOffset: 20, yOffset: -35 } },
-                { label: 'Excelente', val: 22, position: { percentage: 92, radiusOffset: 20, yOffset: -35 } },
-                { label: 'Superior', val: 30, position: { percentage: 100, radiusOffset: 30, textAnchor: 'start' } }
+                { label: 'Bajo', val: 15, position: { percentage: 0, radiusOffset: 25, textAnchor: 'end' } },
+                { label: 'Promedio', val: 18, position: { percentage: 8, radiusOffset: 15, yOffset: -35 } },
+                { label: 'Excelente', val: 22, position: { percentage: 92, radiusOffset: 15, yOffset: -35 } },
+                { label: 'Superior', val: 30, position: { percentage: 100, radiusOffset: 25, textAnchor: 'start' } }
             ]
         },
         male: {
             min: 12,
-            max: 30, // Using same max for symmetry unless specified otherwise
+            max: 30,
             unit: "kg/m²",
             markers: [
-                { label: 'Bajo', val: 18, position: { percentage: 0, radiusOffset: 30, textAnchor: 'end' } },
-                { label: 'Promedio', val: 21, position: { percentage: 8, radiusOffset: 20, yOffset: -35 } },
-                { label: 'Excelente', val: 25, position: { percentage: 92, radiusOffset: 20, yOffset: -35 } },
-                { label: 'Superior', val: 30, position: { percentage: 100, radiusOffset: 30, textAnchor: 'start' } }
+                { label: 'Bajo', val: 18, position: { percentage: 0, radiusOffset: 25, textAnchor: 'end' } },
+                { label: 'Promedio', val: 21, position: { percentage: 8, radiusOffset: 15, yOffset: -35 } },
+                { label: 'Excelente', val: 25, position: { percentage: 92, radiusOffset: 15, yOffset: -35 } },
+                { label: 'Superior', val: 30, position: { percentage: 100, radiusOffset: 25, textAnchor: 'start' } }
             ]
         }
     };
@@ -117,15 +119,19 @@ export default function ReportHeader({ client, measurement, ffmi }: ReportHeader
                         )}
                     </div>
                 </div>
-                <div className="bg-white/10 backdrop-blur-md rounded-3xl p-3 border border-white/20 h-fit min-w-[340px] flex flex-col items-center justify-center">
-                    <Gauge
-                        value={ffmi.value}
-                        min={activeConfig.min}
-                        max={activeConfig.max}
-                        unit={activeConfig.unit}
-                        markers={activeConfig.markers as any} // Cast to any to avoid strict type checks on position during dev
-                        ticks={gaugeController.ticks}
-                    />
+                <div className="bg-white/10 backdrop-blur-md rounded-3xl p-1 border border-white/20 h-fit flex flex-col items-center justify-center">
+                    <div className="w-full flex items-center justify-center">
+                        <Gauge
+                            value={ffmi.value}
+                            min={activeConfig.min}
+                            max={activeConfig.max}
+                            unit={activeConfig.unit}
+                            markers={activeConfig.markers as any} // Cast to any to avoid strict type checks on position during dev
+                            ticks={gaugeController.ticks}
+                            width={gaugeController.width}
+                            height={gaugeController.height}
+                        />
+                    </div>
                     <div className="text-[10px] font-bold uppercase tracking-widest opacity-70 mt-4 text-center leading-tight">
                         Índice de Masa<br />Libre de Grasa
                     </div>

@@ -19,9 +19,11 @@ interface GaugeProps {
     unit: string;
     markers: GaugeMarker[];
     ticks?: number[]; // Array of percentages (0-100) where divider lines should appear
+    width?: number;
+    height?: number;
 }
 
-export default function Gauge({ value, min, max, unit, markers, ticks }: GaugeProps) {
+export default function Gauge({ value, min, max, unit, markers, ticks, width = 280, height = 130 }: GaugeProps) {
     // Segment-based scaling logic
     const calculateSegmentPercentage = (v: number) => {
         const thresholds = [min, ...markers.map(m => m.val)];
@@ -42,8 +44,6 @@ export default function Gauge({ value, min, max, unit, markers, ticks }: GaugePr
     const percentage = calculateSegmentPercentage(value);
     const strokeWidth = 10;
     const radius = 70;
-    const width = 280;
-    const height = 130;
     const centerX = width / 2;
     const centerY = 110;
 
