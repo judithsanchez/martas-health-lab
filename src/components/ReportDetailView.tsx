@@ -25,6 +25,7 @@ import {
     calculateASMI,
     calculateWtHR,
     calculateFFMI,
+    calculateMFR,
     interpretVisceralFat,
     CalculationResult
 } from '@/lib/utils/health-calculations';
@@ -61,6 +62,7 @@ export default function ReportDetailView({
     );
     const wthr = measurement.waist ? calculateWtHR(measurement.waist, measurement.height || client.height) : null;
     const ffmi = calculateFFMI(measurement.weight, measurement.fatPercent || 0, measurement.height || client.height, client.gender || 'male');
+    const mfr = calculateMFR(measurement.muscleMass || 0, measurement.weight, measurement.fatPercent || 0);
     const visceral = interpretVisceralFat(measurement.visceralFat || 0);
 
     const Tooltip = ({ text }: { text: string }) => (
@@ -189,21 +191,53 @@ export default function ReportDetailView({
                 {/* Hero / Summary Area */}
                 <div className="bg-plum rounded-[3rem] p-12 text-white shadow-2xl relative overflow-hidden">
                     <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
-                        <div>
-                            <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold tracking-widest bg-white/20 uppercase mb-4">Reporte de Salud Clínico</span>
-                            <h1 className="text-5xl font-bold mb-4">{client.name} {client.lastname}</h1>
-                            <div className="flex gap-6 opacity-70">
-                                <div className="flex items-center gap-2">
-                                    <User size={18} /> {client.gender === 'male' ? 'Hombre' : 'Mujer'}
+                        <div className="flex-1">
+                            <h1 className="text-5xl font-bold mb-6">{client.name} {client.lastname}</h1>
+                            <div className="grid grid-cols-2 lg:grid-cols-3 gap-y-6 gap-x-8">
+                                <div className="flex items-center gap-3">
+                                    <User size={20} className="text-white/50" />
+                                    <div>
+                                        <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Género</p>
+                                        <p className="font-semibold">{client.gender === 'male' ? 'Hombre' : 'Mujer'}</p>
+                                    </div>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <TrendingUp size={18} /> {measurement.height || client.height} cm
+                                <div className="flex items-center gap-3">
+                                    <Calendar size={20} className="text-white/50" />
+                                    <div>
+                                        <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Edad / Cumpleaños</p>
+                                        <p className="font-semibold">
+                                            {client.age || '--'} años {client.birthday ? `(${new Date(client.birthday).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })})` : ''}
+                                        </p>
+                                    </div>
                                 </div>
+                                <div className="flex items-center gap-3">
+                                    <TrendingUp size={20} className="text-white/50" />
+                                    <div>
+                                        <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Altura</p>
+                                        <p className="font-semibold">{measurement.height || client.height || '--'} cm</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <Activity size={20} className="text-white/50" />
+                                    <div>
+                                        <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Nivel de Actividad</p>
+                                        <p className="font-semibold">Nivel {measurement.activityLevel || client.activityLevel || '--'}</p>
+                                    </div>
+                                </div>
+                                {client.sessionsPerWeek && (
+                                    <div className="flex items-center gap-3">
+                                        <Zap size={20} className="text-white/50" />
+                                        <div>
+                                            <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Sesiones / Sem</p>
+                                            <p className="font-semibold">{client.sessionsPerWeek} sesiones</p>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
-                        <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20">
-                            <div className="text-xs font-bold uppercase tracking-widest opacity-50 mb-2">Peso Actual</div>
-                            <div className="text-6xl font-black">{measurement.weight}<span className="text-2xl ml-1 opacity-50">kg</span></div>
+                        <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20 h-fit min-w-[200px]">
+                            <div className="text-xs font-bold uppercase tracking-widest opacity-50 mb-2 text-center">Peso Actual</div>
+                            <div className="text-6xl font-black text-center">{measurement.weight}<span className="text-2xl ml-1 opacity-50">kg</span></div>
                         </div>
                     </div>
                 </div>
@@ -217,15 +251,20 @@ export default function ReportDetailView({
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <div className="lg:col-span-2">
                             <HealthScale
-                                title="Indice de Masa Corporal"
-                                value={bmi.value}
+                                title="Fat-Free Mass Index (FFMI)"
+                                value={ffmi.value}
                                 unit="kg/m²"
-                                min={15} max={40}
-                                markers={[
-                                    { label: 'Bajo', val: 18.5 },
-                                    { label: 'Normal', val: 24.9 },
-                                    { label: 'Sobrepeso', val: 29.9 },
-                                    { label: 'Obeso', val: 40 }
+                                min={12} max={30}
+                                markers={client.gender === 'female' ? [
+                                    { label: 'Bajo', val: 14.9 },
+                                    { label: 'Promedio', val: 17.9 },
+                                    { label: 'Excelente', val: 21.9 },
+                                    { label: 'Superior', val: 30 }
+                                ] : [
+                                    { label: 'Bajo', val: 17.9 },
+                                    { label: 'Promedio', val: 20.9 },
+                                    { label: 'Excelente', val: 24.9 },
+                                    { label: 'Superior', val: 30 }
                                 ]}
                             />
                         </div>
@@ -265,14 +304,28 @@ export default function ReportDetailView({
                         </div>
                         <div className="lg:col-span-2">
                             <HealthScale
+                                title="MFR (Muscle-to-Fat Ratio)"
+                                value={mfr.value}
+                                unit="ratio"
+                                min={0} max={6}
+                                markers={[
+                                    { label: 'Pobre', val: 1.5 },
+                                    { label: 'Aceptable', val: 2.5 },
+                                    { label: 'Bueno', val: 4.0 },
+                                    { label: 'Atlético', val: 6 }
+                                ]}
+                            />
+                        </div>
+                        <div className="lg:col-span-2">
+                            <HealthScale
                                 title="Grasa Visceral"
                                 value={measurement.visceralFat}
                                 unit="lvl"
                                 min={1} max={20}
                                 markers={[
-                                    { label: 'Saludable', val: 9 },
-                                    { label: 'Exceso', val: 12 },
-                                    { label: 'Alto Riesgo', val: 15 }
+                                    { label: 'Saludable', val: 12 },
+                                    { label: 'Exceso', val: 15 },
+                                    { label: 'Riesgo', val: 20 }
                                 ]}
                             />
                         </div>
