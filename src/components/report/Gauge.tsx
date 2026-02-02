@@ -18,9 +18,10 @@ interface GaugeProps {
     max: number;
     unit: string;
     markers: GaugeMarker[];
+    ticks?: number[]; // Array of percentages (0-100) where divider lines should appear
 }
 
-export default function Gauge({ value, min, max, unit, markers }: GaugeProps) {
+export default function Gauge({ value, min, max, unit, markers, ticks }: GaugeProps) {
     // Segment-based scaling logic
     const calculateSegmentPercentage = (v: number) => {
         const thresholds = [min, ...markers.map(m => m.val)];
@@ -48,6 +49,9 @@ export default function Gauge({ value, min, max, unit, markers }: GaugeProps) {
 
     const circumference = Math.PI * radius;
     const strokeDashoffset = circumference - (percentage / 100) * circumference;
+
+    // Default ticks if not provided
+    const activeTicks = ticks || [25, 50, 75];
 
     return (
         <a
@@ -86,8 +90,8 @@ export default function Gauge({ value, min, max, unit, markers }: GaugeProps) {
                         className="transition-all duration-1000 ease-out"
                     />
 
-                    {/* Segment Ticks (Equally spaced at 25%, 50%, 75%) */}
-                    {[25, 50, 75].map((p, i) => {
+                    {/* Segment Ticks */}
+                    {activeTicks.map((p, i) => {
                         const angle = Math.PI + (p / 100) * Math.PI;
                         const x1 = centerX + (radius - 3) * Math.cos(angle);
                         const y1 = centerY + (radius - 3) * Math.sin(angle);

@@ -30,6 +30,37 @@ export default function ReportHeader({ client, measurement, ffmi }: ReportHeader
         return labels[level] || `Nivel ${level}`;
     };
 
+    // --- Gauge Controller Configuration ---
+    // Adjust these variables to control the gauge appearance
+    const gaugeController = {
+        ticks: [25, 50, 75], // Partitions at 25%, 50%, 75%
+        female: {
+            min: 12,
+            max: 30,
+            unit: "kg/m²",
+            markers: [
+                { label: 'Bajo', val: 15, position: { percentage: 0, radiusOffset: 30, textAnchor: 'end' } },
+                { label: 'Promedio', val: 18, position: { percentage: 8, radiusOffset: 20, yOffset: -35 } },
+                { label: 'Excelente', val: 22, position: { percentage: 92, radiusOffset: 20, yOffset: -35 } },
+                { label: 'Superior', val: 30, position: { percentage: 100, radiusOffset: 30, textAnchor: 'start' } }
+            ]
+        },
+        male: {
+            min: 12,
+            max: 30, // Using same max for symmetry unless specified otherwise
+            unit: "kg/m²",
+            markers: [
+                { label: 'Bajo', val: 18, position: { percentage: 0, radiusOffset: 30, textAnchor: 'end' } },
+                { label: 'Promedio', val: 21, position: { percentage: 8, radiusOffset: 20, yOffset: -35 } },
+                { label: 'Excelente', val: 25, position: { percentage: 92, radiusOffset: 20, yOffset: -35 } },
+                { label: 'Superior', val: 30, position: { percentage: 100, radiusOffset: 30, textAnchor: 'start' } }
+            ]
+        }
+    };
+
+    // Select active config based on gender
+    const activeConfig = client.gender === 'female' ? gaugeController.female : gaugeController.male;
+
     return (
         <div className="bg-plum rounded-[3rem] p-12 text-white shadow-2xl relative overflow-hidden">
             <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
@@ -89,19 +120,11 @@ export default function ReportHeader({ client, measurement, ffmi }: ReportHeader
                 <div className="bg-white/10 backdrop-blur-md rounded-3xl p-3 border border-white/20 h-fit min-w-[340px] flex flex-col items-center justify-center">
                     <Gauge
                         value={ffmi.value}
-                        min={12} max={30}
-                        unit="kg/m²"
-                        markers={client.gender === 'female' ? [
-                            { label: 'Bajo', val: 15, position: { percentage: 0, radiusOffset: 30, textAnchor: 'end' } },
-                            { label: 'Promedio', val: 18, position: { percentage: 8, radiusOffset: 20, yOffset: -35 } },
-                            { label: 'Excelente', val: 22, position: { percentage: 92, radiusOffset: 20, yOffset: -35 } },
-                            { label: 'Superior', val: 30, position: { percentage: 100, radiusOffset: 30, textAnchor: 'start' } }
-                        ] : [
-                            { label: 'Bajo', val: 18, position: { percentage: 0, radiusOffset: 30, textAnchor: 'end' } },
-                            { label: 'Promedio', val: 21, position: { percentage: 8, radiusOffset: 20, yOffset: -35 } },
-                            { label: 'Excelente', val: 25, position: { percentage: 92, radiusOffset: 20, yOffset: -35 } },
-                            { label: 'Superior', val: 30, position: { percentage: 100, radiusOffset: 30, textAnchor: 'start' } }
-                        ]}
+                        min={activeConfig.min}
+                        max={activeConfig.max}
+                        unit={activeConfig.unit}
+                        markers={activeConfig.markers as any} // Cast to any to avoid strict type checks on position during dev
+                        ticks={gaugeController.ticks}
                     />
                     <div className="text-[10px] font-bold uppercase tracking-widest opacity-70 mt-4 text-center leading-tight">
                         Índice de Masa<br />Libre de Grasa
