@@ -54,6 +54,8 @@ export default function ReportDetailView({
     measurement: any,
     history?: any[]
 }) {
+    // activeGroup and metricGroups removed as they are no longer used
+
     const getActivityLevelLabel = (level: number | null) => {
         if (!level) return '--';
         const labels: Record<number, string> = {
@@ -82,6 +84,34 @@ export default function ReportDetailView({
     const bmrCalc = calculateBMR(measurement.weight, measurement.height || client.height, client.age || 0, client.gender || 'male');
     const metAgeCalc = interpretMetabolicAge(measurement.metabolicAge || 0, client.age || 0);
     const boneMassCalc = interpretBoneMass(measurement.boneMass || 0, measurement.weight, client.gender || 'male');
+
+    // Prepare chart data merging history with current measurement
+    const chartData = React.useMemo(() => {
+        // Create a map to avoid duplicates based on date string
+        const dataMap = new Map();
+
+        // Add history items
+        history.forEach(item => {
+            const dateStr = new Date(item.date).toISOString().split('T')[0];
+            dataMap.set(dateStr, { ...item });
+        });
+
+        // Add/Overwrite with current measurement
+        if (measurement.date) {
+            const currentDateStr = new Date(measurement.date).toISOString().split('T')[0];
+            dataMap.set(currentDateStr, { ...measurement });
+        }
+
+        // Convert back to array and sort
+        return Array.from(dataMap.values())
+            .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+            .slice(-10) // Keep only last 10
+            .map(record => ({
+                ...record,
+                ffmi: calculateFFMI(record.weight, record.fatPercent, record.height || client.height, client.gender).value,
+                fatMassKg: Number((record.weight * (record.fatPercent / 100)).toFixed(1))
+            }));
+    }, [history, measurement, client.height, client.gender]);
 
     const Tooltip = ({ text }: { text: string }) => (
         <div className="group relative inline-block ml-1">
@@ -231,25 +261,33 @@ export default function ReportDetailView({
         );
     };
 
-    const StatusRow = ({ label, value, unit, status, statusColor, icon: Icon }: any) => (
-        <div className="bg-white/50 p-4 rounded-3xl flex items-center justify-between group hover:bg-white transition-all border border-transparent hover:border-gray-100">
-            <div className="flex items-center gap-4">
-                <div className="p-3 bg-white rounded-2xl shadow-sm group-hover:shadow-md transition-shadow">
-                    <Icon size={20} className="text-plum" />
-                </div>
-                <div>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">{label}</p>
-                    <div className="flex items-baseline gap-1">
-                        <span className="text-lg font-bold text-plum">{value}</span>
-                        <span className="text-[10px] text-gray-400 font-medium">{unit}</span>
+    // TinyLineChart removed as requested
+
+
+    const StatusRow = ({ label, value, unit, status, statusColor, icon: Icon }: any) => {
+        return (
+            <div className="bg-white/50 p-4 rounded-3xl flex items-center justify-between group hover:bg-white transition-all border border-transparent hover:border-gray-100 relative overflow-hidden">
+                <div className="flex items-center gap-4 z-10 relative">
+                    <div className="p-3 bg-white rounded-2xl shadow-sm group-hover:shadow-md transition-shadow">
+                        <Icon size={20} className="text-plum" />
+                    </div>
+                    <div>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">{label}</p>
+                        <div className="flex items-baseline gap-1">
+                            <span className="text-lg font-bold text-plum">{value}</span>
+                            <span className="text-[10px] text-gray-400 font-medium">{unit}</span>
+                        </div>
                     </div>
                 </div>
+
+                <div className="flex items-center gap-4 z-10 relative">
+                    <span className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full ${statusColor} bg-white shadow-sm border border-gray-50`}>
+                        {status}
+                    </span>
+                </div>
             </div>
-            <span className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full ${statusColor} bg-white shadow-sm border border-gray-50`}>
-                {status}
-            </span>
-        </div>
-    );
+        );
+    };
 
     const Gauge = ({ value, min, max, unit, markers }: { value: number, min: number, max: number, unit: string, markers: { label: string, val: number }[] }) => {
         // Segment-based scaling logic
@@ -464,6 +502,115 @@ export default function ReportDetailView({
                     </div>
                 </div>
 
+                {/* Master History Chart (Option A) */}{/* Only show if we have enough data points including current */}
+                {chartData && chartData.length > 1 && (
+                    <div className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-xl mb-12">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-plum/10 rounded-xl">
+                                    <TrendingUp className="text-plum" size={20} />
+                                </div>
+                                <div>
+                                    <h4 className="text-lg font-bold text-plum">Historial de Progreso</h4>
+                                    <p className="text-xs text-gray-400 font-medium">Evolución: Masa Libre de Grasa, Porcentaje Graso y Músculo.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="h-[300px] w-full mb-6">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart
+                                    data={chartData}
+                                    margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+                                >
+                                    <defs>
+                                        <linearGradient id="gradient-ffmi" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.2} />
+                                            <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
+                                        </linearGradient>
+                                        <linearGradient id="gradient-fatMassKg" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.2} />
+                                            <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
+                                        </linearGradient>
+                                        <linearGradient id="gradient-muscleMass" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#10b981" stopOpacity={0.2} />
+                                            <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                                        </linearGradient>
+                                    </defs>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                                    <XAxis
+                                        dataKey="date"
+                                        tick={{ fontSize: 10, fill: '#9ca3af' }}
+                                        tickLine={false}
+                                        axisLine={false}
+                                        tickFormatter={(val) => new Date(val).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                                        dy={10}
+                                    />
+                                    <YAxis
+                                        domain={['auto', 'auto']}
+                                        tick={{ fontSize: 10, fill: '#9ca3af' }}
+                                        tickLine={false}
+                                        axisLine={false}
+                                        width={30}
+                                    />
+                                    <RechartsTooltip
+                                        contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)' }}
+                                        itemStyle={{ fontSize: '12px', fontWeight: 600, padding: '2px 0' }}
+                                        labelStyle={{ color: '#9ca3af', marginBottom: '8px', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}
+                                    />
+
+                                    <Area
+                                        type="monotone"
+                                        dataKey="ffmi"
+                                        stroke="#8b5cf6"
+                                        strokeWidth={3}
+                                        fillOpacity={1}
+                                        fill="url(#gradient-ffmi)"
+                                        name="Masa Libre de Grasa"
+                                        unit="kg"
+                                    />
+                                    <Area
+                                        type="monotone"
+                                        dataKey="fatMassKg"
+                                        stroke="#f59e0b"
+                                        strokeWidth={3}
+                                        fillOpacity={1}
+                                        fill="url(#gradient-fatMassKg)"
+                                        name="Grasa Corporal"
+                                        unit="kg"
+                                    />
+                                    <Area
+                                        type="monotone"
+                                        dataKey="muscleMass"
+                                        stroke="#10b981"
+                                        strokeWidth={3}
+                                        fillOpacity={1}
+                                        fill="url(#gradient-muscleMass)"
+                                        name="Masa Muscular"
+                                        unit="kg"
+                                    />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        </div>
+
+                        {/* Legend */}
+                        <div className="flex flex-wrap justify-center gap-6">
+                            <div className="flex items-center gap-2">
+                                <div className="w-3 h-3 rounded-full bg-violet-500" />
+                                <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Masa Libre Grasa (kg)</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <div className="w-3 h-3 rounded-full bg-amber-500" />
+                                <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Grasa Corporal (kg)</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <div className="w-3 h-3 rounded-full bg-emerald-500" />
+                                <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Masa Muscular</span>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {/* New Section 2: Fragmented Dashboard Layout */}
                 <div className="space-y-8 mb-12">
                     {/* 1) Top Horizontal Card: Core Composition */}
@@ -579,6 +726,8 @@ export default function ReportDetailView({
                                     status={asmi.label.toUpperCase()}
                                     statusColor={asmi.color}
                                     icon={Activity}
+                                // No direct history for ASMI unless calculated for all past records? 
+                                // Skipping graph for inferred index for now to ensure safety.
                                 />
                             </div>
                         </div>
@@ -599,6 +748,8 @@ export default function ReportDetailView({
                                     status={visceral.label}
                                     statusColor={visceral.color}
                                     icon={AlertCircle}
+                                    history={history}
+                                    dataKey="visceralFat"
                                 />
                                 <StatusRow
                                     label="Masa Ósea"
@@ -607,14 +758,18 @@ export default function ReportDetailView({
                                     status={boneMassCalc.label}
                                     statusColor={boneMassCalc.color}
                                     icon={Dna}
+                                    history={history}
+                                    dataKey="boneMass"
                                 />
                                 <StatusRow
                                     label="Peso"
                                     value={measurement.weight}
                                     unit="kg"
-                                    status="REG"
-                                    statusColor="text-plum"
+                                    status="ACTUAL"
+                                    statusColor="text-plum bg-plum/5 border-plum/10"
                                     icon={Weight}
+                                    history={history}
+                                    dataKey="weight"
                                 />
                                 <StatusRow
                                     label="BMI (IMC)"
@@ -623,6 +778,8 @@ export default function ReportDetailView({
                                     status={bmi.label.toUpperCase()}
                                     statusColor={bmi.color}
                                     icon={Scale}
+                                    history={history}
+                                    dataKey="bmi"
                                 />
                             </div>
                         </div>
