@@ -17,7 +17,8 @@ import {
     AlertCircle,
     CheckCircle2,
     Zap as Flash,
-    ArrowUpRight
+    ArrowUpRight,
+    Ruler
 } from 'lucide-react';
 import Link from 'next/link';
 import {
@@ -50,6 +51,16 @@ export default function ReportDetailView({
     measurement: any,
     history?: any[]
 }) {
+    const getActivityLevelLabel = (level: number | null) => {
+        if (!level) return '--';
+        const labels: Record<number, string> = {
+            1: 'Sedentario',
+            2: 'Moderadamente activo',
+            3: 'Muy activo / Atleta'
+        };
+        return labels[level] || `Nivel ${level}`;
+    };
+
     // Perform calculations
     const bmi = calculateBMI(measurement.weight, measurement.height || client.height);
     const asmi = calculateASMI(
@@ -204,14 +215,23 @@ export default function ReportDetailView({
                                 <div className="flex items-center gap-3">
                                     <Calendar size={20} className="text-white/50" />
                                     <div>
-                                        <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Edad / Cumpleaños</p>
-                                        <p className="font-semibold">
-                                            {client.age || '--'} años {client.birthday ? `(${new Date(client.birthday).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })})` : ''}
-                                        </p>
+                                        <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Edad</p>
+                                        <p className="font-semibold">{client.age || '--'} años</p>
                                     </div>
                                 </div>
+                                {client.birthday && (
+                                    <div className="flex items-center gap-3">
+                                        <Calendar size={20} className="text-white/50" />
+                                        <div>
+                                            <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Cumpleaños</p>
+                                            <p className="font-semibold">
+                                                {new Date(client.birthday).toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
                                 <div className="flex items-center gap-3">
-                                    <TrendingUp size={20} className="text-white/50" />
+                                    <Ruler size={20} className="text-white/50" />
                                     <div>
                                         <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Altura</p>
                                         <p className="font-semibold">{measurement.height || client.height || '--'} cm</p>
@@ -221,14 +241,14 @@ export default function ReportDetailView({
                                     <Activity size={20} className="text-white/50" />
                                     <div>
                                         <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Nivel de Actividad</p>
-                                        <p className="font-semibold">Nivel {measurement.activityLevel || client.activityLevel || '--'}</p>
+                                        <p className="font-semibold">{getActivityLevelLabel(measurement.activityLevel || client.activityLevel)}</p>
                                     </div>
                                 </div>
                                 {client.sessionsPerWeek && (
                                     <div className="flex items-center gap-3">
                                         <Zap size={20} className="text-white/50" />
                                         <div>
-                                            <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Sesiones / Sem</p>
+                                            <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Sesiones por semana</p>
                                             <p className="font-semibold">{client.sessionsPerWeek} sesiones</p>
                                         </div>
                                     </div>
