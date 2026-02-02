@@ -502,114 +502,7 @@ export default function ReportDetailView({
                     </div>
                 </div>
 
-                {/* Master History Chart (Option A) */}{/* Only show if we have enough data points including current */}
-                {chartData && chartData.length > 1 && (
-                    <div className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-xl mb-12">
-                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
-                            <div className="flex items-center gap-3">
-                                <div className="p-2 bg-plum/10 rounded-xl">
-                                    <TrendingUp className="text-plum" size={20} />
-                                </div>
-                                <div>
-                                    <h4 className="text-lg font-bold text-plum">Historial de Progreso</h4>
-                                    <p className="text-xs text-gray-400 font-medium">Evolución: Masa Libre de Grasa, Porcentaje Graso y Músculo.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="h-[300px] w-full mb-6">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <AreaChart
-                                    data={chartData}
-                                    margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
-                                >
-                                    <defs>
-                                        <linearGradient id="gradient-ffmi" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.2} />
-                                            <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
-                                        </linearGradient>
-                                        <linearGradient id="gradient-fatMassKg" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.2} />
-                                            <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
-                                        </linearGradient>
-                                        <linearGradient id="gradient-muscleMass" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#10b981" stopOpacity={0.2} />
-                                            <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                                        </linearGradient>
-                                    </defs>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                                    <XAxis
-                                        dataKey="date"
-                                        tick={{ fontSize: 10, fill: '#9ca3af' }}
-                                        tickLine={false}
-                                        axisLine={false}
-                                        tickFormatter={(val) => new Date(val).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-                                        dy={10}
-                                    />
-                                    <YAxis
-                                        domain={['auto', 'auto']}
-                                        tick={{ fontSize: 10, fill: '#9ca3af' }}
-                                        tickLine={false}
-                                        axisLine={false}
-                                        width={30}
-                                    />
-                                    <RechartsTooltip
-                                        contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)' }}
-                                        itemStyle={{ fontSize: '12px', fontWeight: 600, padding: '2px 0' }}
-                                        labelStyle={{ color: '#9ca3af', marginBottom: '8px', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}
-                                    />
-
-                                    <Area
-                                        type="monotone"
-                                        dataKey="ffmi"
-                                        stroke="#8b5cf6"
-                                        strokeWidth={3}
-                                        fillOpacity={1}
-                                        fill="url(#gradient-ffmi)"
-                                        name="Masa Libre de Grasa"
-                                        unit="kg"
-                                    />
-                                    <Area
-                                        type="monotone"
-                                        dataKey="fatMassKg"
-                                        stroke="#f59e0b"
-                                        strokeWidth={3}
-                                        fillOpacity={1}
-                                        fill="url(#gradient-fatMassKg)"
-                                        name="Grasa Corporal"
-                                        unit="kg"
-                                    />
-                                    <Area
-                                        type="monotone"
-                                        dataKey="muscleMass"
-                                        stroke="#10b981"
-                                        strokeWidth={3}
-                                        fillOpacity={1}
-                                        fill="url(#gradient-muscleMass)"
-                                        name="Masa Muscular"
-                                        unit="kg"
-                                    />
-                                </AreaChart>
-                            </ResponsiveContainer>
-                        </div>
-
-                        {/* Legend */}
-                        <div className="flex flex-wrap justify-center gap-6">
-                            <div className="flex items-center gap-2">
-                                <div className="w-3 h-3 rounded-full bg-violet-500" />
-                                <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Masa Libre Grasa (kg)</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <div className="w-3 h-3 rounded-full bg-amber-500" />
-                                <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Grasa Corporal (kg)</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <div className="w-3 h-3 rounded-full bg-emerald-500" />
-                                <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Masa Muscular</span>
-                            </div>
-                        </div>
-                    </div>
-                )}
+                {/* Master History Chart (Option A) removed as requested */}
 
                 {/* New Section 2: Fragmented Dashboard Layout */}
                 <div className="space-y-8 mb-12">
@@ -787,38 +680,7 @@ export default function ReportDetailView({
                 </div>
 
 
-                {/* Section: Progress History */}
-                {history.length >= 2 && (
-                    <section>
-                        <SectionHeader
-                            title="Evolución Histórica"
-                            subtitle="Seguimiento visual de tu progreso a lo largo del tiempo."
-                        />
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <ProgressChart
-                                title="Peso"
-                                data={history}
-                                dataKey="weight"
-                                color="#4a304b" // Plum
-                                unit="kg"
-                            />
-                            <ProgressChart
-                                title="Grasa Corporal"
-                                data={history}
-                                dataKey="fatPercent"
-                                color="#c2a05b" // Gold
-                                unit="%"
-                            />
-                            <ProgressChart
-                                title="Masa Muscular"
-                                data={history}
-                                dataKey="muscleMass"
-                                color="#a4b9bc" // Sage
-                                unit="kg"
-                            />
-                        </div>
-                    </section>
-                )}
+                {/* Section: Progress History removed as requested */}
 
                 {/* Segmental Analysis */}
                 <section className="bg-white rounded-[3rem] p-12 border border-gray-100 shadow-xl">
