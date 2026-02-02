@@ -205,10 +205,10 @@ export default function ReportDetailView({
         const percentage = calculateSegmentPercentage(value);
         const strokeWidth = 10;
         const radius = 70;
-        const width = 240;
-        const height = 150;
+        const width = 340;
+        const height = 160;
         const centerX = width / 2;
-        const centerY = 120;
+        const centerY = 130;
 
         const circumference = Math.PI * radius;
         const strokeDashoffset = circumference - (percentage / 100) * circumference;
@@ -293,7 +293,7 @@ export default function ReportDetailView({
                             );
                         })}
                     </svg>
-                    <div className="absolute top-[85px] left-1/2 -translate-x-1/2 flex flex-col items-center w-full">
+                    <div className="absolute top-[95px] left-1/2 -translate-x-1/2 flex flex-col items-center w-full">
                         <span className="text-5xl font-black leading-tight">{value}</span>
                         <span className="text-[10px] font-bold opacity-40 uppercase tracking-widest -mt-1">{unit}</span>
                     </div>
@@ -380,7 +380,7 @@ export default function ReportDetailView({
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20 h-fit min-w-[240px] flex flex-col items-center justify-center pt-8">
+                        <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20 h-fit min-w-[340px] flex flex-col items-center justify-center pt-8">
                             <Gauge
                                 value={ffmi.value}
                                 min={12} max={30}
