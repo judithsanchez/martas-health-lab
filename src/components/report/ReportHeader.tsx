@@ -92,15 +92,15 @@ export default function ReportHeader({ client, measurement, ffmi }: ReportHeader
                         min={12} max={30}
                         unit="kg/m²"
                         markers={client.gender === 'female' ? [
-                            { label: 'Bajo', val: 15 },
-                            { label: 'Promedio', val: 18 },
-                            { label: 'Excelente', val: 22 },
-                            { label: 'Superior', val: 30 }
+                            { label: 'Bajo', val: 15, position: { percentage: 0, radiusOffset: 30, textAnchor: 'end' } },
+                            { label: 'Promedio', val: 18, position: { percentage: 8, radiusOffset: 20, yOffset: -35 } },
+                            { label: 'Excelente', val: 22, position: { percentage: 92, radiusOffset: 20, yOffset: -35 } },
+                            { label: 'Superior', val: 30, position: { percentage: 100, radiusOffset: 30, textAnchor: 'start' } }
                         ] : [
-                            { label: 'Bajo', val: 18 },
-                            { label: 'Promedio', val: 21 },
-                            { label: 'Excelente', val: 25 },
-                            { label: 'Superior', val: 30 }
+                            { label: 'Bajo', val: 18, position: { percentage: 0, radiusOffset: 30, textAnchor: 'end' } },
+                            { label: 'Promedio', val: 21, position: { percentage: 8, radiusOffset: 20, yOffset: -35 } },
+                            { label: 'Excelente', val: 25, position: { percentage: 92, radiusOffset: 20, yOffset: -35 } },
+                            { label: 'Superior', val: 30, position: { percentage: 100, radiusOffset: 30, textAnchor: 'start' } }
                         ]}
                     />
                     <div className="text-[10px] font-bold uppercase tracking-widest opacity-70 mt-4 text-center leading-tight">

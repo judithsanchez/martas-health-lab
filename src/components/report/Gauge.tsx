@@ -1,11 +1,23 @@
 import React from 'react';
 
+interface GaugeMarker {
+    label: string;
+    val: number;
+    position?: {
+        percentage?: number;
+        radiusOffset?: number;
+        xOffset?: number;
+        yOffset?: number;
+        textAnchor?: "start" | "middle" | "end";
+    };
+}
+
 interface GaugeProps {
     value: number;
     min: number;
     max: number;
     unit: string;
-    markers: { label: string; val: number }[];
+    markers: GaugeMarker[];
 }
 
 export default function Gauge({ value, min, max, unit, markers }: GaugeProps) {
@@ -88,29 +100,17 @@ export default function Gauge({ value, min, max, unit, markers }: GaugeProps) {
 
                     {/* Labels Positioning */}
                     {markers.map((m, i) => {
-                        let p = 0;
-                        let textAnchor: "start" | "middle" | "end" = "middle";
-                        let labelRadius = radius + 25;
-                        let offsetY = 0;
-
-                        if (i === 0) {
-                            p = 0; // BAJO at the very start
-                            textAnchor = "end";
-                            labelRadius = radius + 30;
-                        } else if (i === markers.length - 1) {
-                            p = 100; // SUPERIOR at the very end
-                            textAnchor = "start";
-                            labelRadius = radius + 30;
-                        } else {
-                            // PROMEDIO and EXCELENTE
-                            p = i === 1 ? 8 : 92;
-                            labelRadius = radius + 20;
-                            offsetY = -35;
-                        }
+                        // Default positioning if not specified (fallback)
+                        const defaultPercentage = (i / (markers.length - 1)) * 100;
+                        const p = m.position?.percentage ?? defaultPercentage;
+                        const r = radius + (m.position?.radiusOffset ?? 25);
+                        const dx = m.position?.xOffset ?? 0;
+                        const dy = m.position?.yOffset ?? 0;
+                        const textAnchor = m.position?.textAnchor ?? "middle";
 
                         const angle = Math.PI + (p / 100) * Math.PI;
-                        const tx = centerX + labelRadius * Math.cos(angle);
-                        const ty = centerY + labelRadius * Math.sin(angle) + offsetY;
+                        const tx = centerX + r * Math.cos(angle) + dx;
+                        const ty = centerY + r * Math.sin(angle) + dy;
 
                         return (
                             <text
