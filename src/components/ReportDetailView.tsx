@@ -351,13 +351,15 @@ export default function ReportDetailView({
 
                     {/* MFR Standalone Section (Horizontal Insert) */}
                     <div className="bg-gold/10 rounded-[3rem] p-10 border border-gold/20 shadow-lg">
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="p-2 bg-white rounded-xl shadow-sm">
+                        <div className="flex items-start gap-4 mb-6">
+                            <div className="p-2 bg-white rounded-xl shadow-sm mt-1">
                                 <TrendingUp className="text-gold" size={20} />
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div>
                                 <h4 className="text-xl font-bold text-plum">Relación Músculo-Grasa (MFR)</h4>
-                                <Tooltip text="Muscle-to-Fat Ratio: Indica cuántos kg de músculo tienes por cada kg de grasa. Un valor > 2.5 es saludable, > 4.0 es ideal para atletas." />
+                                <p className="text-sm text-plum/70 mt-1 max-w-2xl leading-relaxed">
+                                    Indica cuántos kg de músculo tienes por cada kg de grasa. Un valor &gt; 2.5 es saludable, &gt; 4.0 es ideal para atletas.
+                                </p>
                             </div>
                         </div>
 
