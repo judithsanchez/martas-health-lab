@@ -42,8 +42,8 @@ export default function ReportHeader({ client, measurement, ffmi }: ReportHeader
             unit: "kg/m²",
             markers: [
                 { label: 'Bajo', val: 15, color: 'bg-indigo-500', position: { percentage: 0, radiusOffset: 25, textAnchor: 'end' } },
-                { label: 'Promedio', val: 18, color: 'bg-emerald-500', position: { percentage: 8, radiusOffset: 15, yOffset: -35 } },
-                { label: 'Excelente', val: 22, color: 'bg-amber-500', position: { percentage: 92, radiusOffset: 15, yOffset: -35 } },
+                { label: '', val: 18, color: 'bg-emerald-500', position: { percentage: 8, radiusOffset: 15, yOffset: -35 } },
+                { label: '', val: 22, color: 'bg-amber-500', position: { percentage: 92, radiusOffset: 15, yOffset: -35 } },
                 { label: 'Superior', val: 30, color: 'bg-rose-500', position: { percentage: 100, radiusOffset: 25, textAnchor: 'start' } }
             ]
         },
@@ -53,8 +53,8 @@ export default function ReportHeader({ client, measurement, ffmi }: ReportHeader
             unit: "kg/m²",
             markers: [
                 { label: 'Bajo', val: 18, color: 'bg-indigo-500', position: { percentage: 0, radiusOffset: 25, textAnchor: 'end' } },
-                { label: 'Promedio', val: 21, color: 'bg-emerald-500', position: { percentage: 8, radiusOffset: 15, yOffset: -35 } },
-                { label: 'Excelente', val: 25, color: 'bg-amber-500', position: { percentage: 92, radiusOffset: 15, yOffset: -35 } },
+                { label: '', val: 21, color: 'bg-emerald-500', position: { percentage: 8, radiusOffset: 15, yOffset: -35 } },
+                { label: '', val: 25, color: 'bg-amber-500', position: { percentage: 92, radiusOffset: 15, yOffset: -35 } },
                 { label: 'Superior', val: 30, color: 'bg-rose-500', position: { percentage: 100, radiusOffset: 25, textAnchor: 'start' } }
             ]
         }

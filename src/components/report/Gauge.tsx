@@ -73,14 +73,12 @@ export default function Gauge({ value, min, max, unit, markers }: GaugeProps) {
             </div>
 
             {/* Legend / Labels below */}
-            <div className="flex justify-between mt-2 text-[10px] uppercase font-bold text-white/30 tracking-widest">
-                <span>{min}</span>
-                <div className="flex gap-4">
+            <div className="flex justify-center mt-2 text-[10px] uppercase font-bold text-white/30 tracking-widest">
+                <div className="flex justify-between w-full px-1">
                     {ranges.map((r, i) => (
-                        <span key={i} className="hidden sm:inline-block">{r.label}</span>
+                        <span key={i}>{r.label}</span>
                     ))}
                 </div>
-                <span>{max}</span>
             </div>
         </div>
     );
