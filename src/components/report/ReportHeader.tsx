@@ -33,7 +33,7 @@ export default function ReportHeader({ client, measurement, ffmi }: ReportHeader
     // --- Gauge Controller Configuration ---
     // Adjust these variables to control the gauge appearance
     const gaugeController = {
-        width: 480, // Increased width to prevent cramping
+        width: 350, // Increased width to prevent cramping
         height: 140,
         ticks: [25, 50, 75], // Partitions at 25%, 50%, 75%
         female: {
@@ -119,7 +119,7 @@ export default function ReportHeader({ client, measurement, ffmi }: ReportHeader
                         )}
                     </div>
                 </div>
-                <div className="bg-white/10 backdrop-blur-md rounded-3xl p-1 border border-white/20 h-fit flex flex-col items-center justify-center">
+                <div className="bg-white/10 backdrop-blur-md rounded-3xl p-1 border border-white/20 h-fit flex flex-col items-center justify-center" style={{ width: gaugeController.width }}>
                     <div className="w-full flex items-center justify-center">
                         <Gauge
                             value={ffmi.value}
