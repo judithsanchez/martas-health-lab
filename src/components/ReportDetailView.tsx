@@ -377,9 +377,9 @@ export default function ReportDetailView({
                         />
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* 2) Metabolic Health Card */}
-                        <div className="bg-white rounded-[3rem] p-10 border border-gray-100 shadow-xl">
+                        <div className="bg-white rounded-[3rem] p-8 border border-gray-100 shadow-xl">
                             <div className="flex items-center gap-3 mb-8">
                                 <div className="p-2 bg-gold/10 rounded-xl">
                                     <Zap className="text-gold" size={18} />
@@ -432,7 +432,7 @@ export default function ReportDetailView({
                         </div>
 
                         {/* 3) Physical Indices Grid (Replaces List) */}
-                        <div className="bg-white rounded-[3rem] p-10 border border-gray-100 shadow-xl">
+                        <div className="bg-white rounded-[3rem] p-8 border border-gray-100 shadow-xl">
                             <div className="flex items-center gap-3 mb-8">
                                 <div className="p-2 bg-plum/10 rounded-xl">
                                     <Scale className="text-plum" size={18} />
