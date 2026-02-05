@@ -41,10 +41,7 @@ export default function Gauge({ value, min, max, unit, markers }: GaugeProps) {
 
     return (
         <div className="w-full max-w-sm">
-            <div className="flex justify-between items-baseline mb-2">
-                <span className="text-sm font-medium text-white/70 uppercase tracking-wider">
-                    {/* Label could be passed via props if available, or inferred */}
-                </span>
+            <div className="flex justify-center items-baseline mb-2">
                 <div className="flex items-baseline gap-1">
                     <span className="text-4xl font-black text-white tracking-tight">{value}</span>
                     <span className="text-sm font-bold text-white/50 uppercase">{unit}</span>
