@@ -54,7 +54,7 @@ export function calculateASMI(
 
     return {
         value: Number(asmi.toFixed(2)),
-        label: isRisk ? 'Riesgo de Sarcopenia' : 'Masa Muscular Suficiente',
+        label: isRisk ? 'Riesgo Sarcopenia' : 'Masa Suficiente',
         description: "Índice de Masa Músculo Esquelética Apendicular (Gold Standard para Sarcopenia).",
         level: isRisk ? 'risk' : 'optimal',
         color: isRisk ? 'text-red-500' : 'text-green-500'

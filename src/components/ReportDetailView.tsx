@@ -158,24 +158,24 @@ export default function ReportDetailView({
     );
 
     const MetricCard = ({ title, value, unit, label, description, color, icon: Icon, fullTitle, sparklineData, sparklineKey, sparklineColor }: any) => (
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col h-full hover:shadow-md transition-shadow group/card relative overflow-hidden">
-            <div className="flex justify-between items-start mb-4 relative z-10">
-                <div className={`p-3 rounded-2xl bg-gray-50 ${color}`}>
-                    <Icon size={24} />
+        <div className="bg-white rounded-3xl p-4 shadow-sm border border-gray-100 flex flex-col h-full hover:shadow-md transition-shadow group/card relative overflow-hidden">
+            <div className="flex justify-between items-start mb-3 relative z-10">
+                <div className={`p-2 rounded-2xl bg-gray-50 ${color}`}>
+                    <Icon size={18} />
                 </div>
                 {label && (
-                    <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full bg-gray-50 ${color}`}>
+                    <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded-full bg-gray-50 ${color}`}>
                         {label}
                     </span>
                 )}
             </div>
             <div className="flex items-center mb-1 relative z-10">
-                <h4 className="text-gray-500 text-xs font-bold uppercase tracking-widest">{title}</h4>
+                <h4 className="text-gray-500 text-[10px] font-bold uppercase tracking-widest">{title}</h4>
                 {fullTitle && <Tooltip text={fullTitle} />}
             </div>
-            <div className="flex items-baseline gap-1 mb-2 relative z-10">
-                <span className="text-3xl font-bold text-plum">{value}</span>
-                <span className="text-sm font-medium text-gray-400">{unit}</span>
+            <div className="flex items-baseline gap-1 mb-1 relative z-10">
+                <span className="text-2xl font-bold text-plum">{value}</span>
+                <span className="text-xs font-medium text-gray-400">{unit}</span>
             </div>
 
             {/* Sparkline Overlay */}
@@ -201,7 +201,7 @@ export default function ReportDetailView({
                 </div>
             )}
 
-            <p className="text-xs text-gray-400 mt-auto leading-relaxed relative z-10">{description}</p>
+            <p className="text-[10px] text-gray-400 mt-auto leading-relaxed relative z-10">{description}</p>
         </div>
     );
 
@@ -298,19 +298,19 @@ export default function ReportDetailView({
 
         return (
             <div className="bg-white/50 p-4 rounded-3xl flex items-center justify-between group hover:bg-white transition-all border border-transparent hover:border-gray-100 relative overflow-hidden">
-                <div className="flex items-center gap-4 z-10 relative">
-                    <div className="p-3 bg-white rounded-2xl shadow-sm group-hover:shadow-md transition-shadow">
-                        <Icon size={20} className="text-plum" />
+                <div className="flex items-center gap-3 z-10 relative">
+                    <div className="p-2 bg-white rounded-xl shadow-sm group-hover:shadow-md transition-shadow">
+                        <Icon size={16} className="text-plum" />
                     </div>
                     <div>
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">{label}</p>
+                        <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">{label}</p>
                         <div className="flex items-baseline gap-2">
-                            <span className="text-lg font-bold text-plum">{value}</span>
-                            <span className="text-[10px] text-gray-400 font-medium">{unit}</span>
+                            <span className="text-base font-bold text-plum">{value}</span>
+                            <span className="text-[9px] text-gray-400 font-medium">{unit}</span>
 
                             {/* Trend Indicator */}
                             {trend !== undefined && trend !== null && !isNaN(trend) && Math.abs(trend) >= 0.1 && (
-                                <div className={`flex items-center text-[10px] font-bold ${trendColor} bg-white/50 px-1.5 py-0.5 rounded-md`}>
+                                <div className={`flex items-center text-[9px] font-bold ${trendColor} bg-white/50 px-1.5 py-0.5 rounded-md`}>
                                     {trend > 0 ? '▲' : trend < 0 ? '▼' : '-'}
                                     <span className="ml-0.5">{Math.abs(trend).toFixed(1)}</span>
                                 </div>
@@ -320,7 +320,7 @@ export default function ReportDetailView({
                 </div>
 
                 <div className="flex items-center gap-4 z-10 relative">
-                    <span className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full ${statusColor} bg-white shadow-sm border border-gray-50`}>
+                    <span className={`text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-full ${statusColor} bg-white shadow-sm border border-gray-50`}>
                         {status}
                     </span>
                 </div>
