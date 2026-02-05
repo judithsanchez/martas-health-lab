@@ -68,7 +68,7 @@ export async function GET(
                 }
                 
                 /* title adjustments */
-                h1.text-5xl { font-size: 2.5rem !important; margin-bottom: 0.5rem !important; }
+                h1.text-5xl { font-size: 2.5rem !important; margin-bottom: 2rem !important; }
 
                 /* Fix activity level text wrapping */
                 .text-sm { font-size: 0.8rem !important; white-space: nowrap !important; }
