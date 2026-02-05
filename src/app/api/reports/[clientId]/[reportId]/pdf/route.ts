@@ -33,7 +33,7 @@ export async function GET(
         // Also hiding 'ReportHeader' navigation elements if needed, but keeping the Report Title card.
         await page.addStyleTag({
             content: `
-                /* Hide Sidebar - Adjust selector based on actual Sidebar component */
+                /* Hide Sidebar and elements marked no-pdf */
                 aside, nav, .sidebar-container, .no-pdf { display: none !important; }
 
                 /* Reset Main Content Margins and Height */
@@ -70,6 +70,14 @@ export async function GET(
                 .gap-8 { gap: 1rem !important; }
                 .gap-12 { gap: 1.5rem !important; }
 
+                /* FORCE GAUGE VISIBILITY */
+                /* The gauge is hidden on mobile (hidden md:block). We must override this for PDF. */
+                .hidden { display: block !important; } 
+                div[class*="hidden md:block"] { display: block !important; }
+
+                /* Fix backdrop blur issues in PDF */
+                .backdrop-blur-md { backdrop-filter: none !important; background-color: rgba(255, 255, 255, 0.2) !important; }
+
                 /* Ensure background color persists */
                 body { -webkit-print-color-adjust: exact; }
 
@@ -79,7 +87,7 @@ export async function GET(
         });
 
         // Wait a bit for layout to adjust after style injection
-        await new Promise(r => setTimeout(r, 500));
+        await new Promise(r => setTimeout(r, 1500));
 
         // Calculate the full height of the content
         // Since we removed overflow constraints, body/html should now be full height

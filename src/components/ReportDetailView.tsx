@@ -332,18 +332,7 @@ export default function ReportDetailView({
     return (
         <main className="min-h-screen bg-cream pb-20">
             {/* Minimal Header */}
-            <div className="px-12 py-8 max-w-7xl mx-auto flex items-center justify-between">
-                <Link href={`/clients/${client.id}`} className="flex items-center gap-2 text-sage hover:text-plum transition-colors font-bold text-sm">
-                    <ArrowLeft size={18} /> Volver a {client.name}
-                </Link>
-                <div className="flex items-center gap-4">
-                    <span className="text-xs font-bold uppercase tracking-widest text-gray-400 flex items-center gap-2">
-                        <Calendar size={14} /> {new Date(measurement.date).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
-                    </span>
-                </div>
-            </div>
-
-            <div className="px-12 max-w-7xl mx-auto space-y-16">
+            <div className="px-12 max-w-7xl mx-auto space-y-16 mt-8">
                 {/* Hero / Summary Area */}
                 <ReportHeader client={client} measurement={measurement} ffmi={{ ...ffmi, color: ffmi.color || '' }} />
 
