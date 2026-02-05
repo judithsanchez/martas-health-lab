@@ -40,7 +40,7 @@ export default function Gauge({ value, min, max, unit, markers }: GaugeProps) {
     });
 
     return (
-        <div className="w-full max-w-sm">
+        <div className="w-full max-w-lg">
             <div className="flex justify-center items-baseline mb-2">
                 <div className="flex items-baseline gap-1">
                     <span className="text-4xl font-black text-white tracking-tight">{value}</span>

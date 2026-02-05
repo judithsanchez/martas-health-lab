@@ -33,7 +33,7 @@ export default function ReportHeader({ client, measurement, ffmi }: ReportHeader
     // --- Gauge Controller Configuration ---
     // Adjust these variables to control the gauge appearance
     const gaugeController = {
-        width: 340, // Reduced width to tighten horizontal space (was 340)
+        width: 480, // Increased width to prevent cramping
         height: 140,
         ticks: [25, 50, 75], // Partitions at 25%, 50%, 75%
         female: {
