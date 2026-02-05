@@ -264,7 +264,7 @@ export default function ReportDetailView({
                 </div>
                 <div className="relative h-3 bg-gray-200 rounded-full overflow-hidden mb-2">
                     <div
-                        className="absolute top-0 left-0 h-full bg-plum rounded-r-full transition-all duration-1000 ease-out"
+                        className="absolute top-0 left-0 h-full bg-plum rounded-full"
                         style={{ width: `${percentage}%` }}
                     />
                 </div>
