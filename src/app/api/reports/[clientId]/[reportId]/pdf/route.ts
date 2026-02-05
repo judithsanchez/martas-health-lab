@@ -49,7 +49,7 @@ export async function GET(
                     padding: 0 !important; 
                     width: 100% !important; 
                     height: auto !important; 
-                    min-height: 100vh !important; 
+                    min-height: 0 !important; /* Allow height to shrink to content */
                     overflow: visible !important; 
                     position: static !important;
                 }
