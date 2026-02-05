@@ -59,7 +59,7 @@ export async function GET(
                     zoom: 0.85; 
                     background-color: #f9f8f4 !important; 
                     -webkit-print-color-adjust: exact; 
-                    padding-bottom: 50px !important; /* Prevent abrupt cut-off */
+                    padding-bottom: 25px !important; /* Reduced padding from 50px */
                 }
 
                 /* Specific fixes for the Header Card */

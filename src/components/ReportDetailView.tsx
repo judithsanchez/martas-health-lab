@@ -500,7 +500,7 @@ export default function ReportDetailView({
                 {/* Section: Progress History removed as requested */}
 
                 {/* Side-by-Side Layout: Segmental (Left) + Charts (Right) */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-0">
 
                     {/* Left Column: Segmental Analysis (Clean vertical list) */}
                     <section className="bg-white rounded-[3rem] p-8 border border-gray-100 shadow-xl h-full flex flex-col">
