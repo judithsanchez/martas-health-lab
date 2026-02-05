@@ -28,6 +28,13 @@ export async function GET(
             timeout: 60000,
         });
 
+        // Set viewport to A4 width at 2x scale (Retina) for sharp text/charts
+        await page.setViewport({
+            width: 794,
+            height: 1123, // Standard A4 height, though it will expand
+            deviceScaleFactor: 2,
+        });
+
         // Hide sidebar and scrollbars via CSS injection
         // We assume the sidebar has a generic structure to match.
         // Also hiding 'ReportHeader' navigation elements if needed, but keeping the Report Title card.
@@ -100,26 +107,36 @@ export async function GET(
         // Wait a bit for layout to settle (removed transitions should make this faster/safer)
         await new Promise(r => setTimeout(r, 1000));
 
-        // Calculate the full height of the content
-        // Since we removed overflow constraints, body/html should now be full height
-        const bodyHeight = await page.evaluate(() => {
-            return Math.max(
-                document.body.scrollHeight,
-                document.body.offsetHeight,
-                document.documentElement.clientHeight,
-                document.documentElement.scrollHeight,
-                document.documentElement.offsetHeight
-            );
+        // ---------------------------------------------------------
+        // SCREENSHOT-TO-PDF STRATEGY (High Fidelity)
+        // ---------------------------------------------------------
+        // 1. Capture the exact state of the screen/DOM as a PNG
+        const screenshotBuffer = await page.screenshot({
+            fullPage: true,
+            encoding: 'base64',
+            type: 'png'
+            // omit background: transparent so we capture standard white/cream bg
         });
 
-        // Generate PDF
-        // We set width to standard A4 width (794px at 96dpi) to force "Portrait" layout (vertical stack)
-        // and height to full content to make it "pageless"
+        // 2. setContent to an HTML page that just renders this image
+        // This avoids "print compliant" rendering issues (like gradients/gauges disappearing)
+        // because we are printing a flat image.
+        await page.setContent(`
+            <!DOCTYPE html>
+            <html>
+                <body style="margin:0; padding:0; background-color: rgb(255, 252, 248);">
+                    <img src="data:image/png;base64,${screenshotBuffer}" style="width:100%; height:auto; display:block;" />
+                </body>
+            </html>
+        `);
+
+        // 3. Print this "Image Page" to PDF
         const pdfBuffer = await page.pdf({
-            width: '794px',
-            height: `${bodyHeight + 40}px`, // Add some padding
+            width: '794px', // A4 Portrait width
             printBackground: true,
-            pageRanges: '1', // Only 1 "page" which is the full height
+            pageRanges: '1',
+            // Height will be auto-calculated by the printer based on the image length
+            margin: { top: 0, right: 0, bottom: 0, left: 0 }
         });
 
         await browser.close();
