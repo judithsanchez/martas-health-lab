@@ -57,8 +57,9 @@ export async function GET(
                 /* Scale down everything to fit better in Portrait */
                 body { 
                     zoom: 0.85; 
-                    background-color: rgb(255, 252, 248) !important; 
+                    background-color: #f9f8f4 !important; 
                     -webkit-print-color-adjust: exact; 
+                    padding-bottom: 50px !important; /* Prevent abrupt cut-off */
                 }
 
                 /* Specific fixes for the Header Card */
@@ -97,7 +98,7 @@ export async function GET(
                 div[class*="bg-black/20"] { background-color: rgba(0, 0, 0, 0.2) !important; }
                 
                 /* Ensure background color persists globally */
-                body { background-color: rgb(255, 252, 248) !important; }
+                body { background-color: #f9f8f4 !important; }
 
                 /* Hide scrollbars */
                 ::-webkit-scrollbar { display: none; }
@@ -131,7 +132,7 @@ export async function GET(
         await page.setContent(`
             <!DOCTYPE html>
             <html>
-                <body style="margin:0; padding:0; background-color: rgb(255, 252, 248);">
+                <body style="margin:0; padding:0; background-color: #f9f8f4;">
                     <img src="data:image/png;base64,${screenshotBuffer}" style="width:100%; height:auto; display:block;" />
                 </body>
             </html>
