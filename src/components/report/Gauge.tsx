@@ -3,13 +3,8 @@ import React from 'react';
 interface GaugeMarker {
     label: string;
     val: number;
-    position?: {
-        percentage?: number;
-        radiusOffset?: number;
-        xOffset?: number;
-        yOffset?: number;
-        textAnchor?: "start" | "middle" | "end";
-    };
+    color?: string;
+    position?: any; // Kept for interface compatibility but unused
 }
 
 interface GaugeProps {
@@ -18,122 +13,78 @@ interface GaugeProps {
     max: number;
     unit: string;
     markers: GaugeMarker[];
-    ticks?: number[]; // Array of percentages (0-100) where divider lines should appear
-    width?: number;
-    height?: number;
+    ticks?: number[]; // Unused in new design
+    width?: number; // Unused
+    height?: number; // Unused
 }
 
-export default function Gauge({ value, min, max, unit, markers, ticks, width = 280, height = 130 }: GaugeProps) {
-    // Segment-based scaling logic
-    const calculateSegmentPercentage = (v: number) => {
-        const thresholds = [min, ...markers.map(m => m.val)];
-        const segmentCount = markers.length;
-        const segmentWidth = 100 / segmentCount;
+export default function Gauge({ value, min, max, unit, markers }: GaugeProps) {
+    const rangeTotal = max - min;
+    const percentage = Math.min(Math.max(((value - min) / rangeTotal) * 100, 0), 100);
 
-        for (let i = 0; i < segmentCount; i++) {
-            const s = thresholds[i];
-            const e = thresholds[i + 1];
-            if (v <= e) {
-                const inner = (v - s) / (e - s);
-                return (i + Math.min(Math.max(inner, 0), 1)) * segmentWidth;
-            }
-        }
-        return 100;
-    };
+    // Convert markers to ranges
+    // Markers are assumed to be "end" points of ranges, or explicitly sorted thresholds
+    // Logic: range[i] is from (previous_val or min) LOW to markers[i].val HIGH
+    const ranges = markers.map((m, i, arr) => {
+        const start = i === 0 ? min : arr[i - 1].val;
+        const end = m.val;
+        // Use provided color or default to a subtle slate if missing
+        const color = m.color ? `${m.color}/20` : 'bg-slate-700/20';
 
-    const percentage = calculateSegmentPercentage(value);
-    const strokeWidth = 10;
-    const radius = 70;
-    const centerX = width / 2;
-    const centerY = 110;
-
-    const circumference = Math.PI * radius;
-    const strokeDashoffset = circumference - (percentage / 100) * circumference;
-
-    // Default ticks if not provided
-    const activeTicks = ticks || [25, 50, 75];
+        return {
+            start,
+            end,
+            label: m.label,
+            color
+        };
+    });
 
     return (
-        <a
-            href="https://pubmed.ncbi.nlm.nih.gov/7496846/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex flex-col items-center no-underline cursor-pointer group"
-        >
-            <div className="relative">
-                <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} className="overflow-visible">
-                    {/* Background Path */}
-                    <path
-                        d={`M ${centerX - radius} ${centerY} A ${radius} ${radius} 0 0 1 ${centerX + radius} ${centerY}`}
-                        fill="none"
-                        stroke="rgba(255, 255, 255, 0.15)"
-                        strokeWidth={strokeWidth}
-                        strokeLinecap="round"
-                    />
-                    {/* Value Path */}
-                    <path
-                        d={`M ${centerX - radius} ${centerY} A ${radius} ${radius} 0 0 1 ${centerX + radius} ${centerY}`}
-                        fill="none"
-                        stroke="white"
-                        strokeWidth={strokeWidth}
-                        strokeLinecap="round"
-                    />
-                    {/* Value Fill */}
-                    <path
-                        d={`M ${centerX - radius} ${centerY} A ${radius} ${radius} 0 0 1 ${centerX + radius} ${centerY}`}
-                        fill="none"
-                        stroke="white"
-                        strokeWidth={strokeWidth}
-                        strokeLinecap="round"
-                        strokeDasharray={circumference}
-                        strokeDashoffset={strokeDashoffset}
-                        className="transition-all duration-1000 ease-out"
-                    />
-
-                    {/* Segment Ticks */}
-                    {activeTicks.map((p, i) => {
-                        const angle = Math.PI + (p / 100) * Math.PI;
-                        const x1 = centerX + (radius - 3) * Math.cos(angle);
-                        const y1 = centerY + (radius - 3) * Math.sin(angle);
-                        const x2 = centerX + (radius + 3) * Math.cos(angle);
-                        const y2 = centerY + (radius + 3) * Math.sin(angle);
-                        return (
-                            <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="white" strokeOpacity="0.5" strokeWidth="2" strokeLinecap="round" />
-                        );
-                    })}
-
-                    {/* Labels Positioning */}
-                    {markers.map((m, i) => {
-                        // Default positioning if not specified (fallback)
-                        const defaultPercentage = (i / (markers.length - 1)) * 100;
-                        const p = m.position?.percentage ?? defaultPercentage;
-                        const r = radius + (m.position?.radiusOffset ?? 25);
-                        const dx = m.position?.xOffset ?? 0;
-                        const dy = m.position?.yOffset ?? 0;
-                        const textAnchor = m.position?.textAnchor ?? "middle";
-
-                        const angle = Math.PI + (p / 100) * Math.PI;
-                        const tx = centerX + r * Math.cos(angle) + dx;
-                        const ty = centerY + r * Math.sin(angle) + dy;
-
-                        return (
-                            <text
-                                key={i}
-                                x={tx}
-                                y={ty}
-                                textAnchor={textAnchor}
-                                className="fill-white font-bold text-[9px] uppercase tracking-wider opacity-70"
-                            >
-                                {m.label}
-                            </text>
-                        );
-                    })}
-                </svg>
-                <div className="absolute top-[75px] left-1/2 -translate-x-1/2 flex flex-col items-center w-full">
-                    <span className="text-5xl font-black leading-tight">{value}</span>
-                    <span className="text-[10px] font-bold opacity-40 uppercase tracking-widest -mt-1">{unit}</span>
+        <div className="w-full max-w-sm">
+            <div className="flex justify-between items-baseline mb-2">
+                <span className="text-sm font-medium text-white/70 uppercase tracking-wider">
+                    {/* Label could be passed via props if available, or inferred */}
+                </span>
+                <div className="flex items-baseline gap-1">
+                    <span className="text-4xl font-black text-white tracking-tight">{value}</span>
+                    <span className="text-sm font-bold text-white/50 uppercase">{unit}</span>
                 </div>
             </div>
-        </a>
+
+            <div className="relative h-4 w-full bg-black/20 rounded-full overflow-hidden flex backdrop-blur-sm border border-white/5">
+                {/* Background Ranges */}
+                {ranges.map((r, i) => {
+                    // Safe calculation for width percentage
+                    const widthRaw = ((r.end - r.start) / rangeTotal) * 100;
+                    const width = Math.max(0, widthRaw); // Ensure no negative widths
+
+                    return (
+                        <div
+                            key={i}
+                            className={`h-full ${r.color} transition-all duration-300 hover:opacity-100 opacity-80`}
+                            style={{ width: `${width}%` }}
+                            title={`${r.label}: ${r.start} - ${r.end}`}
+                        />
+                    );
+                })}
+
+                {/* Marker */}
+                <div
+                    className="absolute top-0 bottom-0 w-1.5 bg-white shadow-[0_0_15px_rgba(255,255,255,0.8)] z-10 transition-all duration-1000 ease-out rounded-full -ml-[3px]"
+                    style={{ left: `${percentage}%` }}
+                />
+            </div>
+
+            {/* Legend / Labels below */}
+            <div className="flex justify-between mt-2 text-[10px] uppercase font-bold text-white/30 tracking-widest">
+                <span>{min}</span>
+                <div className="flex gap-4">
+                    {ranges.map((r, i) => (
+                        <span key={i} className="hidden sm:inline-block">{r.label}</span>
+                    ))}
+                </div>
+                <span>{max}</span>
+            </div>
+        </div>
     );
 }
