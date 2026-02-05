@@ -262,9 +262,9 @@ export default function ReportDetailView({
                     <h5 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{title}</h5>
                     <span className="text-xl font-bold text-plum">{value}<span className="text-[10px] ml-1 opacity-50">{unit}</span></span>
                 </div>
-                <div className="relative h-2 bg-gray-100 rounded-full overflow-hidden mb-2">
+                <div className="relative h-3 bg-gray-200 rounded-full overflow-hidden mb-2">
                     <div
-                        className="absolute top-0 left-0 h-full bg-plum transition-all duration-1000 ease-out"
+                        className="absolute top-0 left-0 h-full bg-plum rounded-r-full transition-all duration-1000 ease-out"
                         style={{ width: `${percentage}%` }}
                     />
                 </div>
