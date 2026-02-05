@@ -111,16 +111,23 @@ export async function GET(
         // SCREENSHOT-TO-PDF STRATEGY (High Fidelity)
         // ---------------------------------------------------------
         // 1. Capture the exact state of the screen/DOM as a PNG
+        // We capture fullPage: true, which gives us the entire scrollable height
         const screenshotBuffer = await page.screenshot({
             fullPage: true,
             encoding: 'base64',
             type: 'png'
-            // omit background: transparent so we capture standard white/cream bg
         });
 
-        // 2. setContent to an HTML page that just renders this image
-        // This avoids "print compliant" rendering issues (like gradients/gauges disappearing)
-        // because we are printing a flat image.
+        // 2. We need to know the aspect ratio to set the PDF height correctly.
+        // The screenshot dimensions depend on the viewport we set earlier (width: 794).
+        // Let's get the actual body height from the page context to be precise.
+        const bodyHeight = await page.evaluate(() => document.body.scrollHeight);
+
+        // The viewport width was 794. The screenshot height should be bodyHeight.
+        // We add a little padding to be safe.
+        const pdfHeight = bodyHeight + 20;
+
+        // 3. setContent to an HTML page that just renders this image
         await page.setContent(`
             <!DOCTYPE html>
             <html>
@@ -130,12 +137,12 @@ export async function GET(
             </html>
         `);
 
-        // 3. Print this "Image Page" to PDF
+        // 4. Print this "Image Page" to PDF with exact dimensions
         const pdfBuffer = await page.pdf({
-            width: '794px', // A4 Portrait width
+            width: '794px',
+            height: `${pdfHeight}px`, // Dynamically set height to fit the full image
             printBackground: true,
             pageRanges: '1',
-            // Height will be auto-calculated by the printer based on the image length
             margin: { top: 0, right: 0, bottom: 0, left: 0 }
         });
 
