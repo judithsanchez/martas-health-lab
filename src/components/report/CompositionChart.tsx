@@ -65,11 +65,7 @@ export default function CompositionChart({ fatPercent, muscleMass, boneMass, wat
                 </div>
 
                 {/* Legend / Context */}
-                <div className="flex justify-between text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">
-                    <span className="text-orange-400">Grasa ({fatKg.toFixed(1)}kg)</span>
-                    <span className="text-emerald-500 text-center">Músculo ({muscleMass}kg)</span>
-                    <span className="text-slate-400 text-right">Hueso</span>
-                </div>
+                {/* Legend removed as requested */}
             </div>
 
             {/* Variable Separada: Agua */}
