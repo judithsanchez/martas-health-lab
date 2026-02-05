@@ -36,24 +36,69 @@ export async function GET(
                 /* Hide Sidebar - Adjust selector based on actual Sidebar component */
                 aside, nav, .sidebar-container, .no-pdf { display: none !important; }
 
-                /* Reset Main Content Margins */
-                main { margin: 0 !important; padding: 0 !important; width: 100% !important; max-width: 100% !important; }
-                body { overflow: visible !important; background-color: rgb(255, 252, 248) !important; }
+                /* Reset Main Content Margins and Height */
+                html, body, main { 
+                    margin: 0 !important; 
+                    padding: 0 !important; 
+                    width: 100% !important; 
+                    height: auto !important; 
+                    min-height: 100vh !important; 
+                    overflow: visible !important; 
+                    position: static !important;
+                }
+
+                /* Scale down everything to fit better in Portrait */
+                body { 
+                    zoom: 0.85; 
+                    background-color: rgb(255, 252, 248) !important; 
+                    -webkit-print-color-adjust: exact; 
+                }
+
+                /* Specific fixes for the Header Card */
+                .bg-plum {
+                    padding: 1.5rem !important; /* Reduce from p-12 (3rem) to p-6 */
+                    border-radius: 1.5rem !important;
+                }
+                
+                /* title adjustments */
+                h1.text-5xl { font-size: 2.5rem !important; margin-bottom: 0.5rem !important; }
+
+                /* Fix activity level text wrapping */
+                .text-sm { font-size: 0.8rem !important; white-space: nowrap !important; }
+                
+                /* Reduce gap in grid/flex layouts */
+                .gap-8 { gap: 1rem !important; }
+                .gap-12 { gap: 1.5rem !important; }
+
+                /* Ensure background color persists */
+                body { -webkit-print-color-adjust: exact; }
 
                 /* Hide scrollbars */
                 ::-webkit-scrollbar { display: none; }
             `
         });
 
-        // Calculate the full height of the body
-        const bodyHeight = await page.evaluate(() => document.body.scrollHeight);
+        // Wait a bit for layout to adjust after style injection
+        await new Promise(r => setTimeout(r, 500));
+
+        // Calculate the full height of the content
+        // Since we removed overflow constraints, body/html should now be full height
+        const bodyHeight = await page.evaluate(() => {
+            return Math.max(
+                document.body.scrollHeight,
+                document.body.offsetHeight,
+                document.documentElement.clientHeight,
+                document.documentElement.scrollHeight,
+                document.documentElement.offsetHeight
+            );
+        });
 
         // Generate PDF
-        // We set width to standard screen width (e.g., 1440px or 1200px) and height to full content
-        // This creates a "pageless" feel
+        // We set width to standard A4 width (794px at 96dpi) to force "Portrait" layout (vertical stack)
+        // and height to full content to make it "pageless"
         const pdfBuffer = await page.pdf({
-            width: '1440px',
-            height: `${bodyHeight + 50}px`, // Add some padding
+            width: '794px',
+            height: `${bodyHeight + 40}px`, // Add some padding
             printBackground: true,
             pageRanges: '1', // Only 1 "page" which is the full height
         });
