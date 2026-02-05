@@ -262,12 +262,12 @@ export default function ReportDetailView({
                     <h5 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{title}</h5>
                     <span className="text-xl font-bold text-plum">{value}<span className="text-[10px] ml-1 opacity-50">{unit}</span></span>
                 </div>
-                <div className="relative h-3 bg-gray-200 rounded-full overflow-hidden mb-2">
-                    <div
-                        className="absolute top-0 left-0 h-full bg-plum rounded-l-none rounded-r-full"
-                        style={{ width: `${percentage}%` }}
-                    />
-                </div>
+                <div
+                    className="h-3 rounded-full mb-2 w-full overflow-hidden"
+                    style={{
+                        background: `linear-gradient(to right, #4a304b ${percentage}%, #e5e7eb ${percentage}%)`
+                    }}
+                />
                 <div className="flex justify-between">
                     {markers.map((m: any, i: number) => (
                         <div key={i} className="flex flex-col items-center">
