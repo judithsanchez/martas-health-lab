@@ -78,12 +78,15 @@ export default function CompositionChart({ fatPercent, muscleMass, boneMass, wat
                     </div>
 
                     {/* Bone Segment */}
+                    {/* Bone Segment */}
                     <div
                         className="bg-slate-200 flex flex-col justify-center items-center relative transition-all duration-500"
                         style={{ width: `${boneWidth}%` }}
                     >
                         <span className="text-[10px] font-bold uppercase opacity-60 text-slate-500 hidden sm:block">Hueso</span>
-                        <span className="text-sm font-black text-slate-500">{boneMass}kg</span>
+                        <div className='flex items-baseline gap-0.5'>
+                            <span className="text-sm font-black text-slate-500">{((boneMass / weight) * 100).toFixed(1)}%</span>
+                        </div>
                     </div>
                 </div>
 
