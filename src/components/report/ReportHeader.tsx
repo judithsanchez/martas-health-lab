@@ -150,7 +150,7 @@ export default function ReportHeader({ client, measurement, ffmi }: ReportHeader
                             )}
                         </div>
                     </div>
-                    <div className="bg-white/10 backdrop-blur-md rounded-3xl p-1 border border-white/20 h-fit flex flex-col items-center justify-center" style={{ width: gaugeController.width }}>
+                    <div className="bg-white/10 backdrop-blur-md rounded-3xl p-1 border border-white/20 h-fit flex flex-col items-center justify-center w-full md:w-[350px]">
                         <div className="w-full flex items-center justify-center">
                             <Gauge
                                 value={ffmi.value}

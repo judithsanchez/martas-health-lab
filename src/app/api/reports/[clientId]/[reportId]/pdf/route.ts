@@ -75,19 +75,30 @@ export async function GET(
                 .hidden { display: block !important; } 
                 div[class*="hidden md:block"] { display: block !important; }
 
-                /* Fix backdrop blur issues in PDF */
+                /* Fix backdrop blur and opacity issues in PDF */
                 .backdrop-blur-md { backdrop-filter: none !important; background-color: rgba(255, 255, 255, 0.2) !important; }
 
-                /* Ensure background color persists */
-                body { -webkit-print-color-adjust: exact; }
+                /* FORCE COLORS AND OPACITY FOR GAUGE */
+                * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                
+                /* Disable all transitions for PDF capture */
+                * { transition: none !important; animation: none !important; }
+
+                /* Target Gauge specific bars to ensure they are visible */
+                /* Matches Tailwind opacity-80 and transition classes */
+                div[class*="opacity-80"] { opacity: 1 !important; }
+                div[class*="bg-black/20"] { background-color: rgba(0, 0, 0, 0.2) !important; }
+                
+                /* Ensure background color persists globally */
+                body { background-color: rgb(255, 252, 248) !important; }
 
                 /* Hide scrollbars */
                 ::-webkit-scrollbar { display: none; }
             `
         });
 
-        // Wait a bit for layout to adjust after style injection
-        await new Promise(r => setTimeout(r, 1500));
+        // Wait a bit for layout to settle (removed transitions should make this faster/safer)
+        await new Promise(r => setTimeout(r, 1000));
 
         // Calculate the full height of the content
         // Since we removed overflow constraints, body/html should now be full height
