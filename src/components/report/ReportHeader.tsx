@@ -4,7 +4,8 @@ import {
     Calendar,
     User,
     Ruler,
-    Zap
+    Zap,
+    Download
 } from 'lucide-react';
 import Gauge from './Gauge';
 
@@ -65,6 +66,16 @@ export default function ReportHeader({ client, measurement, ffmi }: ReportHeader
 
     return (
         <div className="bg-plum rounded-[3rem] p-12 text-white shadow-2xl relative overflow-hidden">
+            {/* PDF Download Button - Hidden in PDF via 'no-pdf' class */}
+            <button
+                onClick={() => window.open(`/api/reports/${client.id}/${measurement.id}/pdf`, '_blank')}
+                className="no-pdf absolute top-8 right-8 z-20 flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md px-4 py-2 rounded-full transition-all border border-white/10 group"
+                title="Descargar PDF"
+            >
+                <Download size={18} className="text-gold" />
+                <span className="text-xs font-bold uppercase tracking-wider">Descargar PDF</span>
+            </button>
+
             <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
                 <div className="flex-1">
                     <h1 className="text-5xl font-bold mb-6">{client.name} {client.lastname}</h1>
