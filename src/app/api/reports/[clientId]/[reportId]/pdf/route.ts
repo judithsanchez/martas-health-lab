@@ -28,6 +28,25 @@ export async function GET(
             timeout: 60000,
         });
 
+        // EXTRACT METADATA FOR FILENAME
+        // We do this before modifying the page content for screenshotting
+        const docMetadata = await page.evaluate(() => {
+            const nameEl = document.querySelector('h1.text-5xl');
+            const dateEl = document.querySelector('span.text-xs.font-bold.tracking-widest.uppercase');
+
+            const rawName = nameEl ? (nameEl as HTMLElement).innerText : 'Reporte';
+            const rawDate = dateEl ? (dateEl as HTMLElement).innerText : new Date().toISOString().split('T')[0];
+
+            return { rawName, rawDate };
+        });
+
+        // Sanitize for filename: "Name Lastname" -> "Name_Lastname"
+        const cleanName = docMetadata.rawName.trim().replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_\u00C0-\u00FF]/g, '');
+        // "29 de enero de 2026" -> "29_de_enero_de_2026"
+        const cleanDate = docMetadata.rawDate.trim().replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_\u00C0-\u00FF]/g, '');
+
+        const filename = `${cleanName}_${cleanDate}.pdf`;
+
         // Set viewport to A4 width at 2x scale (Retina) for sharp text/charts
         await page.setViewport({
             width: 794,
@@ -153,7 +172,7 @@ export async function GET(
         return new NextResponse(Buffer.from(pdfBuffer), {
             headers: {
                 'Content-Type': 'application/pdf',
-                'Content-Disposition': `attachment; filename="report-${clientId}-${reportId}.pdf"`,
+                'Content-Disposition': `attachment; filename="${filename}"`,
             },
         });
 
