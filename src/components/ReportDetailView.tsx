@@ -552,39 +552,7 @@ export default function ReportDetailView({
                     {/* Right Column: History Charts (Stacked Vertically) */}
                     {history.length >= 2 ? (
                         <div className="space-y-8">
-                            {/* Weight Chart */}
-                            <div className="bg-white rounded-[2.5rem] p-8 shadow-xl border border-gray-100">
-                                <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Progreso de Peso (kg)</h4>
-                                <div className="h-32">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <AreaChart data={[...history].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).slice(-10)}>
-                                            <defs>
-                                                <linearGradient id="colorWeight" x1="0" y1="0" x2="0" y2="1">
-                                                    <stop offset="5%" stopColor="#581c87" stopOpacity={0.1} />
-                                                    <stop offset="95%" stopColor="#581c87" stopOpacity={0} />
-                                                </linearGradient>
-                                            </defs>
-                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
-                                            <XAxis dataKey="date" hide />
-                                            <YAxis domain={['dataMin - 1', 'dataMax + 1']} hide />
-                                            <RechartsTooltip
-                                                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', fontSize: '12px' }}
-                                                labelFormatter={(date) => new Date(date).toLocaleDateString()}
-                                            />
-                                            <Area
-                                                type="monotone"
-                                                dataKey="weight"
-                                                stroke="#581c87"
-                                                strokeWidth={3}
-                                                fillOpacity={1}
-                                                fill="url(#colorWeight)"
-                                                dot={{ r: 4, fill: '#581c87', strokeWidth: 2, stroke: '#fff' }}
-                                                activeDot={{ r: 6, strokeWidth: 0 }}
-                                            />
-                                        </AreaChart>
-                                    </ResponsiveContainer>
-                                </div>
-                            </div>
+
 
                             {/* Muscle Chart */}
                             <div className="bg-white rounded-[2.5rem] p-8 shadow-xl border border-gray-100">
