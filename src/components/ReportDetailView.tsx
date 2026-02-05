@@ -17,8 +17,7 @@ import {
     AlertCircle,
     CheckCircle2,
     Zap as Flash,
-    ArrowUpRight,
-    Ruler
+    ArrowUpRight
 } from 'lucide-react';
 import Link from 'next/link';
 import {
@@ -44,6 +43,8 @@ import {
     AreaChart,
     Area
 } from 'recharts';
+import ReportHeader from '@/components/report/ReportHeader';
+import CompositionChart from '@/components/report/CompositionChart';
 
 export default function ReportDetailView({
     client,
@@ -55,16 +56,6 @@ export default function ReportDetailView({
     history?: any[]
 }) {
     // activeGroup and metricGroups removed as they are no longer used
-
-    const getActivityLevelLabel = (level: number | null) => {
-        if (!level) return '--';
-        const labels: Record<number, string> = {
-            1: 'Sedentario',
-            2: 'Moderadamente activo',
-            3: 'Muy activo / Atleta'
-        };
-        return labels[level] || `Nivel ${level}`;
-    };
 
     // Perform calculations
     const bmi = calculateBMI(measurement.weight, measurement.height || client.height);
@@ -106,12 +97,55 @@ export default function ReportDetailView({
         return Array.from(dataMap.values())
             .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
             .slice(-10) // Keep only last 10
-            .map(record => ({
-                ...record,
-                ffmi: calculateFFMI(record.weight, record.fatPercent, record.height || client.height, client.gender).value,
-                fatMassKg: Number((record.weight * (record.fatPercent / 100)).toFixed(1))
-            }));
+            .map(record => {
+                return {
+                    ...record,
+                    bmi: calculateBMI(record.weight, record.height || client.height).value,
+                    visceralFat: record.visceralFat || 0,
+                    boneMass: record.boneMass || 0,
+                    ffmi: calculateFFMI(record.weight, record.fatPercent, record.height || client.height, client.gender).value,
+                    fatMassKg: Number((record.weight * (record.fatPercent / 100)).toFixed(1))
+                };
+            });
     }, [history, measurement, client.height, client.gender]);
+
+    // Find previous measurement for progress comparison
+    // Find previous measurement for progress comparison
+    const previousMeasurement = React.useMemo(() => {
+        if (!history || history.length === 0) return null;
+        // Filter out current date to ensure we compare against past
+        const past = history.filter(h => {
+            // Simple string comparison YYYY-MM-DD
+            const hDate = new Date(h.date).toISOString().split('T')[0];
+            const cDate = new Date(measurement.date).toISOString().split('T')[0];
+            return hDate !== cDate;
+        });
+        // Sort descending by date
+        return past.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
+    }, [history, measurement.date]);
+
+    // Calculate previous values if available
+    const prevValues = React.useMemo(() => {
+        if (!previousMeasurement) return null;
+        const h = previousMeasurement.height || client.height;
+        return {
+            weight: previousMeasurement.weight,
+            visceral: previousMeasurement.visceralFat || 0, // Raw number
+            boneMass: previousMeasurement.boneMass || 0,   // Raw number
+            bmi: calculateBMI(previousMeasurement.weight, h).value, // Extract value
+            bmr: calculateBMR(previousMeasurement.weight, h, previousMeasurement.age || client.age || 30, client.gender || 'male').value, // Extract value
+            dci: previousMeasurement.dciKcal,
+            metAge: previousMeasurement.metabolicAge || 0, // Raw number
+            asmi: calculateASMI(
+                h,
+                previousMeasurement.muscleArmLeft || 0,
+                previousMeasurement.muscleArmRight || 0,
+                previousMeasurement.muscleLegLeft || 0,
+                previousMeasurement.muscleLegRight || 0,
+                client.gender || 'male'
+            ).value // Extract value
+        };
+    }, [previousMeasurement, client]);
 
     const Tooltip = ({ text }: { text: string }) => (
         <div className="group relative inline-block ml-1">
@@ -123,9 +157,9 @@ export default function ReportDetailView({
         </div>
     );
 
-    const MetricCard = ({ title, value, unit, label, description, color, icon: Icon, fullTitle }: any) => (
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col h-full hover:shadow-md transition-shadow group/card">
-            <div className="flex justify-between items-start mb-4">
+    const MetricCard = ({ title, value, unit, label, description, color, icon: Icon, fullTitle, sparklineData, sparklineKey, sparklineColor }: any) => (
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col h-full hover:shadow-md transition-shadow group/card relative overflow-hidden">
+            <div className="flex justify-between items-start mb-4 relative z-10">
                 <div className={`p-3 rounded-2xl bg-gray-50 ${color}`}>
                     <Icon size={24} />
                 </div>
@@ -135,15 +169,39 @@ export default function ReportDetailView({
                     </span>
                 )}
             </div>
-            <div className="flex items-center mb-1">
+            <div className="flex items-center mb-1 relative z-10">
                 <h4 className="text-gray-500 text-xs font-bold uppercase tracking-widest">{title}</h4>
                 {fullTitle && <Tooltip text={fullTitle} />}
             </div>
-            <div className="flex items-baseline gap-1 mb-2">
+            <div className="flex items-baseline gap-1 mb-2 relative z-10">
                 <span className="text-3xl font-bold text-plum">{value}</span>
                 <span className="text-sm font-medium text-gray-400">{unit}</span>
             </div>
-            <p className="text-xs text-gray-400 mt-auto leading-relaxed">{description}</p>
+
+            {/* Sparkline Overlay */}
+            {sparklineData && sparklineData.length >= 2 && (
+                <div className="absolute bottom-0 left-0 right-0 h-16 opacity-10 pointer-events-none">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={sparklineData}>
+                            <defs>
+                                <linearGradient id={`grad-${sparklineKey}`} x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor={sparklineColor || "#581c87"} stopOpacity={0.8} />
+                                    <stop offset="95%" stopColor={sparklineColor || "#581c87"} stopOpacity={0} />
+                                </linearGradient>
+                            </defs>
+                            <Area
+                                type="monotone"
+                                dataKey={sparklineKey}
+                                stroke={sparklineColor || "#581c87"}
+                                strokeWidth={2}
+                                fill={`url(#grad-${sparklineKey})`}
+                            />
+                        </AreaChart>
+                    </ResponsiveContainer>
+                </div>
+            )}
+
+            <p className="text-xs text-gray-400 mt-auto leading-relaxed relative z-10">{description}</p>
         </div>
     );
 
@@ -155,6 +213,7 @@ export default function ReportDetailView({
             {subtitle && <p className="text-gray-400 text-sm mt-1 leading-relaxed max-w-2xl">{subtitle}</p>}
         </div>
     );
+
 
     const ProgressChart = ({ data, dataKey, color, title, unit }: any) => (
         <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm flex flex-col h-[300px]">
@@ -221,50 +280,22 @@ export default function ReportDetailView({
         );
     };
 
-    const CircularProgress = ({ value, label, subValue, subLabel, unit, color, icon: Icon }: any) => {
-        const radius = 35;
-        const circumference = 2 * Math.PI * radius;
-        const offset = circumference - (value / 100) * circumference;
 
-        return (
-            <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 flex flex-col items-center flex-1 shadow-sm hover:shadow-md transition-shadow">
-                <div className="relative mb-6">
-                    <svg width="100" height="100" className="transform -rotate-90">
-                        <circle
-                            cx="50" cy="50" r={radius}
-                            className="stroke-gray-100 fill-none"
-                            strokeWidth="8"
-                        />
-                        <circle
-                            cx="50" cy="50" r={radius}
-                            className={`fill-none transition-all duration-1000 ease-out ${color}`}
-                            strokeWidth="8"
-                            strokeDasharray={circumference}
-                            strokeDashoffset={offset}
-                            strokeLinecap="round"
-                        />
-                    </svg>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="flex flex-baseline items-baseline">
-                            <span className="text-2xl font-black text-plum">{value}</span>
-                            <span className="text-[10px] font-bold text-gray-400 ml-0.5">{unit}</span>
-                        </div>
-                    </div>
-                </div>
-                <h4 className="text-base font-bold text-plum mb-1">{label}</h4>
-                {subValue && (
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tight">
-                        {subValue}{subLabel}
-                    </p>
-                )}
-            </div>
-        );
-    };
 
     // TinyLineChart removed as requested
 
 
-    const StatusRow = ({ label, value, unit, status, statusColor, icon: Icon }: any) => {
+    const StatusRow = ({ label, value, unit, status, statusColor, icon: Icon, trend, higherIsBetter = false }: any) => {
+        // Determine logic for Trend Color
+        // If higherIsBetter = true: (+)=>Green, (-)=>Red
+        // If higherIsBetter = false: (+)=>Red, (-)=>Green (Default, e.g. for Weight/Fat)
+        let trendColor = 'text-gray-300';
+        if (trend > 0) {
+            trendColor = higherIsBetter ? 'text-emerald-500' : 'text-rose-400';
+        } else if (trend < 0) {
+            trendColor = higherIsBetter ? 'text-rose-400' : 'text-emerald-500';
+        }
+
         return (
             <div className="bg-white/50 p-4 rounded-3xl flex items-center justify-between group hover:bg-white transition-all border border-transparent hover:border-gray-100 relative overflow-hidden">
                 <div className="flex items-center gap-4 z-10 relative">
@@ -273,9 +304,17 @@ export default function ReportDetailView({
                     </div>
                     <div>
                         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">{label}</p>
-                        <div className="flex items-baseline gap-1">
+                        <div className="flex items-baseline gap-2">
                             <span className="text-lg font-bold text-plum">{value}</span>
                             <span className="text-[10px] text-gray-400 font-medium">{unit}</span>
+
+                            {/* Trend Indicator */}
+                            {trend !== undefined && trend !== null && !isNaN(trend) && Math.abs(trend) >= 0.1 && (
+                                <div className={`flex items-center text-[10px] font-bold ${trendColor} bg-white/50 px-1.5 py-0.5 rounded-md`}>
+                                    {trend > 0 ? '▲' : trend < 0 ? '▼' : '-'}
+                                    <span className="ml-0.5">{Math.abs(trend).toFixed(1)}</span>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -289,123 +328,6 @@ export default function ReportDetailView({
         );
     };
 
-    const Gauge = ({ value, min, max, unit, markers }: { value: number, min: number, max: number, unit: string, markers: { label: string, val: number }[] }) => {
-        // Segment-based scaling logic
-        const calculateSegmentPercentage = (v: number) => {
-            const thresholds = [min, ...markers.map(m => m.val)];
-            const segmentCount = markers.length;
-            const segmentWidth = 100 / segmentCount;
-
-            for (let i = 0; i < segmentCount; i++) {
-                const s = thresholds[i];
-                const e = thresholds[i + 1];
-                if (v <= e) {
-                    const inner = (v - s) / (e - s);
-                    return (i + Math.min(Math.max(inner, 0), 1)) * segmentWidth;
-                }
-            }
-            return 100;
-        };
-
-        const percentage = calculateSegmentPercentage(value);
-        const strokeWidth = 10;
-        const radius = 70;
-        const width = 280;
-        const height = 130;
-        const centerX = width / 2;
-        const centerY = 110;
-
-        const circumference = Math.PI * radius;
-        const strokeDashoffset = circumference - (percentage / 100) * circumference;
-
-        return (
-            <a
-                href="https://pubmed.ncbi.nlm.nih.gov/7496846/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex flex-col items-center no-underline cursor-pointer group"
-            >
-                <div className="relative">
-                    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} className="overflow-visible">
-                        {/* Background Path */}
-                        <path
-                            d={`M ${centerX - radius} ${centerY} A ${radius} ${radius} 0 0 1 ${centerX + radius} ${centerY}`}
-                            fill="none"
-                            stroke="rgba(255, 255, 255, 0.15)"
-                            strokeWidth={strokeWidth}
-                            strokeLinecap="round"
-                        />
-                        {/* Value Path */}
-                        <path
-                            d={`M ${centerX - radius} ${centerY} A ${radius} ${radius} 0 0 1 ${centerX + radius} ${centerY}`}
-                            fill="none"
-                            stroke="white"
-                            strokeWidth={strokeWidth}
-                            strokeLinecap="round"
-                            strokeDasharray={circumference}
-                            strokeDashoffset={strokeDashoffset}
-                            className="transition-all duration-1000 ease-out"
-                        />
-
-                        {/* Segment Ticks (Equally spaced at 25%, 50%, 75%) */}
-                        {[25, 50, 75].map((p, i) => {
-                            const angle = Math.PI + (p / 100) * Math.PI;
-                            const x1 = centerX + (radius - 3) * Math.cos(angle);
-                            const y1 = centerY + (radius - 3) * Math.sin(angle);
-                            const x2 = centerX + (radius + 3) * Math.cos(angle);
-                            const y2 = centerY + (radius + 3) * Math.sin(angle);
-                            return (
-                                <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="white" strokeOpacity="0.5" strokeWidth="2" strokeLinecap="round" />
-                            );
-                        })}
-
-                        {/* Labels Positioning */}
-                        {markers.map((m, i) => {
-                            let p = 0;
-                            let textAnchor: "start" | "middle" | "end" = "middle";
-                            let labelRadius = radius + 25;
-                            let offsetY = 0;
-
-                            if (i === 0) {
-                                p = 0; // BAJO at the very start
-                                textAnchor = "end";
-                                labelRadius = radius + 30;
-                            } else if (i === markers.length - 1) {
-                                p = 100; // SUPERIOR at the very end
-                                textAnchor = "start";
-                                labelRadius = radius + 30;
-                            } else {
-                                // PROMEDIO and EXCELENTE
-                                p = i === 1 ? 8 : 92;
-                                labelRadius = radius + 20;
-                                offsetY = -35;
-                            }
-
-                            const angle = Math.PI + (p / 100) * Math.PI;
-                            const tx = centerX + labelRadius * Math.cos(angle);
-                            const ty = centerY + labelRadius * Math.sin(angle) + offsetY;
-
-                            return (
-                                <text
-                                    key={i}
-                                    x={tx}
-                                    y={ty}
-                                    textAnchor={textAnchor}
-                                    className="fill-white font-bold text-[9px] uppercase tracking-wider opacity-70"
-                                >
-                                    {m.label}
-                                </text>
-                            );
-                        })}
-                    </svg>
-                    <div className="absolute top-[75px] left-1/2 -translate-x-1/2 flex flex-col items-center w-full">
-                        <span className="text-5xl font-black leading-tight">{value}</span>
-                        <span className="text-[10px] font-bold opacity-40 uppercase tracking-widest -mt-1">{unit}</span>
-                    </div>
-                </div>
-            </a>
-        );
-    };
 
     return (
         <main className="min-h-screen bg-cream pb-20">
@@ -423,241 +345,20 @@ export default function ReportDetailView({
 
             <div className="px-12 max-w-7xl mx-auto space-y-16">
                 {/* Hero / Summary Area */}
-                <div className="bg-plum rounded-[3rem] p-12 text-white shadow-2xl relative overflow-hidden">
-                    <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
-                        <div className="flex-1">
-                            <h1 className="text-5xl font-bold mb-6">{client.name} {client.lastname}</h1>
-                            <div className="grid grid-cols-2 lg:grid-cols-3 gap-y-6 gap-x-8">
-                                <div className="flex items-center gap-3">
-                                    <User size={20} className="text-white/50" />
-                                    <div>
-                                        <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Género</p>
-                                        <p className="font-semibold">{client.gender === 'male' ? 'Hombre' : 'Mujer'}</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <Calendar size={20} className="text-white/50" />
-                                    <div>
-                                        <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Edad</p>
-                                        <p className="font-semibold">{client.age || '--'} años</p>
-                                    </div>
-                                </div>
-                                {client.birthday && (
-                                    <div className="flex items-center gap-3">
-                                        <Calendar size={20} className="text-white/50" />
-                                        <div>
-                                            <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Cumpleaños</p>
-                                            <p className="font-semibold">
-                                                {new Date(client.birthday).toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}
-                                            </p>
-                                        </div>
-                                    </div>
-                                )}
-                                <div className="flex items-center gap-3">
-                                    <Ruler size={20} className="text-white/50" />
-                                    <div>
-                                        <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Altura</p>
-                                        <p className="font-semibold">{measurement.height || client.height || '--'} cm</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <Activity size={20} className="text-white/50" />
-                                    <div>
-                                        <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Nivel de Actividad</p>
-                                        <p className="font-semibold">{getActivityLevelLabel(measurement.activityLevel || client.activityLevel)}</p>
-                                    </div>
-                                </div>
-                                {client.sessionsPerWeek && (
-                                    <div className="flex items-center gap-3">
-                                        <Zap size={20} className="text-white/50" />
-                                        <div>
-                                            <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Sesiones por semana</p>
-                                            <p className="font-semibold">{client.sessionsPerWeek} sesiones</p>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                        <div className="bg-white/10 backdrop-blur-md rounded-3xl p-3 border border-white/20 h-fit min-w-[340px] flex flex-col items-center justify-center">
-                            <Gauge
-                                value={ffmi.value}
-                                min={12} max={30}
-                                unit="kg/m²"
-                                markers={client.gender === 'female' ? [
-                                    { label: 'Bajo', val: 15 },
-                                    { label: 'Promedio', val: 18 },
-                                    { label: 'Excelente', val: 22 },
-                                    { label: 'Superior', val: 30 }
-                                ] : [
-                                    { label: 'Bajo', val: 18 },
-                                    { label: 'Promedio', val: 21 },
-                                    { label: 'Excelente', val: 25 },
-                                    { label: 'Superior', val: 30 }
-                                ]}
-                            />
-                            <div className="text-[10px] font-bold uppercase tracking-widest opacity-70 mt-4 text-center leading-tight">
-                                Índice de Masa<br />Libre de Grasa
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <ReportHeader client={client} measurement={measurement} ffmi={{ ...ffmi, color: ffmi.color || '' }} />
 
-                {/* Master History Chart (Option A) */}{/* Only show if we have enough data points including current */}
-                {chartData && chartData.length > 1 && (
-                    <div className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-xl mb-12">
-                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
-                            <div className="flex items-center gap-3">
-                                <div className="p-2 bg-plum/10 rounded-xl">
-                                    <TrendingUp className="text-plum" size={20} />
-                                </div>
-                                <div>
-                                    <h4 className="text-lg font-bold text-plum">Historial de Progreso</h4>
-                                    <p className="text-xs text-gray-400 font-medium">Evolución: Masa Libre de Grasa, Porcentaje Graso y Músculo.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="h-[300px] w-full mb-6">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <AreaChart
-                                    data={chartData}
-                                    margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
-                                >
-                                    <defs>
-                                        <linearGradient id="gradient-ffmi" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.2} />
-                                            <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
-                                        </linearGradient>
-                                        <linearGradient id="gradient-fatMassKg" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.2} />
-                                            <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
-                                        </linearGradient>
-                                        <linearGradient id="gradient-muscleMass" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#10b981" stopOpacity={0.2} />
-                                            <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                                        </linearGradient>
-                                    </defs>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                                    <XAxis
-                                        dataKey="date"
-                                        tick={{ fontSize: 10, fill: '#9ca3af' }}
-                                        tickLine={false}
-                                        axisLine={false}
-                                        tickFormatter={(val) => new Date(val).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-                                        dy={10}
-                                    />
-                                    <YAxis
-                                        domain={['auto', 'auto']}
-                                        tick={{ fontSize: 10, fill: '#9ca3af' }}
-                                        tickLine={false}
-                                        axisLine={false}
-                                        width={30}
-                                    />
-                                    <RechartsTooltip
-                                        contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)' }}
-                                        itemStyle={{ fontSize: '12px', fontWeight: 600, padding: '2px 0' }}
-                                        labelStyle={{ color: '#9ca3af', marginBottom: '8px', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}
-                                    />
-
-                                    <Area
-                                        type="monotone"
-                                        dataKey="ffmi"
-                                        stroke="#8b5cf6"
-                                        strokeWidth={3}
-                                        fillOpacity={1}
-                                        fill="url(#gradient-ffmi)"
-                                        name="Masa Libre de Grasa"
-                                        unit="kg"
-                                    />
-                                    <Area
-                                        type="monotone"
-                                        dataKey="fatMassKg"
-                                        stroke="#f59e0b"
-                                        strokeWidth={3}
-                                        fillOpacity={1}
-                                        fill="url(#gradient-fatMassKg)"
-                                        name="Grasa Corporal"
-                                        unit="kg"
-                                    />
-                                    <Area
-                                        type="monotone"
-                                        dataKey="muscleMass"
-                                        stroke="#10b981"
-                                        strokeWidth={3}
-                                        fillOpacity={1}
-                                        fill="url(#gradient-muscleMass)"
-                                        name="Masa Muscular"
-                                        unit="kg"
-                                    />
-                                </AreaChart>
-                            </ResponsiveContainer>
-                        </div>
-
-                        {/* Legend */}
-                        <div className="flex flex-wrap justify-center gap-6">
-                            <div className="flex items-center gap-2">
-                                <div className="w-3 h-3 rounded-full bg-violet-500" />
-                                <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Masa Libre Grasa (kg)</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <div className="w-3 h-3 rounded-full bg-amber-500" />
-                                <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Grasa Corporal (kg)</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <div className="w-3 h-3 rounded-full bg-emerald-500" />
-                                <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Masa Muscular</span>
-                            </div>
-                        </div>
-                    </div>
-                )}
+                {/* Master History Chart (Option A) removed as requested */}
 
                 {/* New Section 2: Fragmented Dashboard Layout */}
                 <div className="space-y-8 mb-12">
                     {/* 1) Top Horizontal Card: Core Composition */}
-                    <div className="bg-white rounded-[3rem] p-10 border border-gray-100 shadow-xl">
-                        <div className="flex justify-between items-center mb-10">
-                            <div className="flex items-center gap-4">
-                                <div className="p-3 bg-sage/10 rounded-2xl">
-                                    <Activity className="text-sage" size={24} />
-                                </div>
-                                <h3 className="text-2xl font-bold text-plum">Composición Corporal</h3>
-                            </div>
-                            <div className="flex items-center gap-2 text-gray-400">
-                                <CheckCircle2 size={16} />
-                                <span className="text-[10px] font-bold uppercase tracking-widest">Estándar Global</span>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                            <CircularProgress
-                                label="Grasa Corporal"
-                                value={measurement.fatPercent}
-                                unit="%"
-                                subValue={(measurement.weight * (measurement.fatPercent / 100)).toFixed(1)}
-                                subLabel="KG MASA GRASA"
-                                color="stroke-orange-500"
-                                icon={Flame}
-                            />
-                            <CircularProgress
-                                label="Masa Muscular"
-                                value={Math.min(100, (measurement.muscleMass / measurement.weight) * 100).toFixed(1)}
-                                unit="%"
-                                subValue={measurement.muscleMass}
-                                subLabel={`KG (${measurement.physiqueRatingScale || '--'} SCORE)`}
-                                color="stroke-sage"
-                                icon={Activity}
-                            />
-                            <CircularProgress
-                                label="Hidratación"
-                                value={measurement.waterPercent}
-                                unit="%"
-                                subValue={(measurement.weight * (measurement.waterPercent / 100)).toFixed(1)}
-                                subLabel="KG AGUA TOTAL"
-                                color="stroke-blue-500"
-                                icon={Droplets}
-                            />
-                        </div>
-                    </div>
+                    <CompositionChart
+                        fatPercent={measurement.fatPercent}
+                        muscleMass={measurement.muscleMass}
+                        boneMass={measurement.boneMass}
+                        waterPercent={measurement.waterPercent}
+                        weight={measurement.weight}
+                    />
 
                     {/* MFR Standalone Section (Horizontal Insert) */}
                     <div className="bg-gold/10 rounded-[3rem] p-10 border border-gold/20 shadow-lg">
@@ -702,6 +403,8 @@ export default function ReportDetailView({
                                     status={bmrCalc.label}
                                     statusColor={bmrCalc.color}
                                     icon={Flame}
+                                    trend={prevValues ? bmrCalc.value - prevValues.bmr : null}
+                                    higherIsBetter={true}
                                 />
                                 <StatusRow
                                     label="Ingesta Calórica (DCI)"
@@ -710,6 +413,7 @@ export default function ReportDetailView({
                                     status="SUGERIDO"
                                     statusColor="text-blue-400"
                                     icon={Zap}
+                                    trend={prevValues ? measurement.dciKcal - prevValues.dci : null}
                                 />
                                 <StatusRow
                                     label="Edad Metabólica"
@@ -718,6 +422,8 @@ export default function ReportDetailView({
                                     status={metAgeCalc.label}
                                     statusColor={metAgeCalc.color}
                                     icon={Calendar}
+                                    trend={prevValues ? metAgeCalc.value - prevValues.metAge : null}
+                                    higherIsBetter={false} // Lower is better
                                 />
                                 <StatusRow
                                     label="Índice ASMI"
@@ -726,13 +432,15 @@ export default function ReportDetailView({
                                     status={asmi.label.toUpperCase()}
                                     statusColor={asmi.color}
                                     icon={Activity}
-                                // No direct history for ASMI unless calculated for all past records? 
-                                // Skipping graph for inferred index for now to ensure safety.
+                                    // No direct history for ASMI unless calculated for all past records? 
+                                    // Skipping graph for inferred index for now to ensure safety.
+                                    trend={prevValues ? asmi.value - prevValues.asmi : null}
+                                    higherIsBetter={true}
                                 />
                             </div>
                         </div>
 
-                        {/* 3) Physical Indices Card */}
+                        {/* 3) Physical Indices Grid (Replaces List) */}
                         <div className="bg-white rounded-[3rem] p-10 border border-gray-100 shadow-xl">
                             <div className="flex items-center gap-3 mb-8">
                                 <div className="p-2 bg-plum/10 rounded-xl">
@@ -740,46 +448,57 @@ export default function ReportDetailView({
                                 </div>
                                 <h4 className="text-sm font-bold text-gray-500 uppercase tracking-widest">Índices Físicos</h4>
                             </div>
-                            <div className="flex flex-col gap-4">
-                                <StatusRow
-                                    label="Grasa Visceral"
-                                    value={measurement.visceralFat}
-                                    unit="Rating"
-                                    status={visceral.label}
-                                    statusColor={visceral.color}
-                                    icon={AlertCircle}
-                                    history={history}
-                                    dataKey="visceralFat"
-                                />
-                                <StatusRow
-                                    label="Masa Ósea"
-                                    value={boneMassCalc.value}
-                                    unit="kg"
-                                    status={boneMassCalc.label}
-                                    statusColor={boneMassCalc.color}
-                                    icon={Dna}
-                                    history={history}
-                                    dataKey="boneMass"
-                                />
-                                <StatusRow
-                                    label="Peso"
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                {/* Weight Card with Sparkline */}
+                                <MetricCard
+                                    title="Peso"
                                     value={measurement.weight}
                                     unit="kg"
-                                    status="ACTUAL"
-                                    statusColor="text-plum bg-plum/5 border-plum/10"
                                     icon={Weight}
-                                    history={history}
-                                    dataKey="weight"
+                                    color="text-plum bg-plum/5"
+                                    sparklineData={chartData}
+                                    sparklineKey="weight"
+                                    sparklineColor="#581c87"
                                 />
-                                <StatusRow
-                                    label="BMI (IMC)"
+
+                                {/* BMI Card with Sparkline */}
+                                <MetricCard
+                                    title="BMI (IMC)"
                                     value={bmi.value}
                                     unit="kg/m²"
-                                    status={bmi.label.toUpperCase()}
-                                    statusColor={bmi.color}
+                                    label={bmi.label.toUpperCase()}
                                     icon={Scale}
-                                    history={history}
-                                    dataKey="bmi"
+                                    color={bmi.color}
+                                    sparklineData={chartData}
+                                    sparklineKey="bmi"
+                                    sparklineColor="#581c87" // Purple for BMI
+                                />
+
+                                {/* Visceral Fat Card */}
+                                <MetricCard
+                                    title="Grasa Visceral"
+                                    value={measurement.visceralFat}
+                                    unit="Rating"
+                                    label={visceral.label}
+                                    icon={AlertCircle}
+                                    color={visceral.color}
+                                    sparklineData={chartData}
+                                    sparklineKey="visceralFat"
+                                    sparklineColor="#eab308" // Gold/Yellow
+                                />
+
+                                {/* Bone Mass Card */}
+                                <MetricCard
+                                    title="Masa Ósea"
+                                    value={boneMassCalc.value}
+                                    unit="kg"
+                                    label={boneMassCalc.label}
+                                    icon={Dna}
+                                    color={boneMassCalc.color}
+                                    sparklineData={chartData}
+                                    sparklineKey="boneMass"
+                                    sparklineColor="#10b981" // Emerald
                                 />
                             </div>
                         </div>
@@ -787,72 +506,129 @@ export default function ReportDetailView({
                 </div>
 
 
-                {/* Section: Progress History */}
-                {history.length >= 2 && (
-                    <section>
-                        <SectionHeader
-                            title="Evolución Histórica"
-                            subtitle="Seguimiento visual de tu progreso a lo largo del tiempo."
-                        />
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <ProgressChart
-                                title="Peso"
-                                data={history}
-                                dataKey="weight"
-                                color="#4a304b" // Plum
-                                unit="kg"
-                            />
-                            <ProgressChart
-                                title="Grasa Corporal"
-                                data={history}
-                                dataKey="fatPercent"
-                                color="#c2a05b" // Gold
-                                unit="%"
-                            />
-                            <ProgressChart
-                                title="Masa Muscular"
-                                data={history}
-                                dataKey="muscleMass"
-                                color="#a4b9bc" // Sage
-                                unit="kg"
-                            />
+                {/* Section: Progress History removed as requested */}
+
+                {/* Side-by-Side Layout: Segmental (Left) + Charts (Right) */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12 items-start">
+
+                    {/* Left Column: Segmental Analysis (Clean vertical list) */}
+                    <section className="bg-white rounded-[3rem] p-10 border border-gray-100 shadow-xl">
+                        <div className="flex items-center gap-3 mb-8">
+                            <div className="p-2 bg-gray-50 rounded-xl">
+                                <Activity className="text-gray-400" size={16} />
+                            </div>
+                            <div>
+                                <h4 className="text-sm font-bold text-gray-500 uppercase tracking-widest">Análisis Segmental</h4>
+                                <p className="text-[10px] text-gray-400">Distribución muscular y de grasa</p>
+                            </div>
+                        </div>
+
+                        <div className="space-y-6">
+                            {[
+                                { label: 'Brazo Derecho', muscle: measurement.muscleArmRight, fat: measurement.fatArmRight },
+                                { label: 'Brazo Izquierdo', muscle: measurement.muscleArmLeft, fat: measurement.fatArmLeft },
+                                { label: 'Pierna Derecha', muscle: measurement.muscleLegRight, fat: measurement.fatLegRight },
+                                { label: 'Pierna Izquierda', muscle: measurement.muscleLegLeft, fat: measurement.fatLegLeft },
+                                { label: 'Tronco', muscle: measurement.muscleTrunk, fat: measurement.fatTrunk },
+                            ].map((row, idx) => (
+                                <div key={idx} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors rounded-lg px-2">
+                                    <span className="text-xs font-bold text-gray-500">{row.label}</span>
+                                    <div className="flex items-center gap-6">
+                                        <div className="flex flex-col items-end">
+                                            <span className="text-xs font-bold text-sage">{row.muscle} kg</span>
+                                            <span className="text-[8px] text-gray-300 uppercase tracking-widest">Músculo</span>
+                                        </div>
+                                        <div className="w-px h-6 bg-gray-100"></div>
+                                        <div className="flex flex-col items-end w-12">
+                                            <span className="text-xs font-bold text-gold">{row.fat}%</span>
+                                            <span className="text-[8px] text-gray-300 uppercase tracking-widest">Grasa</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     </section>
-                )}
 
-                {/* Segmental Analysis */}
-                <section className="bg-white rounded-[3rem] p-12 border border-gray-100 shadow-xl">
-                    <SectionHeader
-                        title="Análisis Segmental"
-                        subtitle="Distribución muscular y de grasa por zonas corporales."
-                    />
-                    <div className="overflow-hidden bg-white/50 rounded-3xl border border-gray-100">
-                        <table className="w-full">
-                            <thead>
-                                <tr className="bg-plum/5 border-b border-plum/10">
-                                    <th className="py-4 px-6 text-left text-xs font-bold text-plum uppercase tracking-widest">Zona</th>
-                                    <th className="py-4 px-6 text-right text-xs font-bold text-sage uppercase tracking-widest">Masa Muscular (kg)</th>
-                                    <th className="py-4 px-6 text-right text-xs font-bold text-gold uppercase tracking-widest">Grasa Corporal (%)</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-50">
-                                {[
-                                    { label: 'Brazo Derecho', muscle: measurement.muscleArmRight, fat: measurement.fatArmRight },
-                                    { label: 'Brazo Izquierdo', muscle: measurement.muscleArmLeft, fat: measurement.fatArmLeft },
-                                    { label: 'Pierna Derecha', muscle: measurement.muscleLegRight, fat: measurement.fatLegRight },
-                                    { label: 'Pierna Izquierda', muscle: measurement.muscleLegLeft, fat: measurement.fatLegLeft },
-                                    { label: 'Tronco', muscle: measurement.muscleTrunk, fat: measurement.fatTrunk },
-                                ].map((row, idx) => (
-                                    <tr key={idx} className="hover:bg-plum/5 transition-colors">
-                                        <td className="py-4 px-6 text-sm font-bold text-plum">{row.label}</td>
-                                        <td className="py-4 px-6 text-right font-medium text-gray-600">{row.muscle} kg</td>
-                                        <td className="py-4 px-6 text-right font-medium text-gray-600">{row.fat}%</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
+                    {/* Right Column: History Charts (Stacked Vertically) */}
+                    {history.length >= 2 ? (
+                        <div className="space-y-8">
+
+
+                            {/* Muscle Chart */}
+                            <div className="bg-white rounded-[2.5rem] p-8 shadow-xl border border-gray-100">
+                                <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Masa Muscular (kg)</h4>
+                                <div className="h-32">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <AreaChart data={[...history].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).slice(-10)}>
+                                            <defs>
+                                                <linearGradient id="colorMuscle" x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.1} />
+                                                    <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                                                </linearGradient>
+                                            </defs>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+                                            <XAxis dataKey="date" hide />
+                                            <YAxis domain={['dataMin - 0.5', 'dataMax + 0.5']} hide />
+                                            <RechartsTooltip
+                                                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', fontSize: '12px' }}
+                                                labelFormatter={(date) => new Date(date).toLocaleDateString()}
+                                            />
+                                            <Area
+                                                type="monotone"
+                                                dataKey="muscleMass"
+                                                stroke="#10b981"
+                                                strokeWidth={3}
+                                                fillOpacity={1}
+                                                fill="url(#colorMuscle)"
+                                                dot={{ r: 4, fill: '#10b981', strokeWidth: 2, stroke: '#fff' }}
+                                                activeDot={{ r: 6, strokeWidth: 0 }}
+                                            />
+                                        </AreaChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </div>
+
+                            {/* Fat Chart */}
+                            <div className="bg-white rounded-[2.5rem] p-8 shadow-xl border border-gray-100">
+                                <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Grasa Corporal (%)</h4>
+                                <div className="h-32">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <AreaChart data={[...history].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).slice(-10)}>
+                                            <defs>
+                                                <linearGradient id="colorFat" x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="5%" stopColor="#eab308" stopOpacity={0.1} />
+                                                    <stop offset="95%" stopColor="#eab308" stopOpacity={0} />
+                                                </linearGradient>
+                                            </defs>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+                                            <XAxis dataKey="date" hide />
+                                            <YAxis domain={['dataMin - 1', 'dataMax + 1']} hide />
+                                            <RechartsTooltip
+                                                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', fontSize: '12px' }}
+                                                labelFormatter={(date) => new Date(date).toLocaleDateString()}
+                                            />
+                                            <Area
+                                                type="monotone"
+                                                dataKey="fatPercent"
+                                                stroke="#eab308"
+                                                strokeWidth={3}
+                                                fillOpacity={1}
+                                                fill="url(#colorFat)"
+                                                dot={{ r: 4, fill: '#eab308', strokeWidth: 2, stroke: '#fff' }}
+                                                activeDot={{ r: 6, strokeWidth: 0 }}
+                                            />
+                                        </AreaChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="flex items-center justify-center p-8 bg-gray-50 rounded-[3rem] border border-dashed border-gray-200 text-gray-400 text-sm italic h-full">
+                            No hay suficiente historial para mostrar gráficos de progreso.
+                        </div>
+                    )}
+                </div>
+
             </div>
         </main>
     );
