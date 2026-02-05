@@ -500,10 +500,10 @@ export default function ReportDetailView({
                 {/* Section: Progress History removed as requested */}
 
                 {/* Side-by-Side Layout: Segmental (Left) + Charts (Right) */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12 items-start">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
 
                     {/* Left Column: Segmental Analysis (Clean vertical list) */}
-                    <section className="bg-white rounded-[3rem] p-10 border border-gray-100 shadow-xl">
+                    <section className="bg-white rounded-[3rem] p-8 border border-gray-100 shadow-xl h-full flex flex-col">
                         <div className="flex items-center gap-3 mb-8">
                             <div className="p-2 bg-gray-50 rounded-xl">
                                 <Activity className="text-gray-400" size={16} />
@@ -514,7 +514,7 @@ export default function ReportDetailView({
                             </div>
                         </div>
 
-                        <div className="space-y-6">
+                        <div className="space-y-6 flex-1 flex flex-col justify-center">
                             {[
                                 { label: 'Brazo Derecho', muscle: measurement.muscleArmRight, fat: measurement.fatArmRight },
                                 { label: 'Brazo Izquierdo', muscle: measurement.muscleArmLeft, fat: measurement.fatArmLeft },
@@ -542,7 +542,7 @@ export default function ReportDetailView({
 
                     {/* Right Column: History Charts (Stacked Vertically) */}
                     {history.length >= 2 ? (
-                        <div className="space-y-8">
+                        <div className="flex flex-col gap-6 h-full">
 
 
                             {/* Muscle Chart */}
