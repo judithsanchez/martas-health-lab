@@ -1,0 +1,23 @@
+node_modules
+.next
+.git
+.github
+.vscode
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+Dockerfile
+docker-compose.yml
+.dockerignore
+# Keep tsconfig, tailwind, etc. for the build
+# Keep scripts if used in build
+# Keep src (obviously)
+# Keep public
+# Keep package.json
+# Keep pnpm-lock.yaml (if it existed, but we'll fetch it)

@@ -4,6 +4,8 @@ import { eq, desc } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import ClientDetailsView from "@/components/ClientDetailsView";
 
+export const dynamic = 'force-dynamic';
+
 // Fetch data directly in Server Component
 async function getData(id: number) {
     const client = await db.select().from(clients).where(eq(clients.id, id)).limit(1);
