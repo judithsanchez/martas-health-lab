@@ -19,9 +19,32 @@ export default function CompositionChart({ fatPercent, muscleMass, boneMass, wat
 
     // 2. Calculate percentages relative to the TRACKED mass (to fill the bar 100%)
     // This visualizes the distribution of weight among these three tissues.
-    const fatWidth = (fatKg / totalTrackedMass) * 100;
-    const muscleWidth = (muscleMass / totalTrackedMass) * 100;
-    const boneWidth = (boneMass / totalTrackedMass) * 100;
+    // 2. Calculate raw percentages
+    let fatWidth = (fatKg / totalTrackedMass) * 100;
+    let muscleWidth = (muscleMass / totalTrackedMass) * 100;
+    let boneWidth = (boneMass / totalTrackedMass) * 100;
+
+    // 3. Smart Layout: Enforce minimum visual width for readability
+    const MIN_DISPLAY_WIDTH = 15; // Minimum % to fit text comfortably
+
+    // Helper to distribute 'defect' (space needed) from rich segments
+    const distributeDefect = (defect: number, ...segments: { val: number, set: (v: number) => void }[]) => {
+        const totalRich = segments.reduce((acc, s) => acc + s.val, 0);
+        segments.forEach(seg => {
+            seg.set(seg.val - (seg.val / totalRich) * defect);
+        });
+    };
+
+    if (boneWidth < MIN_DISPLAY_WIDTH) {
+        const defect = MIN_DISPLAY_WIDTH - boneWidth;
+        boneWidth = MIN_DISPLAY_WIDTH;
+
+        // Steal space from Fat and Muscle
+        const totalOther = fatWidth + muscleWidth;
+        fatWidth -= (fatWidth / totalOther) * defect;
+        muscleWidth -= (muscleWidth / totalOther) * defect;
+    }
+    // (Could add checks for other segments, but Bone is typically the only small one)
 
     return (
         <div className="bg-white rounded-[3rem] p-10 border border-gray-100 shadow-xl space-y-8">
@@ -55,43 +78,43 @@ export default function CompositionChart({ fatPercent, muscleMass, boneMass, wat
                     </div>
 
                     {/* Bone Segment */}
+                    {/* Bone Segment */}
                     <div
                         className="bg-slate-200 flex flex-col justify-center items-center relative transition-all duration-500"
                         style={{ width: `${boneWidth}%` }}
                     >
                         <span className="text-[10px] font-bold uppercase opacity-60 text-slate-500 hidden sm:block">Hueso</span>
-                        <span className="text-sm font-black text-slate-500">{boneMass}kg</span>
+                        <div className='flex items-baseline gap-0.5'>
+                            <span className="text-sm font-black text-slate-500">{((boneMass / weight) * 100).toFixed(1)}%</span>
+                        </div>
                     </div>
                 </div>
 
                 {/* Legend / Context */}
-                <div className="flex justify-between text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">
-                    <span className="text-orange-400">Grasa ({fatKg.toFixed(1)}kg)</span>
-                    <span className="text-emerald-500 text-center">Músculo ({muscleMass}kg)</span>
-                    <span className="text-slate-400 text-right">Hueso</span>
-                </div>
+                {/* Legend removed as requested */}
             </div>
 
             {/* Variable Separada: Agua */}
-            <div className="bg-blue-50 p-6 rounded-3xl border border-blue-100 flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                    <div className="p-3 bg-blue-100 text-blue-500 rounded-xl">
-                        <Droplets size={20} />
+            {/* Variable Separada: Agua (Less Protagonic) */}
+            <div className="bg-blue-50/50 p-4 rounded-2xl border border-blue-100/50 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                    <div className="p-2 bg-blue-100/50 text-blue-400 rounded-lg">
+                        <Droplets size={16} />
                     </div>
                     <div>
-                        <h4 className="text-sm font-bold text-blue-900 uppercase tracking-wider">Agua Corporal</h4>
-                        <p className="text-xs text-blue-400 font-medium">Contenida en tejido magro</p>
+                        <h4 className="text-xs font-bold text-blue-900/70 uppercase tracking-wider">Agua Corporal</h4>
+                        <p className="text-[10px] text-blue-400/80 font-medium">Contenida en tejido magro</p>
                     </div>
                 </div>
                 <div className="flex items-baseline gap-1">
-                    <span className="text-3xl font-black text-blue-600">{waterPercent}</span>
-                    <span className="text-sm font-bold text-blue-400">%</span>
+                    <span className="text-xl font-black text-blue-500/80">{waterPercent}</span>
+                    <span className="text-xs font-bold text-blue-400/80">%</span>
                 </div>
             </div>
 
-            <div className="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-r-xl">
-                <p className="text-xs text-amber-800 font-medium leading-relaxed">
-                    <strong>Distribución de Peso:</strong> Gráfico de pila basado en Kg totales de Grasa + Músculo + Hueso. El agua se muestra por separado ya que es un componente intracelular.
+            <div className="px-2">
+                <p className="text-[10px] text-gray-400 leading-relaxed text-center">
+                    <strong>Distribución de Peso:</strong> Gráfico de pila basado en Grasa + Músculo + Hueso. (El agua es intracelular).
                 </p>
             </div>
         </div>
