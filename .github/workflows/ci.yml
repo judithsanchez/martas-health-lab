@@ -47,3 +47,23 @@ jobs:
 
       - name: Run Tests
         run: pnpm test
+
+  deploy:
+    needs: quality-checks
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy to Raspberry Pi
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.PI_HOST }}
+          username: ${{ secrets.PI_USERNAME }}
+          key: ${{ secrets.PI_SSH_KEY }}
+          script: |
+            cd /home/judithvsanchezc/Desktop/dev/martas-health-lab
+            git pull origin main
+            docker compose build
+            docker compose up -d
