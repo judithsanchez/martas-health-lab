@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { getClients } from "@/lib/actions/clients";
 import ClientManager from "@/components/ClientManager";
 

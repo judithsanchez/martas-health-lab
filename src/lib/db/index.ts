@@ -4,5 +4,12 @@ import * as schema from "./schema";
 
 export * from "./schema";
 
-const sqlite = new Database(process.env.DATABASE_URL?.replace("file:", "") || "data/dev.db");
-export const db = drizzle(sqlite, { schema });
+const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build';
+
+const sqlite = isBuildPhase
+    ? {} as any
+    : new Database(process.env.DATABASE_URL?.replace("file:", "") || "data/dev.db");
+
+export const db = isBuildPhase
+    ? {} as any
+    : drizzle(sqlite, { schema });

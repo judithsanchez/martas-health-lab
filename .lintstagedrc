@@ -1,7 +1,7 @@
 {
     "*.{ts,tsx}": [
         "eslint --fix",
-        "bash -c 'pnpm type-check'",
+        "bash -c 'npm run type-check'",
         "vitest related --run --passWithNoTests"
     ],
     "*.{js,jsx,json,md}": [

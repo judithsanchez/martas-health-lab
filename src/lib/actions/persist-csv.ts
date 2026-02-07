@@ -16,7 +16,7 @@ export type RowAssignment = {
 };
 
 export async function persistPerRowAssignments(assignments: RowAssignment[]) {
-    await db.transaction(async (tx) => {
+    await db.transaction(async (tx: any) => {
         for (const assignment of assignments) {
             let finalClientId = assignment.clientId;
 
