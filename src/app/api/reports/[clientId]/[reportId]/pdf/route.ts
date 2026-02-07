@@ -12,7 +12,19 @@ export async function GET(
         // Ensure we have a valid URL to visit
         // In production, this should be the full domain. For dev, localhost:3000 is fine.
         const host = request.headers.get('host') || 'localhost:3000';
-        const protocol = host.includes('localhost') || host.includes('127.0.0.1') ? 'http' : 'https';
+
+        // Determine protocol:
+        // - http if localhost or 127.0.0.1
+        // - http if accessing via private IP (like Tailscale 100.x or Local 192.168.x)
+        // - http if port is explicitly 3000 (common dev port)
+        // - https otherwise (production)
+        const isHttp = host.includes('localhost') ||
+            host.includes('127.0.0.1') ||
+            host.startsWith('100.') ||
+            host.startsWith('192.168.') ||
+            host.includes(':3000');
+
+        const protocol = isHttp ? 'http' : 'https';
         const reportUrl = `${protocol}://${host}/clients/${clientId}/reports/${reportId}`;
 
         // Launch Puppeteer
