@@ -158,24 +158,24 @@ export default function ReportDetailView({
     );
 
     const MetricCard = ({ title, value, unit, label, description, color, icon: Icon, fullTitle, sparklineData, sparklineKey, sparklineColor }: any) => (
-        <div className="bg-white rounded-3xl p-4 shadow-sm border border-gray-100 flex flex-col h-full hover:shadow-md transition-shadow group/card relative overflow-hidden">
-            <div className="flex justify-between items-start mb-3 relative z-10">
-                <div className={`p-2 rounded-2xl bg-gray-50 ${color}`}>
-                    <Icon size={18} />
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col h-full hover:shadow-md transition-shadow group/card relative overflow-hidden">
+            <div className="flex justify-between items-start mb-4 relative z-10">
+                <div className={`p-3 rounded-2xl bg-gray-50 ${color}`}>
+                    <Icon size={24} />
                 </div>
                 {label && (
-                    <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded-full bg-gray-50 ${color}`}>
+                    <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full bg-gray-50 ${color}`}>
                         {label}
                     </span>
                 )}
             </div>
             <div className="flex items-center mb-1 relative z-10">
-                <h4 className="text-gray-500 text-[10px] font-bold uppercase tracking-widest">{title}</h4>
+                <h4 className="text-gray-500 text-xs font-bold uppercase tracking-widest">{title}</h4>
                 {fullTitle && <Tooltip text={fullTitle} />}
             </div>
-            <div className="flex items-baseline gap-1 mb-1 relative z-10">
-                <span className="text-2xl font-bold text-plum">{value}</span>
-                <span className="text-xs font-medium text-gray-400">{unit}</span>
+            <div className="flex items-baseline gap-1 mb-2 relative z-10">
+                <span className="text-3xl font-bold text-plum">{value}</span>
+                <span className="text-sm font-medium text-gray-400">{unit}</span>
             </div>
 
             {/* Sparkline Overlay */}
@@ -201,7 +201,7 @@ export default function ReportDetailView({
                 </div>
             )}
 
-            <p className="text-[10px] text-gray-400 mt-auto leading-relaxed relative z-10">{description}</p>
+            <p className="text-xs text-gray-400 mt-auto leading-relaxed relative z-10">{description}</p>
         </div>
     );
 
@@ -262,12 +262,12 @@ export default function ReportDetailView({
                     <h5 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{title}</h5>
                     <span className="text-xl font-bold text-plum">{value}<span className="text-[10px] ml-1 opacity-50">{unit}</span></span>
                 </div>
-                <div
-                    className="h-3 rounded-full mb-2 w-full overflow-hidden"
-                    style={{
-                        background: `linear-gradient(to right, #4a304b ${percentage}%, #e5e7eb ${percentage}%)`
-                    }}
-                />
+                <div className="relative h-2 bg-gray-100 rounded-full overflow-hidden mb-2">
+                    <div
+                        className="absolute top-0 left-0 h-full bg-plum transition-all duration-1000 ease-out"
+                        style={{ width: `${percentage}%` }}
+                    />
+                </div>
                 <div className="flex justify-between">
                     {markers.map((m: any, i: number) => (
                         <div key={i} className="flex flex-col items-center">
@@ -298,19 +298,19 @@ export default function ReportDetailView({
 
         return (
             <div className="bg-white/50 p-4 rounded-3xl flex items-center justify-between group hover:bg-white transition-all border border-transparent hover:border-gray-100 relative overflow-hidden">
-                <div className="flex items-center gap-3 z-10 relative">
-                    <div className="p-2 bg-white rounded-xl shadow-sm group-hover:shadow-md transition-shadow">
-                        <Icon size={16} className="text-plum" />
+                <div className="flex items-center gap-4 z-10 relative">
+                    <div className="p-3 bg-white rounded-2xl shadow-sm group-hover:shadow-md transition-shadow">
+                        <Icon size={20} className="text-plum" />
                     </div>
                     <div>
-                        <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">{label}</p>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">{label}</p>
                         <div className="flex items-baseline gap-2">
-                            <span className="text-base font-bold text-plum">{value}</span>
-                            <span className="text-[9px] text-gray-400 font-medium">{unit}</span>
+                            <span className="text-lg font-bold text-plum">{value}</span>
+                            <span className="text-[10px] text-gray-400 font-medium">{unit}</span>
 
                             {/* Trend Indicator */}
                             {trend !== undefined && trend !== null && !isNaN(trend) && Math.abs(trend) >= 0.1 && (
-                                <div className={`flex items-center text-[9px] font-bold ${trendColor} bg-white/50 px-1.5 py-0.5 rounded-md`}>
+                                <div className={`flex items-center text-[10px] font-bold ${trendColor} bg-white/50 px-1.5 py-0.5 rounded-md`}>
                                     {trend > 0 ? '▲' : trend < 0 ? '▼' : '-'}
                                     <span className="ml-0.5">{Math.abs(trend).toFixed(1)}</span>
                                 </div>
@@ -320,7 +320,7 @@ export default function ReportDetailView({
                 </div>
 
                 <div className="flex items-center gap-4 z-10 relative">
-                    <span className={`text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-full ${statusColor} bg-white shadow-sm border border-gray-50`}>
+                    <span className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full ${statusColor} bg-white shadow-sm border border-gray-50`}>
                         {status}
                     </span>
                 </div>
@@ -332,7 +332,18 @@ export default function ReportDetailView({
     return (
         <main className="min-h-screen bg-cream pb-20">
             {/* Minimal Header */}
-            <div className="px-12 max-w-7xl mx-auto space-y-8 mt-4">
+            <div className="px-12 py-8 max-w-7xl mx-auto flex items-center justify-between">
+                <Link href={`/clients/${client.id}`} className="flex items-center gap-2 text-sage hover:text-plum transition-colors font-bold text-sm">
+                    <ArrowLeft size={18} /> Volver a {client.name}
+                </Link>
+                <div className="flex items-center gap-4">
+                    <span className="text-xs font-bold uppercase tracking-widest text-gray-400 flex items-center gap-2">
+                        <Calendar size={14} /> {new Date(measurement.date).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    </span>
+                </div>
+            </div>
+
+            <div className="px-12 max-w-7xl mx-auto space-y-16">
                 {/* Hero / Summary Area */}
                 <ReportHeader client={client} measurement={measurement} ffmi={{ ...ffmi, color: ffmi.color || '' }} />
 
@@ -351,15 +362,13 @@ export default function ReportDetailView({
 
                     {/* MFR Standalone Section (Horizontal Insert) */}
                     <div className="bg-gold/10 rounded-[3rem] p-10 border border-gold/20 shadow-lg">
-                        <div className="flex items-start gap-4 mb-6">
-                            <div className="p-2 bg-white rounded-xl shadow-sm mt-1">
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="p-2 bg-white rounded-xl shadow-sm">
                                 <TrendingUp className="text-gold" size={20} />
                             </div>
-                            <div>
+                            <div className="flex items-center gap-2">
                                 <h4 className="text-xl font-bold text-plum">Relación Músculo-Grasa (MFR)</h4>
-                                <p className="text-sm text-plum/70 mt-1 max-w-2xl leading-relaxed">
-                                    Indica cuántos kg de músculo tienes por cada kg de grasa. Un valor &gt; 2.5 es saludable, &gt; 4.0 es ideal para atletas.
-                                </p>
+                                <Tooltip text="Muscle-to-Fat Ratio: Indica cuántos kg de músculo tienes por cada kg de grasa. Un valor > 2.5 es saludable, > 4.0 es ideal para atletas." />
                             </div>
                         </div>
 
@@ -377,9 +386,9 @@ export default function ReportDetailView({
                         />
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         {/* 2) Metabolic Health Card */}
-                        <div className="bg-white rounded-[3rem] p-8 border border-gray-100 shadow-xl">
+                        <div className="bg-white rounded-[3rem] p-10 border border-gray-100 shadow-xl">
                             <div className="flex items-center gap-3 mb-8">
                                 <div className="p-2 bg-gold/10 rounded-xl">
                                     <Zap className="text-gold" size={18} />
@@ -432,7 +441,7 @@ export default function ReportDetailView({
                         </div>
 
                         {/* 3) Physical Indices Grid (Replaces List) */}
-                        <div className="bg-white rounded-[3rem] p-8 border border-gray-100 shadow-xl">
+                        <div className="bg-white rounded-[3rem] p-10 border border-gray-100 shadow-xl">
                             <div className="flex items-center gap-3 mb-8">
                                 <div className="p-2 bg-plum/10 rounded-xl">
                                     <Scale className="text-plum" size={18} />
@@ -500,10 +509,10 @@ export default function ReportDetailView({
                 {/* Section: Progress History removed as requested */}
 
                 {/* Side-by-Side Layout: Segmental (Left) + Charts (Right) */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-0">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12 items-start">
 
                     {/* Left Column: Segmental Analysis (Clean vertical list) */}
-                    <section className="bg-white rounded-[3rem] p-8 border border-gray-100 shadow-xl h-full flex flex-col">
+                    <section className="bg-white rounded-[3rem] p-10 border border-gray-100 shadow-xl">
                         <div className="flex items-center gap-3 mb-8">
                             <div className="p-2 bg-gray-50 rounded-xl">
                                 <Activity className="text-gray-400" size={16} />
@@ -514,7 +523,7 @@ export default function ReportDetailView({
                             </div>
                         </div>
 
-                        <div className="space-y-6 flex-1 flex flex-col justify-center">
+                        <div className="space-y-6">
                             {[
                                 { label: 'Brazo Derecho', muscle: measurement.muscleArmRight, fat: measurement.fatArmRight },
                                 { label: 'Brazo Izquierdo', muscle: measurement.muscleArmLeft, fat: measurement.fatArmLeft },
@@ -542,7 +551,7 @@ export default function ReportDetailView({
 
                     {/* Right Column: History Charts (Stacked Vertically) */}
                     {history.length >= 2 ? (
-                        <div className="flex flex-col gap-6 h-full">
+                        <div className="space-y-8">
 
 
                             {/* Muscle Chart */}
