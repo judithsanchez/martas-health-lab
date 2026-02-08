@@ -62,7 +62,7 @@ export function ClientListWidget({ clients }: { clients: ClientWithLatestMeasure
                             <div className="text-right">
                                 <div className="text-xs text-gray-400 font-bold uppercase tracking-widest mb-1">Peso</div>
                                 <div className="text-2xl font-bold text-plum flex items-center justify-end gap-2">
-                                    {client.latestMeasurement?.weight ? `${client.latestMeasurement.weight} kg` : '--'}
+                                    {client.latestMeasurement?.weight ? `${Number(client.latestMeasurement.weight).toFixed(1)} kg` : '--'}
                                 </div>
                             </div>
                         </Link>
