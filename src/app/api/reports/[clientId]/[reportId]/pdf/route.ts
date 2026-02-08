@@ -56,10 +56,11 @@ export async function GET(
 
         const filename = `${cleanName}_${cleanDate}.pdf`;
 
-        // Set viewport to A4 width at 2x scale (Retina) for sharp text/charts
+        // Set viewport to Desktop width to ensure 3-column layout is captured
+        // even if the app is responsive.
         await page.setViewport({
-            width: 794,
-            height: 1123, // Standard A4 height, though it will expand
+            width: 1280, // Force Desktop Width
+            height: 800,
             deviceScaleFactor: 2,
         });
 
@@ -82,29 +83,35 @@ export async function GET(
                     position: static !important;
                 }
 
-                /* Scale down everything to fit better in Portrait */
+                /* Layout Adjustments for PDF */
                 body { 
-                    zoom: 0.85; 
+                    /* 
+                       Since we are capturing a 1280px screen and shrinking it to A4 (794px),
+                       the content is effectively scaled down by ~60%.
+                       We can increase the zoom slightly if text is too small, 
+                       but '1.0' usually looks crisp for 'Desktop on A4' look.
+                    */
+                    zoom: 1.0; 
                     background-color: #f9f8f4 !important; 
                     -webkit-print-color-adjust: exact; 
-                    padding-bottom: 25px !important; /* Reduced padding from 50px */
+                    padding-bottom: 25px !important;
                 }
 
                 /* Specific fixes for the Header Card */
                 .bg-plum {
-                    padding: 1.5rem !important; /* Reduce from p-12 (3rem) to p-6 */
+                    padding: 2rem !important;
                     border-radius: 1.5rem !important;
                 }
                 
                 /* title adjustments */
-                h1.text-5xl { font-size: 2.5rem !important; margin-bottom: 2rem !important; }
+                h1.text-5xl { font-size: 3rem !important; margin-bottom: 1.5rem !important; }
 
                 /* Fix activity level text wrapping */
-                .text-sm { font-size: 0.8rem !important; white-space: nowrap !important; }
+                .text-sm { white-space: nowrap !important; }
                 
                 /* Reduce gap in grid/flex layouts */
-                .gap-8 { gap: 1rem !important; }
-                .gap-12 { gap: 1.5rem !important; }
+                .gap-8 { gap: 1.5rem !important; }
+                .gap-12 { gap: 2rem !important; }
 
                 /* FORCE GAUGE VISIBILITY */
                 /* The gauge is hidden on mobile (hidden md:block). We must override this for PDF. */

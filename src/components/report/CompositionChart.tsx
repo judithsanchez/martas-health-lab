@@ -47,7 +47,7 @@ export default function CompositionChart({ fatPercent, muscleMass, boneMass, wat
     // (Could add checks for other segments, but Bone is typically the only small one)
 
     return (
-        <div className="bg-white rounded-[3rem] p-10 border border-gray-100 shadow-xl space-y-8">
+        <div className="bg-white rounded-[2rem] md:rounded-[3rem] p-6 md:p-10 border border-gray-100 shadow-xl space-y-8">
             <div className="flex justify-between items-end">
                 <h3 className="text-2xl font-bold text-plum">Composición Corporal</h3>
                 {/* Optional: Add context or validation badge if needed */}

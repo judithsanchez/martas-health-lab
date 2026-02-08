@@ -95,10 +95,10 @@ export default function ReportHeader({ client, measurement, ffmi }: ReportHeader
                 </div>
             </div>
 
-            <div className="bg-plum rounded-[3rem] p-12 text-white shadow-2xl relative overflow-hidden">
+            <div className="bg-plum rounded-[2rem] md:rounded-[3rem] p-6 md:p-12 text-white shadow-2xl relative overflow-hidden">
                 <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
                     <div className="flex-1">
-                        <h1 className="text-5xl font-bold mb-6">{client.name} {client.lastname}</h1>
+                        <h1 className="text-3xl md:text-5xl font-bold mb-6">{client.name} {client.lastname}</h1>
                         <div className="grid grid-cols-2 lg:grid-cols-3 gap-y-6 gap-x-8">
                             <div className="flex items-center gap-3">
                                 <User size={20} className="text-white/50" />

@@ -38,14 +38,14 @@ export function ClientListWidget({ clients }: { clients: ClientWithLatestMeasure
             <div className="grid grid-cols-1 gap-4">
                 {filteredClients.length > 0 ? (
                     filteredClients.map((client) => (
-                        <Link href={`/clients/${client.id}`} key={client.id} className="bg-white p-6 rounded-[2rem] flex items-center justify-between hover:shadow-xl transition-all border border-transparent hover:border-gray-100 group">
+                        <Link href={`/clients/${client.id}`} key={client.id} className="bg-white p-4 md:p-6 rounded-[2rem] flex flex-col md:flex-row items-start md:items-center justify-between hover:shadow-xl transition-all border border-transparent hover:border-gray-100 group gap-4">
                             <div className="flex flex-col gap-4 w-full">
-                                <div className="flex items-center gap-6">
-                                    <div className="w-16 h-16 rounded-3xl flex items-center justify-center text-2xl bg-cream shadow-inner text-plum font-bold border border-sage/20 shrink-0">
+                                <div className="flex items-center gap-4 md:gap-6">
+                                    <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl md:rounded-3xl flex items-center justify-center text-lg md:text-2xl bg-cream shadow-inner text-plum font-bold border border-sage/20 shrink-0">
                                         {client.name.charAt(0)}{(client.lastname ?? '').charAt(0)}
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-xl mb-1 text-plum group-hover:text-gold transition-colors">{client.name} {client.lastname}</h4>
+                                        <h4 className="font-bold text-lg md:text-xl mb-1 text-plum group-hover:text-gold transition-colors">{client.name} {client.lastname}</h4>
                                         <div className="flex items-center gap-2">
                                             <div className={`w-2 h-2 rounded-full ${client.latestMeasurement ? 'bg-green-400' : 'bg-gray-300'}`}></div>
                                             <span className={`text-xs font-bold uppercase tracking-wider ${client.latestMeasurement ? 'text-green-600' : 'text-gray-400'}`}>

@@ -41,21 +41,21 @@ export default function ClientManager({ clients }: { clients: any[] }) {
     return (
         <main>
             {/* Header */}
-            <div className="flex justify-between items-center mb-8">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 md:mb-8">
                 <div>
-                    <h1 className="text-3xl font-bold text-plum">Manage Clients</h1>
+                    <h1 className="text-2xl md:text-3xl font-bold text-plum">Manage Clients</h1>
                     <p className="text-plum/60 mt-1">{clients.length} Total Clients</p>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex gap-3 w-full md:w-auto">
                     <Link
                         href="/"
-                        className="px-6 py-3 border border-plum/10 text-plum rounded-2xl hover:bg-white hover:shadow-md transition font-medium"
+                        className="flex-1 md:flex-none px-6 py-3 border border-plum/10 text-plum rounded-2xl hover:bg-white hover:shadow-md transition font-medium text-center"
                     >
                         Dashboard
                     </Link>
                     <button
                         onClick={() => setIsCreating(true)}
-                        className="px-6 py-3 bg-gold text-plum rounded-2xl hover:bg-white hover:shadow-xl transition font-bold shadow-md"
+                        className="flex-1 md:flex-none px-6 py-3 bg-gold text-plum rounded-2xl hover:bg-white hover:shadow-xl transition font-bold shadow-md"
                     >
                         + New Client
                     </button>
@@ -63,10 +63,9 @@ export default function ClientManager({ clients }: { clients: any[] }) {
             </div>
 
             {/* Content Container */}
-            <div className="bg-white rounded-[2.5rem] p-8 shadow-xl border border-gray-100">
+            <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-4 md:p-8 shadow-xl border border-gray-100">
                 {/* Search Bar */}
-                <div className="mb-8 max-w-md">
-                    {/* Reusing the style from ClientListWidget implies we might want a Search component, but inline for now */}
+                <div className="mb-6 md:mb-8 max-w-md">
                     <input
                         type="text"
                         placeholder="Search clients..."
@@ -76,8 +75,60 @@ export default function ClientManager({ clients }: { clients: any[] }) {
                     />
                 </div>
 
-                {/* Table */}
-                <div className="overflow-hidden">
+                {/* Mobile View: Cards */}
+                <div className="md:hidden space-y-4">
+                    {filteredClients.map((client) => (
+                        <div key={client.id} className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                            <div className="flex items-center gap-4 mb-4">
+                                <div className="w-12 h-12 rounded-2xl bg-cream flex items-center justify-center text-plum font-bold shadow-inner border border-sage/10 shrink-0">
+                                    {client.name.charAt(0)}
+                                </div>
+                                <div>
+                                    <div className="font-bold text-plum text-lg">{client.name} {client.lastname}</div>
+                                    <div className="text-gray-400 text-xs font-medium">@{client.username}</div>
+                                </div>
+                                <span className={`ml-auto px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider ${client.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                                    {client.isActive ? 'Active' : 'Inactive'}
+                                </span>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-2 text-sm mb-4">
+                                <div className="bg-white p-3 rounded-xl">
+                                    <span className="text-xs text-gray-400 block uppercase tracking-wider mb-1">Sessions/Wk</span>
+                                    <span className="font-bold text-plum">{client.sessionsPerWeek || '-'}</span>
+                                </div>
+                                <div className="bg-white p-3 rounded-xl">
+                                    <span className="text-xs text-gray-400 block uppercase tracking-wider mb-1">Start Date</span>
+                                    <span className="font-bold text-plum">{client.startDate || '-'}</span>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => setEditingClient(client)}
+                                    className="flex-1 py-2 text-sm font-bold text-plum bg-white rounded-xl border border-gray-200 hover:border-gold hover:text-gold transition-colors"
+                                >
+                                    Edit
+                                </button>
+                                <button
+                                    onClick={() => handleToggleStatus(client.id, client.isActive)}
+                                    className="flex-1 py-2 text-sm font-medium text-gray-500 bg-white rounded-xl border border-gray-200 hover:text-plum transition-colors"
+                                >
+                                    {client.isActive ? 'Deactivate' : 'Activate'}
+                                </button>
+                                <button
+                                    onClick={() => handleDelete(client.id)}
+                                    className="px-4 py-2 text-sm font-bold text-red-500 bg-white rounded-xl border border-gray-200 hover:bg-red-50 transition-colors"
+                                >
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Desktop View: Table */}
+                <div className="hidden md:block overflow-hidden">
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr>
