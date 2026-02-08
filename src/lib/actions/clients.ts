@@ -2,7 +2,7 @@
 
 import { db } from "@/lib/db";
 import { clients, measurements } from "@/lib/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 export async function getMeasurements() {
@@ -169,9 +169,30 @@ export async function getClientsWithLatestMeasurement() {
     return clientsWithData;
 }
 
+
 function calculateTrend(current?: number | null, previous?: number | null): 'up' | 'down' | 'stable' | null {
     if (typeof current !== 'number' || typeof previous !== 'number') return null;
     if (current > previous) return 'up';
     if (current < previous) return 'down';
     return 'stable';
+}
+
+export async function getMeasurementsCountThisMonth() {
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1);
+    startOfMonth.setHours(0, 0, 0, 0);
+    // Format as YYYY-MM-DD to match stored date strings if necessary, 
+    // or ISO string if full timestamp stored. Based on schema 'date' is text.
+    // Assuming ISO string or similar sortable string format.
+    const startOfMonthStr = startOfMonth.toISOString();
+
+    // Using raw SQL or a query builder filter
+    // Since we store dates as ISO strings, we can compare them lexicographically
+    const result = await db.select({
+        count: sql<number>`count(*)`
+    })
+        .from(measurements)
+        .where(sql`${measurements.date} >= ${startOfMonthStr}`);
+
+    return result[0].count;
 }
