@@ -45,7 +45,7 @@ export function Sidebar() {
                     href="/"
                     active={isActive("/")}
                     icon={<LayoutDashboard size={24} />}
-                    label="Dashboard"
+                    label="Inicio"
                     collapsed={isCollapsed}
                 />
                 <NavItem

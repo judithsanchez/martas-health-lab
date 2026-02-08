@@ -12,7 +12,7 @@ export default function ClientDetailsView({ client, measurements }: { client: an
     const [isCreating, setIsCreating] = useState(false);
 
     async function handleDelete(id: number) {
-        if (confirm("Are you sure you want to delete this measurement?")) {
+        if (confirm("¿Estás seguro de que quieres eliminar esta medición?")) {
             await deleteRecord(id);
             router.refresh();
         }
@@ -26,53 +26,53 @@ export default function ClientDetailsView({ client, measurements }: { client: an
                     <div>
                         <div className="flex items-center gap-2 mb-3">
                             <Link href="/" className="text-sage hover:text-plum transition-colors text-sm font-medium flex items-center gap-1">
-                                ← Back to Dashboard
+                                ← Volver al Panel
                             </Link>
                         </div>
-                        <h1 className="text-4xl font-serif font-bold text-plum">{client.name} {client.lastname}</h1>
+                        <h1 className="text-4xl font-bold text-plum">{client.name} {client.lastname}</h1>
                         <div className="flex flex-wrap gap-4 text-slate-500 mt-2 text-sm items-center">
                             <span className="bg-white px-2 py-1 rounded shadow-sm">@{client.username}</span>
                             <span>•</span>
-                            <span>Activity Lvl {client.activityLevel?.toString() ?? '-'}</span>
+                            <span>Nivel Actividad {client.activityLevel?.toString() ?? '-'}</span>
                             <span>•</span>
-                            <span>{client.height ? `${client.height} cm` : 'No Height'}</span>
+                            <span>{client.height ? `${client.height} cm` : 'Sin Altura'}</span>
                         </div>
                     </div>
                     <button
                         onClick={() => setIsCreating(true)}
                         className="px-6 py-3 bg-plum text-cream rounded-lg hover:bg-slate-800 transition font-medium shadow-md hover:shadow-lg flex items-center gap-2"
                     >
-                        <span>+</span> Add Record
+                        <span>+</span> Añadir Registro
                     </button>
                 </div>
 
                 {/* Measurements Table */}
                 <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
                     <div className="p-6 border-b border-slate-100 bg-white flex justify-between items-center">
-                        <h2 className="text-xl font-bold text-plum font-serif">Measurement History</h2>
-                        <span className="px-3 py-1 bg-sage/10 text-sage rounded-full text-xs font-bold uppercase tracking-wider">{measurements.length} Records</span>
+                        <h2 className="text-xl font-bold text-plum">Historial de Mediciones</h2>
+                        <span className="px-3 py-1 bg-sage/10 text-sage rounded-full text-xs font-bold uppercase tracking-wider">{measurements.length} Registros</span>
                     </div>
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead className="bg-cream text-plum uppercase text-xs font-bold tracking-wider">
                                 <tr>
-                                    <th className="p-5 border-b border-slate-100">Date</th>
-                                    <th className="p-5 border-b border-slate-100">Weight</th>
+                                    <th className="p-5 border-b border-slate-100">Fecha</th>
+                                    <th className="p-5 border-b border-slate-100">Peso</th>
                                     <th className="p-5 border-b border-slate-100">BMI</th>
-                                    <th className="p-5 border-b border-slate-100">Fat %</th>
-                                    <th className="p-5 border-b border-slate-100">Muscle</th>
-                                    <th className="p-5 border-b border-slate-100">Bone Mass</th>
+                                    <th className="p-5 border-b border-slate-100">% Grasa</th>
+                                    <th className="p-5 border-b border-slate-100">Músculo</th>
+                                    <th className="p-5 border-b border-slate-100">Masa Ósea</th>
                                     <th className="p-5 border-b border-slate-100">Visceral</th>
                                     <th className="p-5 border-b border-slate-100">DCI (kcal)</th>
-                                    <th className="p-5 border-b border-slate-100">Met. Age</th>
-                                    <th className="p-5 border-b border-slate-100 text-right">Actions</th>
+                                    <th className="p-5 border-b border-slate-100">Edad Met.</th>
+                                    <th className="p-5 border-b border-slate-100 text-right">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-50">
                                 {measurements.length === 0 ? (
                                     <tr>
                                         <td colSpan={10} className="p-12 text-center text-slate-400">
-                                            No measurements recorded yet. Add one to get started.
+                                            No hay mediciones registradas todavía. Añade una para empezar.
                                         </td>
                                     </tr>
                                 ) : (
@@ -106,13 +106,13 @@ export default function ClientDetailsView({ client, measurements }: { client: an
                                                         onClick={() => setEditingRecord(record)}
                                                         className="text-sage hover:text-plum text-sm font-semibold transition-colors px-2"
                                                     >
-                                                        Edit
+                                                        Editar
                                                     </button>
                                                     <button
                                                         onClick={() => handleDelete(record.id)}
                                                         className="text-red-400 hover:text-red-600 text-sm font-semibold transition-colors px-2"
                                                     >
-                                                        Delete
+                                                        Eliminar
                                                     </button>
                                                 </td>
                                             </tr>
