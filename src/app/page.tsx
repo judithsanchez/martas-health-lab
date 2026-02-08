@@ -1,4 +1,4 @@
-import { getClientsWithLatestMeasurement } from "@/lib/actions/clients";
+import { getClientsWithLatestMeasurement, getMeasurementsCountThisMonth } from "@/lib/actions/clients";
 import {
     Users,
     Upload,
@@ -18,13 +18,7 @@ export default async function Home() {
     const activeClientsCount = clients.filter(c => c.isActive).length;
 
     // Calculate measurements this month
-    const startOfMonth = new Date();
-    startOfMonth.setDate(1);
-    startOfMonth.setHours(0, 0, 0, 0);
-
-    const measurementsThisMonthCount = clients.filter(c =>
-        c.latestMeasurement && new Date(c.latestMeasurement.date) >= startOfMonth
-    ).length;
+    const measurementsThisMonthCount = await getMeasurementsCountThisMonth();
 
     return (
         <div className="bg-cream min-h-screen">
