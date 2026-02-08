@@ -62,7 +62,7 @@ export default function CompositionChart({ fatPercent, muscleMass, boneMass, wat
                         style={{ width: `${fatWidth}%` }}
                     >
                         <span className="text-[10px] font-bold uppercase opacity-60 text-orange-500 hidden sm:block">Grasa</span>
-                        <span className="text-xl font-black text-orange-500">{fatPercent}%</span>
+                        <span className="text-xl font-black text-orange-500">{Number(fatPercent).toFixed(1)}%</span>
                     </div>
 
                     {/* Muscle Segment */}
@@ -77,7 +77,6 @@ export default function CompositionChart({ fatPercent, muscleMass, boneMass, wat
                         </div>
                     </div>
 
-                    {/* Bone Segment */}
                     {/* Bone Segment */}
                     <div
                         className="bg-slate-200 flex flex-col justify-center items-center relative transition-all duration-500"
@@ -107,7 +106,7 @@ export default function CompositionChart({ fatPercent, muscleMass, boneMass, wat
                     </div>
                 </div>
                 <div className="flex items-baseline gap-1">
-                    <span className="text-xl font-black text-blue-500/80">{waterPercent}</span>
+                    <span className="text-xl font-black text-blue-500/80">{Number(waterPercent).toFixed(1)}</span>
                     <span className="text-xs font-bold text-blue-400/80">%</span>
                 </div>
             </div>

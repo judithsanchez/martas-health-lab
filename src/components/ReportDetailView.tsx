@@ -346,10 +346,10 @@ export default function ReportDetailView({
                 <div className="space-y-8 mb-12">
                     {/* 1) Top Horizontal Card: Core Composition */}
                     <CompositionChart
-                        fatPercent={measurement.fatPercent}
-                        muscleMass={measurement.muscleMass}
-                        boneMass={measurement.boneMass}
-                        waterPercent={measurement.waterPercent}
+                        fatPercent={measurement.fatPercent || 0}
+                        muscleMass={measurement.muscleMass || 0}
+                        boneMass={measurement.boneMass || 0}
+                        waterPercent={measurement.waterPercent || 0}
                         weight={measurement.weight}
                     />
 
@@ -369,7 +369,7 @@ export default function ReportDetailView({
 
                         <HealthScale
                             title=""
-                            value={mfr.value}
+                            value={Number(mfr.value || 0).toFixed(1)}
                             unit="ratio"
                             min={0} max={6}
                             markers={[
@@ -422,7 +422,7 @@ export default function ReportDetailView({
                                 />
                                 <StatusRow
                                     label="Índice ASMI"
-                                    value={asmi.value}
+                                    value={Number(asmi.value || 0).toFixed(1)}
                                     unit="kg/m²"
                                     status={asmi.label.toUpperCase()}
                                     statusColor={asmi.color}
@@ -448,7 +448,7 @@ export default function ReportDetailView({
                                 {/* Weight Card with Sparkline */}
                                 <MetricCard
                                     title="Peso"
-                                    value={measurement.weight}
+                                    value={Number(measurement.weight || 0).toFixed(1)}
                                     unit="kg"
                                     icon={Weight}
                                     color="text-plum bg-plum/5"
@@ -473,7 +473,7 @@ export default function ReportDetailView({
                                 {/* Visceral Fat Card */}
                                 <MetricCard
                                     title="Grasa Visceral"
-                                    value={measurement.visceralFat}
+                                    value={Number(measurement.visceralFat || 0).toFixed(1)}
                                     unit="Rating"
                                     label={visceral.label}
                                     icon={AlertCircle}
@@ -486,7 +486,7 @@ export default function ReportDetailView({
                                 {/* Bone Mass Card */}
                                 <MetricCard
                                     title="Masa Ósea"
-                                    value={boneMassCalc.value}
+                                    value={Number(boneMassCalc.value || 0).toFixed(1)}
                                     unit="kg"
                                     label={boneMassCalc.label}
                                     icon={Dna}
@@ -530,12 +530,12 @@ export default function ReportDetailView({
                                     <span className="text-xs font-bold text-gray-500">{row.label}</span>
                                     <div className="flex items-center gap-6">
                                         <div className="flex flex-col items-end">
-                                            <span className="text-xs font-bold text-sage">{row.muscle} kg</span>
+                                            <span className="text-xs font-bold text-sage">{Number(row.muscle || 0).toFixed(1)} kg</span>
                                             <span className="text-[8px] text-gray-300 uppercase tracking-widest">Músculo</span>
                                         </div>
                                         <div className="w-px h-6 bg-gray-100"></div>
                                         <div className="flex flex-col items-end w-12">
-                                            <span className="text-xs font-bold text-gold">{row.fat}%</span>
+                                            <span className="text-xs font-bold text-gold">{Number(row.fat || 0).toFixed(1)}%</span>
                                             <span className="text-[8px] text-gray-300 uppercase tracking-widest">Grasa</span>
                                         </div>
                                     </div>
