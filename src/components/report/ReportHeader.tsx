@@ -129,7 +129,7 @@ export default function ReportHeader({ client, measurement, ffmi }: ReportHeader
                                 <Ruler size={20} className="text-white/50" />
                                 <div>
                                     <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Altura</p>
-                                    <p className="font-semibold">{measurement.height || client.height || '--'} cm</p>
+                                    <p className="font-semibold">{measurement.height || client.height ? Number(measurement.height || client.height).toFixed(1) : '--'} cm</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">

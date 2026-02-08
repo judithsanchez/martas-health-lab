@@ -39,31 +39,63 @@ export function ClientListWidget({ clients }: { clients: ClientWithLatestMeasure
                 {filteredClients.length > 0 ? (
                     filteredClients.map((client) => (
                         <Link href={`/clients/${client.id}`} key={client.id} className="bg-white p-6 rounded-[2rem] flex items-center justify-between hover:shadow-xl transition-all border border-transparent hover:border-gray-100 group">
-                            <div className="flex items-center gap-6">
-                                <div className="w-16 h-16 rounded-3xl flex items-center justify-center text-2xl bg-cream shadow-inner text-plum font-bold border border-sage/20">
-                                    {client.name.charAt(0)}{(client.lastname ?? '').charAt(0)}
-                                </div>
-                                <div>
-                                    <h4 className="font-bold text-xl mb-1 text-plum group-hover:text-gold transition-colors">{client.name} {client.lastname}</h4>
-                                    <div className="flex items-center gap-2">
-                                        <div className={`w-2 h-2 rounded-full ${client.latestMeasurement ? 'bg-green-400' : 'bg-gray-300'}`}></div>
-                                        <span className={`text-xs font-bold uppercase tracking-wider ${client.latestMeasurement ? 'text-green-600' : 'text-gray-400'}`}>
-                                            {client.latestMeasurement ? 'Activo' : 'Sin datos'}
-                                        </span>
-                                        {client.latestMeasurement && (
-                                            <span className="text-xs text-gray-400 ml-2">
-                                                🗓️ {new Date(client.latestMeasurement.date).toLocaleDateString()}
+                            <div className="flex flex-col gap-4 w-full">
+                                <div className="flex items-center gap-6">
+                                    <div className="w-16 h-16 rounded-3xl flex items-center justify-center text-2xl bg-cream shadow-inner text-plum font-bold border border-sage/20 shrink-0">
+                                        {client.name.charAt(0)}{(client.lastname ?? '').charAt(0)}
+                                    </div>
+                                    <div>
+                                        <h4 className="font-bold text-xl mb-1 text-plum group-hover:text-gold transition-colors">{client.name} {client.lastname}</h4>
+                                        <div className="flex items-center gap-2">
+                                            <div className={`w-2 h-2 rounded-full ${client.latestMeasurement ? 'bg-green-400' : 'bg-gray-300'}`}></div>
+                                            <span className={`text-xs font-bold uppercase tracking-wider ${client.latestMeasurement ? 'text-green-600' : 'text-gray-400'}`}>
+                                                {client.latestMeasurement ? 'ACTIVO' : 'SIN DATOS'}
                                             </span>
-                                        )}
+                                            {client.latestMeasurement && (
+                                                <span className="text-xs text-gray-400 ml-2">
+                                                    🗓️ {new Date(client.latestMeasurement.date).toLocaleDateString()}
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div className="text-right">
-                                <div className="text-xs text-gray-400 font-bold uppercase tracking-widest mb-1">Peso</div>
-                                <div className="text-2xl font-bold text-plum flex items-center justify-end gap-2">
-                                    {client.latestMeasurement?.weight ? `${client.latestMeasurement.weight} kg` : '--'}
-                                </div>
+                                {client.latestMeasurement && (
+                                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 mt-2 bg-gray-50 p-4 rounded-xl border border-gray-100">
+                                        <div>
+                                            <div className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Peso</div>
+                                            <div className="text-sm font-bold text-plum">{Number(client.latestMeasurement.weight).toFixed(1)} kg</div>
+                                        </div>
+                                        <div>
+                                            <div className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">BMI</div>
+                                            <div className="text-sm font-bold text-plum">{client.latestMeasurement.bmi ? Number(client.latestMeasurement.bmi).toFixed(1) : '-'}</div>
+                                        </div>
+                                        <div>
+                                            <div className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">% Grasa</div>
+                                            <div className="text-sm font-bold text-plum">{client.latestMeasurement.fatPercent ? Number(client.latestMeasurement.fatPercent).toFixed(1) + '%' : '-'}</div>
+                                        </div>
+                                        <div>
+                                            <div className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Músculo</div>
+                                            <div className="text-sm font-bold text-plum">{client.latestMeasurement.muscleMass ? Number(client.latestMeasurement.muscleMass).toFixed(1) + ' kg' : '-'}</div>
+                                        </div>
+                                        <div>
+                                            <div className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Masa Ósea</div>
+                                            <div className="text-sm font-bold text-plum">{client.latestMeasurement.boneMass ? Number(client.latestMeasurement.boneMass).toFixed(1) + ' kg' : '-'}</div>
+                                        </div>
+                                        <div>
+                                            <div className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Visceral</div>
+                                            <div className="text-sm font-bold text-plum">{client.latestMeasurement.visceralFat ?? '-'}</div>
+                                        </div>
+                                        <div>
+                                            <div className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">DCI</div>
+                                            <div className="text-sm font-bold text-plum">{client.latestMeasurement.dciKcal ? client.latestMeasurement.dciKcal + ' kcal' : '-'}</div>
+                                        </div>
+                                        <div>
+                                            <div className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Edad Met.</div>
+                                            <div className="text-sm font-bold text-plum">{client.latestMeasurement.metabolicAge ?? '-'}</div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </Link>
                     ))
