@@ -58,9 +58,12 @@ export default function ClientDetailsView({ client, measurements }: { client: an
                                 <tr>
                                     <th className="p-5 border-b border-slate-100">Date</th>
                                     <th className="p-5 border-b border-slate-100">Weight</th>
+                                    <th className="p-5 border-b border-slate-100">BMI</th>
                                     <th className="p-5 border-b border-slate-100">Fat %</th>
                                     <th className="p-5 border-b border-slate-100">Muscle</th>
+                                    <th className="p-5 border-b border-slate-100">Bone Mass</th>
                                     <th className="p-5 border-b border-slate-100">Visceral</th>
+                                    <th className="p-5 border-b border-slate-100">DCI (kcal)</th>
                                     <th className="p-5 border-b border-slate-100">Met. Age</th>
                                     <th className="p-5 border-b border-slate-100 text-right">Actions</th>
                                 </tr>
@@ -68,43 +71,53 @@ export default function ClientDetailsView({ client, measurements }: { client: an
                             <tbody className="divide-y divide-slate-50">
                                 {measurements.length === 0 ? (
                                     <tr>
-                                        <td colSpan={7} className="p-12 text-center text-slate-400">
+                                        <td colSpan={10} className="p-12 text-center text-slate-400">
                                             No measurements recorded yet. Add one to get started.
                                         </td>
                                     </tr>
                                 ) : (
-                                    measurements.map((record) => (
-                                        <tr key={record.id} className="hover:bg-cream/30 transition duration-150 group">
-                                            <td className="p-5 text-slate-800 font-semibold group-hover:text-plum transition-colors">
-                                                {new Date(record.date).toLocaleDateString()}
-                                            </td>
-                                            <td className="p-5 text-slate-600 font-medium">{record.weight} kg</td>
-                                            <td className="p-5 text-slate-600">{record.fatPercent}%</td>
-                                            <td className="p-5 text-slate-600">{record.muscleMass} kg</td>
-                                            <td className="p-5 text-slate-600">{record.visceralFat}</td>
-                                            <td className="p-5 text-slate-600">{record.metabolicAge}</td>
-                                            <td className="p-5 text-right space-x-3">
-                                                <Link
-                                                    href={`/clients/${client.id}/reports/${record.id}`}
-                                                    className="px-3 py-1 bg-gold text-plum rounded-lg text-xs font-bold hover:bg-white transition shadow-sm inline-block"
-                                                >
-                                                    Ver Reporte
-                                                </Link>
-                                                <button
-                                                    onClick={() => setEditingRecord(record)}
-                                                    className="text-sage hover:text-plum text-sm font-semibold transition-colors"
-                                                >
-                                                    Edit
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(record.id)}
-                                                    className="text-red-400 hover:text-red-600 text-sm font-semibold transition-colors"
-                                                >
-                                                    Delete
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))
+                                    measurements.map((record) => {
+                                        const formatValue = (val: any) => {
+                                            if (typeof val === 'number') return val.toFixed(1);
+                                            return val ?? '-';
+                                        };
+
+                                        return (
+                                            <tr key={record.id} className="hover:bg-cream/30 transition duration-150 group">
+                                                <td className="p-5 text-slate-800 font-semibold group-hover:text-plum transition-colors whitespace-nowrap">
+                                                    {new Date(record.date).toLocaleDateString()}
+                                                </td>
+                                                <td className="p-5 text-slate-600 font-medium">{formatValue(record.weight)} kg</td>
+                                                <td className="p-5 text-slate-600">{formatValue(record.bmi)}</td>
+                                                <td className="p-5 text-slate-600">{formatValue(record.fatPercent)}%</td>
+                                                <td className="p-5 text-slate-600">{formatValue(record.muscleMass)} kg</td>
+                                                <td className="p-5 text-slate-600">{formatValue(record.boneMass)} kg</td>
+                                                <td className="p-5 text-slate-600">{record.visceralFat}</td>
+                                                <td className="p-5 text-slate-600">{record.dciKcal}</td>
+                                                <td className="p-5 text-slate-600">{record.metabolicAge}</td>
+                                                <td className="p-5 text-right space-x-2 whitespace-nowrap">
+                                                    <Link
+                                                        href={`/clients/${client.id}/reports/${record.id}`}
+                                                        className="px-3 py-1 bg-gold text-plum rounded-lg text-xs font-bold hover:bg-white transition shadow-sm inline-block"
+                                                    >
+                                                        Ver Reporte
+                                                    </Link>
+                                                    <button
+                                                        onClick={() => setEditingRecord(record)}
+                                                        className="text-sage hover:text-plum text-sm font-semibold transition-colors px-2"
+                                                    >
+                                                        Edit
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDelete(record.id)}
+                                                        className="text-red-400 hover:text-red-600 text-sm font-semibold transition-colors px-2"
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })
                                 )}
                             </tbody>
                         </table>
