@@ -7,7 +7,7 @@ export default async function ClientsPage() {
 
     return (
         <div className="bg-cream min-h-screen">
-            <div className="px-12 py-10 space-y-12 max-w-7xl mx-auto">
+            <div className="px-4 py-6 md:px-12 md:py-10 space-y-6 md:space-y-12 max-w-7xl mx-auto">
                 <ClientManager clients={clients} />
             </div>
         </div>

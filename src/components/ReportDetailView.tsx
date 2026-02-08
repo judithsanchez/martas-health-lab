@@ -351,7 +351,7 @@ export default function ReportDetailView({
     return (
         <main className="min-h-screen bg-cream pb-20">
             {/* Minimal Header */}
-            <div className="px-12 max-w-7xl mx-auto space-y-8 mt-4">
+            <div className="px-4 md:px-12 max-w-7xl mx-auto space-y-6 md:space-y-8 mt-4">
                 {/* Hero / Summary Area */}
                 <ReportHeader client={{ ...client, age: effectiveAge }} measurement={measurement} ffmi={{ ...ffmi, color: ffmi.color || '' }} />
 
@@ -369,8 +369,8 @@ export default function ReportDetailView({
                     />
 
                     {/* MFR Standalone Section (Horizontal Insert) */}
-                    <div className="bg-gold/10 rounded-[3rem] p-10 border border-gold/20 shadow-lg">
-                        <div className="flex items-start gap-4 mb-6">
+                    <div className="bg-gold/10 rounded-[2rem] md:rounded-[3rem] p-6 md:p-10 border border-gold/20 shadow-lg">
+                        <div className="flex flex-col md:flex-row items-start gap-4 mb-6">
                             <div className="p-2 bg-white rounded-xl shadow-sm mt-1">
                                 <TrendingUp className="text-gold" size={20} />
                             </div>
@@ -398,7 +398,7 @@ export default function ReportDetailView({
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* 2) Metabolic Health Card */}
-                        <div className="bg-white rounded-[3rem] p-8 border border-gray-100 shadow-xl">
+                        <div className="bg-white rounded-[2rem] md:rounded-[3rem] p-6 md:p-8 border border-gray-100 shadow-xl">
                             <div className="flex items-center gap-3 mb-8">
                                 <div className="p-2 bg-gold/10 rounded-xl">
                                     <Zap className="text-gold" size={18} />
@@ -451,7 +451,7 @@ export default function ReportDetailView({
                         </div>
 
                         {/* 3) Physical Indices Grid (Replaces List) */}
-                        <div className="bg-white rounded-[3rem] p-8 border border-gray-100 shadow-xl">
+                        <div className="bg-white rounded-[2rem] md:rounded-[3rem] p-6 md:p-8 border border-gray-100 shadow-xl">
                             <div className="flex items-center gap-3 mb-8">
                                 <div className="p-2 bg-plum/10 rounded-xl">
                                     <Scale className="text-plum" size={18} />
@@ -522,7 +522,7 @@ export default function ReportDetailView({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-0">
 
                     {/* Left Column: Segmental Analysis (Clean vertical list) */}
-                    <section className="bg-white rounded-[3rem] p-8 border border-gray-100 shadow-xl h-full flex flex-col">
+                    <section className="bg-white rounded-[2rem] md:rounded-[3rem] p-6 md:p-8 border border-gray-100 shadow-xl h-full flex flex-col">
                         <div className="flex items-center gap-3 mb-8">
                             <div className="p-2 bg-gray-50 rounded-xl">
                                 <Activity className="text-gray-400" size={16} />
@@ -573,7 +573,7 @@ export default function ReportDetailView({
 
 
                             {/* Muscle Chart */}
-                            <div className="bg-white rounded-[2.5rem] p-8 shadow-xl border border-gray-100">
+                            <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 shadow-xl border border-gray-100">
                                 <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Masa Muscular (kg)</h4>
                                 <div className="h-32">
                                     <ResponsiveContainer width="100%" height="100%">
@@ -606,7 +606,7 @@ export default function ReportDetailView({
                             </div>
 
                             {/* Fat Chart */}
-                            <div className="bg-white rounded-[2.5rem] p-8 shadow-xl border border-gray-100">
+                            <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 shadow-xl border border-gray-100">
                                 <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Grasa Corporal (%)</h4>
                                 <div className="h-32">
                                     <ResponsiveContainer width="100%" height="100%">

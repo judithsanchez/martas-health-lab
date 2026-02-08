@@ -22,26 +22,26 @@ export default async function Home() {
 
     return (
         <div className="bg-cream min-h-screen">
-            <div className="px-12 py-10 space-y-12 max-w-7xl mx-auto">
+            <div className="px-4 py-6 md:px-12 md:py-10 space-y-8 md:space-y-12 max-w-7xl mx-auto">
                 <div>
                     <h2 className="text-2xl font-bold text-plum">¡Bienvenida, Marta! 👋</h2>
                 </div>
                 {/* Hero Section */}
-                <section className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-                    <div className="lg:col-span-3 rounded-[2.5rem] p-10 text-white shadow-xl flex items-center justify-between relative overflow-hidden bg-gradient-to-br from-plum to-[#5E3D5E]">
+                <section className="grid grid-cols-1 lg:grid-cols-5 gap-6 md:gap-8">
+                    <div className="lg:col-span-3 rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 text-white shadow-xl flex items-center justify-between relative overflow-hidden bg-gradient-to-br from-plum to-[#5E3D5E]">
                         <div className="relative z-10 max-w-md">
-                            <h3 className="text-4xl font-bold mb-4">Transformando datos en salud. 🍎</h3>
-                            <p className="opacity-70 mb-8 leading-relaxed text-lg">Tienes nuevas métricas para analizar hoy. ¿Empezamos?</p>
-                            <Link href="/upload" className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl font-bold transform transition-all hover:-translate-y-1 shadow-xl bg-gold text-plum border border-transparent hover:bg-white">
+                            <h3 className="text-2xl md:text-4xl font-bold mb-4">Transformando datos en salud. 🍎</h3>
+                            <p className="opacity-70 mb-6 md:mb-8 leading-relaxed text-sm md:text-lg">Tienes nuevas métricas para analizar hoy. ¿Empezamos?</p>
+                            <Link href="/upload" className="inline-flex items-center gap-2 px-6 py-3 md:px-8 md:py-4 rounded-xl md:rounded-2xl font-bold transform transition-all hover:-translate-y-1 shadow-xl bg-gold text-plum border border-transparent hover:bg-white text-sm md:text-base">
                                 <Plus size={20} /> Nuevo Registro
                             </Link>
                         </div>
                         {/* Abstract Shape */}
-                        <div className="absolute top-[-20%] right-[-10%] w-80 h-80 rounded-full opacity-10 border-[40px] border-gold"></div>
+                        <div className="absolute top-[-20%] right-[-10%] w-40 h-40 md:w-80 md:h-80 rounded-full opacity-10 border-[20px] md:border-[40px] border-gold"></div>
                     </div>
 
                     {/* Vitales Widget */}
-                    <div className="lg:col-span-2 bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-xl flex flex-col justify-between">
+                    <div className="lg:col-span-2 bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 border border-gray-100 shadow-xl flex flex-col justify-between">
                         <div>
                             <h4 className="text-lg font-bold mb-6 flex items-center gap-2 text-plum">
                                 <Activity size={20} className="text-sage" /> Vitales del Mes
