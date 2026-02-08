@@ -332,6 +332,21 @@ export default function ReportDetailView({
         );
     };
 
+    const CustomChartTooltip = ({ active, payload, label, unit }: any) => {
+        if (active && payload && payload.length) {
+            return (
+                <div className="bg-white p-3 rounded-xl shadow-lg border border-gray-100 text-xs">
+                    <p className="font-bold text-gray-500 mb-1">{new Date(label).toLocaleDateString()}</p>
+                    <p className="font-bold text-plum text-sm">
+                        {Number(payload[0].value).toFixed(1)}
+                        <span className="text-[10px] ml-0.5 text-gray-400">{unit}</span>
+                    </p>
+                </div>
+            );
+        }
+        return null;
+    };
+
 
     return (
         <main className="min-h-screen bg-cream pb-20">
@@ -565,8 +580,7 @@ export default function ReportDetailView({
                                             <XAxis dataKey="date" hide />
                                             <YAxis domain={['dataMin - 0.5', 'dataMax + 0.5']} hide />
                                             <RechartsTooltip
-                                                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', fontSize: '12px' }}
-                                                labelFormatter={(date) => new Date(date).toLocaleDateString()}
+                                                content={<CustomChartTooltip unit="kg" />}
                                             />
                                             <Area
                                                 type="monotone"
@@ -599,8 +613,7 @@ export default function ReportDetailView({
                                             <XAxis dataKey="date" hide />
                                             <YAxis domain={['dataMin - 1', 'dataMax + 1']} hide />
                                             <RechartsTooltip
-                                                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', fontSize: '12px' }}
-                                                labelFormatter={(date) => new Date(date).toLocaleDateString()}
+                                                content={<CustomChartTooltip unit="%" />}
                                             />
                                             <Area
                                                 type="monotone"
