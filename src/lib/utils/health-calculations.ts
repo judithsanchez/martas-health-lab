@@ -226,3 +226,15 @@ export function interpretBoneMass(boneMass: number, weight: number, gender: 'mal
         color: isStable ? 'text-green-500' : 'text-red-500'
     };
 }
+
+export function calculateAge(birthday: string | Date | null | undefined): number {
+    if (!birthday) return 0;
+    const birthDate = new Date(birthday);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+    }
+    return age;
+}

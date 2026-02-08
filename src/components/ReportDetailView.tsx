@@ -30,6 +30,7 @@ import {
     calculateBMR,
     interpretMetabolicAge,
     interpretBoneMass,
+    calculateAge,
     CalculationResult
 } from '@/lib/utils/health-calculations';
 import {
@@ -57,6 +58,9 @@ export default function ReportDetailView({
 }) {
     // activeGroup and metricGroups removed as they are no longer used
 
+    // Calculate effective age
+    const effectiveAge = client.age || calculateAge(client.birthday) || 30; // Default to 30 if unknown to avoid div/0 or bad BMR
+
     // Perform calculations
     const bmi = calculateBMI(measurement.weight, measurement.height || client.height);
     const asmi = calculateASMI(
@@ -72,8 +76,8 @@ export default function ReportDetailView({
     const mfr = calculateMFR(measurement.muscleMass || 0, measurement.weight, measurement.fatPercent || 0);
     const visceral = interpretVisceralFat(measurement.visceralFat || 0);
 
-    const bmrCalc = calculateBMR(measurement.weight, measurement.height || client.height, client.age || 0, client.gender || 'male');
-    const metAgeCalc = interpretMetabolicAge(measurement.metabolicAge || 0, client.age || 0);
+    const bmrCalc = calculateBMR(measurement.weight, measurement.height || client.height, effectiveAge, client.gender || 'male');
+    const metAgeCalc = interpretMetabolicAge(measurement.metabolicAge || 0, effectiveAge);
     const boneMassCalc = interpretBoneMass(measurement.boneMass || 0, measurement.weight, client.gender || 'male');
 
     // Prepare chart data merging history with current measurement
@@ -334,7 +338,7 @@ export default function ReportDetailView({
             {/* Minimal Header */}
             <div className="px-12 max-w-7xl mx-auto space-y-8 mt-4">
                 {/* Hero / Summary Area */}
-                <ReportHeader client={client} measurement={measurement} ffmi={{ ...ffmi, color: ffmi.color || '' }} />
+                <ReportHeader client={{ ...client, age: effectiveAge }} measurement={measurement} ffmi={{ ...ffmi, color: ffmi.color || '' }} />
 
                 {/* Master History Chart (Option A) removed as requested */}
 
