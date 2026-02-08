@@ -13,19 +13,16 @@ export async function GET(
         // In production, this should be the full domain. For dev, localhost:3000 is fine.
         const host = request.headers.get('host') || 'localhost:3000';
 
-        // Determine protocol:
-        // - http if localhost or 127.0.0.1
-        // - http if accessing via private IP (like Tailscale 100.x or Local 192.168.x)
-        // - http if port is explicitly 3000 (common dev port)
-        // - https otherwise (production)
-        const isHttp = host.includes('localhost') ||
-            host.includes('127.0.0.1') ||
-            host.startsWith('100.') ||
-            host.startsWith('192.168.') ||
-            host.includes(':3000');
+        console.log(`[PDF] Request received. Host: ${host}, Client: ${clientId}, Report: ${reportId}`);
 
-        const protocol = isHttp ? 'http' : 'https';
-        const reportUrl = `${protocol}://${host}/clients/${clientId}/reports/${reportId}`;
+        // FORCE LOCALHOST STRATEGY
+        // The incoming host (e.g., 100.117.x.y) might not be reachable from inside the Docker container.
+        // Since Puppeteer is running on the same server/container, we can simply visit localhost.
+        const localHost = '127.0.0.1:3000';
+        const protocol = 'http'; // Always http for localhost
+        const reportUrl = `${protocol}://${localHost}/clients/${clientId}/reports/${reportId}`;
+
+        console.log(`[PDF] Puppeteer visiting: ${reportUrl}`);
 
         // Launch Puppeteer
         const browser = await puppeteer.launch({
