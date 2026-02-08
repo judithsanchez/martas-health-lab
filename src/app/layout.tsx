@@ -29,7 +29,7 @@ export default function RootLayout({
         <html lang="en" className={`${outfit.variable} ${playfair.variable}`}>
             <body className="bg-cream min-h-screen text-slate-900 font-sans flex">
                 <Sidebar />
-                <main className="flex-1 overflow-y-auto h-screen">
+                <main className="flex-1 overflow-y-auto h-screen pt-16 md:pt-0">
                     {children}
                 </main>
             </body>
