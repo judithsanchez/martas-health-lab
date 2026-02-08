@@ -533,7 +533,17 @@ export default function ReportDetailView({
                             </div>
                         </div>
 
-                        <div className="space-y-6 flex-1 flex flex-col justify-center">
+                        <div className="space-y-2 flex-1 flex flex-col justify-center">
+                            {/* Header Row */}
+                            <div className="flex items-center justify-between pb-2 border-b border-gray-100 px-2">
+                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Zona</span>
+                                <div className="flex items-center gap-6">
+                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest w-16 text-right">Músculo</span>
+                                    <div className="w-px h-0"></div>
+                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest w-12 text-right">Grasa</span>
+                                </div>
+                            </div>
+
                             {[
                                 { label: 'Brazo Derecho', muscle: measurement.muscleArmRight, fat: measurement.fatArmRight },
                                 { label: 'Brazo Izquierdo', muscle: measurement.muscleArmLeft, fat: measurement.fatArmLeft },
@@ -541,17 +551,15 @@ export default function ReportDetailView({
                                 { label: 'Pierna Izquierda', muscle: measurement.muscleLegLeft, fat: measurement.fatLegLeft },
                                 { label: 'Tronco', muscle: measurement.muscleTrunk, fat: measurement.fatTrunk },
                             ].map((row, idx) => (
-                                <div key={idx} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors rounded-lg px-2">
+                                <div key={idx} className="flex items-center justify-between py-3 border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors rounded-lg px-2">
                                     <span className="text-xs font-bold text-gray-500">{row.label}</span>
                                     <div className="flex items-center gap-6">
-                                        <div className="flex flex-col items-end">
+                                        <div className="flex flex-col items-end w-16">
                                             <span className="text-xs font-bold text-sage">{Number(row.muscle || 0).toFixed(1)} kg</span>
-                                            <span className="text-[8px] text-gray-300 uppercase tracking-widest">Músculo</span>
                                         </div>
-                                        <div className="w-px h-6 bg-gray-100"></div>
+                                        <div className="w-px h-4 bg-gray-100"></div>
                                         <div className="flex flex-col items-end w-12">
                                             <span className="text-xs font-bold text-gold">{Number(row.fat || 0).toFixed(1)}%</span>
-                                            <span className="text-[8px] text-gray-300 uppercase tracking-widest">Grasa</span>
                                         </div>
                                     </div>
                                 </div>
