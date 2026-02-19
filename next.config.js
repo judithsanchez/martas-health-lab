@@ -1,12 +1,17 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    // output: 'standalone',
-    typescript: {
-        ignoreBuildErrors: true,
+  // output: 'standalone',
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "4mb",
     },
-    eslint: {
-        ignoreDuringBuilds: true,
-    },
+  },
 };
 
 module.exports = nextConfig;

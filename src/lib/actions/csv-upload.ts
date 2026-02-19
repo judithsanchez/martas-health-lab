@@ -17,14 +17,24 @@ export async function uploadCsv(formData: FormData) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    const uploadsDir = path.join(process.cwd(), "uploads");
-    if (!fs.existsSync(uploadsDir)) {
-        fs.mkdirSync(uploadsDir);
-    }
+    console.log(`[Upload] Starting upload for file: ${file.name}, size: ${bytes.byteLength} bytes`);
 
+    // Use the mounted data volume which we know is writable
+    const uploadsDir = path.join(process.cwd(), "data", "uploads");
     const fileName = `${Date.now()}-${file.name}`;
-    const filePath = path.join(uploadsDir, fileName);
-    fs.writeFileSync(filePath, buffer);
+
+    try {
+        if (!fs.existsSync(uploadsDir)) {
+            fs.mkdirSync(uploadsDir, { recursive: true });
+        }
+
+        const filePath = path.join(uploadsDir, fileName);
+        fs.writeFileSync(filePath, buffer);
+        console.log(`[Upload] Audit file saved to: ${filePath}`);
+    } catch (saveError) {
+        // Critical: Don't block the actual parsing if audit storage fails (common in RO filesystems)
+        console.error("[Upload] Failed to save audit file, proceeding with parsing anyway:", saveError);
+    }
 
     // 2. CSV Parsing
     const csvContent = buffer.toString();
