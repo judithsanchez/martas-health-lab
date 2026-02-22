@@ -55,7 +55,7 @@ describe("uploadCsv with XLSX", () => {
         expect(result.fileName).toContain("test.xlsx");
     });
 
-    it("should fallback to CSV for unknown extensions", async () => {
+    it("should use XLSX for unknown extensions too", async () => {
         const fileContent = "~0,2,Wk,70,DT,02/02/2022";
         const file = new File([fileContent], "test.txt", { type: "text/plain" });
         const formData = new FormData();
@@ -63,9 +63,18 @@ describe("uploadCsv with XLSX", () => {
 
         vi.mocked(fs.existsSync).mockReturnValue(true);
 
+        const mockWorkbook = {
+            SheetNames: ["Sheet1"],
+            Sheets: { "Sheet1": {} }
+        };
+        vi.mocked(XLSX.read).mockReturnValue(mockWorkbook as any);
+        vi.mocked(XLSX.utils.sheet_to_json).mockReturnValue([
+            ["~0", "2", "Wk", "70", "DT", "02/02/2022"]
+        ]);
+
         const result = await uploadCsv(formData);
 
-        expect(XLSX.read).not.toHaveBeenCalled();
+        expect(XLSX.read).toHaveBeenCalled();
         expect(result.data[0]).toMatchObject({ weight: 70, date: "2022-02-02" });
     });
 });

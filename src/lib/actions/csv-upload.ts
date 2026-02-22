@@ -39,24 +39,27 @@ export async function uploadCsv(formData: FormData) {
         let rawRows: string[][] = [];
 
         const extension = file.name.split(".").pop()?.toLowerCase();
-        const isExcel = extension === "xlsx" || extension === "xls";
 
-        if (isExcel) {
-            console.log("[Upload] Parsing as Excel format");
-            const workbook = XLSX.read(buffer, { type: "buffer" });
-            const firstSheetName = workbook.SheetNames[0];
-            const worksheet = workbook.Sheets[firstSheetName];
-            // Get data as array of arrays (stringified)
-            rawRows = XLSX.utils.sheet_to_json<string[]>(worksheet, { header: 1, raw: false });
-        } else {
-            console.log("[Upload] Parsing as CSV format");
-            const csvContent = buffer.toString();
-            const parsed = Papa.parse<string[]>(csvContent, {
-                header: false,
-                skipEmptyLines: true,
-            });
-            rawRows = parsed.data;
-        }
+        // We use the 'xlsx' library for both CSV and Excel files.
+        // It provides much better encoding detection (UTF-8, UTF-16, etc.) 
+        // and handles different CSV delimiters automatically.
+        console.log(`[Upload] Parsing ${extension?.toUpperCase()} file using SheetJS`);
+
+        const workbook = XLSX.read(buffer, {
+            type: "buffer",
+            codepage: 65001 // Default to UTF-8 if unknown
+        });
+
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+
+        // Get data as array of arrays (stringified)
+        // raw: false ensures all values are returned as strings (important for Tanita tags)
+        rawRows = XLSX.utils.sheet_to_json<string[]>(worksheet, {
+            header: 1,
+            raw: false,
+            defval: ""
+        });
 
         // 3. Transform & Validate
         console.log(`[Upload] Total rows found: ${rawRows.length}`);
@@ -68,10 +71,7 @@ export async function uploadCsv(formData: FormData) {
 
         // Basic validation
         if (data.length === 0) {
-            if (isExcel) {
-                throw new Error("No valid measurement data found in the Excel file. Please ensure it follows the Tanita export format.");
-            }
-            throw new Error("No valid measurement data found in the CSV. Please check formatting.");
+            throw new Error(`No valid measurement data found in the ${extension?.toUpperCase() || 'file'}. Please ensure it follows the Tanita export format.`);
         }
 
         return {
