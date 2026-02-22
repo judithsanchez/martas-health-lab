@@ -23,7 +23,7 @@ vi.mock("xlsx", () => {
     };
 });
 
-vi.mock("../logger", () => ({
+vi.mock("@/lib/logger", () => ({
     Logger: {
         info: vi.fn(),
         success: vi.fn(),
