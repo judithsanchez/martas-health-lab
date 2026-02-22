@@ -23,6 +23,15 @@ vi.mock("xlsx", () => {
     };
 });
 
+vi.mock("@/lib/logger", () => ({
+    Logger: {
+        info: vi.fn(),
+        success: vi.fn(),
+        warn: vi.fn(),
+        error: vi.fn(),
+    },
+}));
+
 describe("uploadCsv", () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -49,15 +58,19 @@ describe("uploadCsv", () => {
 
         const result = await uploadCsv(formData);
 
-        expect(result.data[0]).toMatchObject({ weight: 60, date: "2020-01-01" });
+        expect(result.success).toBe(true);
+        if (result.success && result.records) {
+            expect(result.records[0]).toMatchObject({ weight: 60, date: "2020-01-01" });
+        }
         expect(fs.writeFileSync).toHaveBeenCalled();
-        expect(result.fileName).toContain("test.csv");
         expect(XLSX.read).toHaveBeenCalled();
     });
 
-    it("should throw error if file is missing", async () => {
+    it("should return error if file is missing", async () => {
         const formData = new FormData();
-        await expect(uploadCsv(formData)).rejects.toThrow("No file uploaded");
+        const result = await uploadCsv(formData);
+        expect(result.success).toBe(false);
+        expect(result.message).toBe("No file uploaded");
     });
 
     it("should throw error if no valid data found", async () => {
@@ -72,6 +85,8 @@ describe("uploadCsv", () => {
         vi.mocked(XLSX.read).mockReturnValue(mockWorkbook as any);
         vi.mocked(XLSX.utils.sheet_to_json).mockReturnValue([["XX", "val"]]); // No date/weight
 
-        await expect(uploadCsv(formData)).rejects.toThrow(/No valid measurement data found/);
+        const result = await uploadCsv(formData);
+        expect(result.success).toBe(false);
+        expect(result.message).toContain("No valid data found");
     });
 });

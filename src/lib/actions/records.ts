@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { measurements } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { Logger } from "../logger";
 
 export type MeasurementData = {
     clientId: number;
@@ -48,32 +49,44 @@ export async function getRecord(id: number) {
 }
 
 export async function createRecord(data: MeasurementData) {
-    const result = await db.insert(measurements).values(data as any).returning();
-    revalidatePath("/");
-    return result[0];
+    try {
+        const result = await db.insert(measurements).values(data as any).returning();
+        await Logger.success(`Created measurement for client ID: ${data.clientId}`, { id: result[0].id }, "RECORD_ACTION");
+        revalidatePath("/");
+        return result[0];
+    } catch (error: any) {
+        await Logger.error(`Failed to create measurement for client ID: ${data.clientId}`, { error: error.message }, "RECORD_ACTION");
+        throw error;
+    }
 }
 
 export async function updateRecord(id: number, data: Partial<MeasurementData>) {
-    // defined fields only to avoid overwriting with undefined if partial is passed incorrectly, 
-    // but Drizzle handles partial objects in set() gracefully typically.
+    try {
+        const result = await db.update(measurements)
+            .set(data)
+            .where(eq(measurements.id, id))
+            .returning();
 
-    // However, we must ensure clientId is not changed if it's not supposed to be, 
-    // but the type allows it. Usually records don't move between clients, but manual fix might require it.
-
-    const result = await db.update(measurements)
-        .set(data)
-        .where(eq(measurements.id, id))
-        .returning();
-
-    revalidatePath("/");
-    return result[0];
+        await Logger.info(`Updated measurement ID: ${id}`, { changes: data }, "RECORD_ACTION");
+        revalidatePath("/");
+        return result[0];
+    } catch (error: any) {
+        await Logger.error(`Failed to update measurement ID: ${id}`, { error: error.message }, "RECORD_ACTION");
+        throw error;
+    }
 }
 
 export async function deleteRecord(id: number) {
-    const result = await db.delete(measurements)
-        .where(eq(measurements.id, id))
-        .returning();
+    try {
+        const result = await db.delete(measurements)
+            .where(eq(measurements.id, id))
+            .returning();
 
-    revalidatePath("/");
-    return result[0];
+        await Logger.success(`Deleted measurement ID: ${id}`, { id }, "RECORD_ACTION");
+        revalidatePath("/");
+        return result[0];
+    } catch (error: any) {
+        await Logger.error(`Failed to delete measurement ID: ${id}`, { error: error.message }, "RECORD_ACTION");
+        throw error;
+    }
 }

@@ -18,6 +18,15 @@ vi.mock("next/cache", () => ({
     revalidatePath: vi.fn(),
 }));
 
+vi.mock("@/lib/logger", () => ({
+    Logger: {
+        info: vi.fn(),
+        success: vi.fn(),
+        warn: vi.fn(),
+        error: vi.fn(),
+    },
+}));
+
 describe("persistPerRowAssignments", () => {
     beforeEach(() => {
         vi.clearAllMocks();

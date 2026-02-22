@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { clients, measurements } from "@/lib/db/schema";
 import { eq, desc, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { Logger } from "../logger";
 
 export async function getMeasurements() {
     return await db.select({
@@ -62,22 +63,28 @@ export async function createClient(data: {
     phone?: string;
     gender?: string;
 }) {
-    const result = await db.insert(clients).values({
-        name: data.name,
-        lastname: data.lastname,
-        username: data.username,
-        birthday: data.birthday,
-        gender: data.gender,
-        height: data.height,
-        activityLevel: data.activityLevel,
-        sessionsPerWeek: data.sessionsPerWeek,
-        startDate: data.startDate,
-        email: data.email,
-        phone: data.phone,
-    }).returning();
+    try {
+        const result = await db.insert(clients).values({
+            name: data.name,
+            lastname: data.lastname,
+            username: data.username,
+            birthday: data.birthday,
+            gender: data.gender,
+            height: data.height,
+            activityLevel: data.activityLevel,
+            sessionsPerWeek: data.sessionsPerWeek,
+            startDate: data.startDate,
+            email: data.email,
+            phone: data.phone,
+        }).returning();
 
-    revalidatePath("/");
-    return result[0];
+        await Logger.success(`Created client: ${data.name}`, { id: result[0].id }, "CLIENT_ACTION");
+        revalidatePath("/");
+        return result[0];
+    } catch (error: any) {
+        await Logger.error(`Failed to create client: ${data.name}`, { error: error.message }, "CLIENT_ACTION");
+        throw error;
+    }
 }
 
 export async function updateClient(
@@ -96,42 +103,61 @@ export async function updateClient(
         gender?: string;
     }
 ) {
-    const result = await db.update(clients)
-        .set(data)
-        .where(eq(clients.id, id))
-        .returning();
+    try {
+        const result = await db.update(clients)
+            .set(data)
+            .where(eq(clients.id, id))
+            .returning();
 
-    revalidatePath("/");
-    return result[0];
+        await Logger.info(`Updated client ID: ${id}`, { changes: data }, "CLIENT_ACTION");
+        revalidatePath("/");
+        return result[0];
+    } catch (error: any) {
+        await Logger.error(`Failed to update client ID: ${id}`, { error: error.message }, "CLIENT_ACTION");
+        throw error;
+    }
 }
 
 export async function toggleClientStatus(id: number, isActive: boolean) {
-    const result = await db.update(clients)
-        .set({ isActive })
-        .where(eq(clients.id, id))
-        .returning();
+    try {
+        const result = await db.update(clients)
+            .set({ isActive })
+            .where(eq(clients.id, id))
+            .returning();
 
-    revalidatePath("/");
-    return result[0];
+        await Logger.info(`${isActive ? 'Activated' : 'Deactivated'} client ID: ${id}`, { id, isActive }, "CLIENT_ACTION");
+        revalidatePath("/");
+        return result[0];
+    } catch (error: any) {
+        await Logger.error(`Failed to toggle status for client ID: ${id}`, { error: error.message }, "CLIENT_ACTION");
+        throw error;
+    }
 }
 
 export async function deleteClient(id: number) {
-    // Check for existing measurements
-    const existingRecords = await db.select({ id: measurements.id })
-        .from(measurements)
-        .where(eq(measurements.clientId, id))
-        .limit(1);
+    try {
+        // Check for existing measurements
+        const existingRecords = await db.select({ id: measurements.id })
+            .from(measurements)
+            .where(eq(measurements.clientId, id))
+            .limit(1);
 
-    if (existingRecords.length > 0) {
-        throw new Error("Cannot delete client with existing records. Please archive/deactivate instead.");
+        if (existingRecords.length > 0) {
+            await Logger.warn(`Attempted to delete client ID: ${id} with existing records`, null, "CLIENT_ACTION");
+            throw new Error("Cannot delete client with existing records. Please archive/deactivate instead.");
+        }
+
+        const result = await db.delete(clients)
+            .where(eq(clients.id, id))
+            .returning();
+
+        await Logger.success(`Deleted client ID: ${id}`, { id }, "CLIENT_ACTION");
+        revalidatePath("/");
+        return result[0];
+    } catch (error: any) {
+        await Logger.error(`Failed to delete client ID: ${id}`, { error: error.message }, "CLIENT_ACTION");
+        throw error;
     }
-
-    const result = await db.delete(clients)
-        .where(eq(clients.id, id))
-        .returning();
-
-    revalidatePath("/");
-    return result[0];
 }
 
 export async function getClientByUsername(username: string) {

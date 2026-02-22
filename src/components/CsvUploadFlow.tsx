@@ -25,18 +25,22 @@ export default function CsvUploadFlow() {
 
             const result = await uploadCsv(formData);
 
-            // Initialize assignments for each row
-            const initialAssignments: RowAssignment[] = result.data.map((record: CsvRecord) => ({
-                record,
-                clientId: undefined,
-            }));
-            setAssignments(initialAssignments);
+            if (result.success && result.records) {
+                // Initialize assignments for each row
+                const initialAssignments: RowAssignment[] = result.records.map((record: CsvRecord) => ({
+                    record,
+                    clientId: undefined,
+                }));
+                setAssignments(initialAssignments);
 
-            // Load existing clients
-            const clients = await getClients();
-            setExistingClients(clients);
+                // Load existing clients
+                const clients = await getClients();
+                setExistingClients(clients);
 
-            setStep("identify");
+                setStep("identify");
+            } else {
+                setError(result.message || "Failed to process file");
+            }
         } catch (err: any) {
             setError(err.message || "Failed to upload CSV");
         } finally {
