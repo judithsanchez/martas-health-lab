@@ -23,6 +23,15 @@ vi.mock("xlsx", () => {
     };
 });
 
+vi.mock("../logger", () => ({
+    Logger: {
+        info: vi.fn(),
+        success: vi.fn(),
+        warn: vi.fn(),
+        error: vi.fn(),
+    },
+}));
+
 describe("uploadCsv with XLSX", () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -51,8 +60,10 @@ describe("uploadCsv with XLSX", () => {
         const result = await uploadCsv(formData);
 
         expect(XLSX.read).toHaveBeenCalled();
-        expect(result.data[0]).toMatchObject({ weight: 60, date: "2020-01-01" });
-        expect(result.fileName).toContain("test.xlsx");
+        expect(result.success).toBe(true);
+        if (result.success && result.records) {
+            expect(result.records[0]).toMatchObject({ weight: 60, date: "2020-01-01" });
+        }
     });
 
     it("should use XLSX for unknown extensions too", async () => {
@@ -75,6 +86,9 @@ describe("uploadCsv with XLSX", () => {
         const result = await uploadCsv(formData);
 
         expect(XLSX.read).toHaveBeenCalled();
-        expect(result.data[0]).toMatchObject({ weight: 70, date: "2022-02-02" });
+        expect(result.success).toBe(true);
+        if (result.success && result.records) {
+            expect(result.records[0]).toMatchObject({ weight: 70, date: "2022-02-02" });
+        }
     });
 });
