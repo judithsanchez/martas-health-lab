@@ -114,13 +114,13 @@ export default function CsvUploadFlow() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                         </svg>
                     </div>
-                    <h2 className="text-2xl font-bold mb-2 text-slate-800">Assign Measurements</h2>
-                    <p className="text-slate-500 mb-8 text-center max-w-sm">Select a CSV file to begin assigning measurement data to your clients.</p>
+                    <h2 className="text-2xl font-bold mb-2 text-plum">Assign Measurements</h2>
+                    <p className="text-slate-500 mb-8 text-center max-w-sm">Select a CSV or Excel file to begin assigning measurement data to your clients.</p>
 
                     <label className="w-full relative flex flex-col items-center px-4 py-16 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 cursor-pointer hover:bg-slate-100 hover:border-slate-300 transition-all group">
                         <span className="text-sm font-semibold text-slate-600 group-hover:text-slate-700">Choose file or drag & drop</span>
-                        <span className="text-xs text-slate-400 mt-2">Only .csv files with &apos;number&apos; and &apos;age&apos; columns</span>
-                        <input type="file" className="hidden" accept=".csv" onChange={handleFileUpload} disabled={loading} />
+                        <span className="text-xs text-slate-400 mt-2">Compatible with .csv and .xlsx (Excel) exports</span>
+                        <input type="file" className="hidden" accept=".csv,.xlsx,.xls,.txt" onChange={handleFileUpload} disabled={loading} />
                     </label>
 
                     {loading && <div className="mt-6 flex items-center gap-3 text-slate-500 animate-pulse">
