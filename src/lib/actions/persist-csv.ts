@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import { measurements, clients } from "@/lib/db/schema";
 import { CsvRecord } from "./csv-upload";
 import { revalidatePath } from "next/cache";
-import { Logger } from "../logger";
+import { logger } from "../logger";
 
 export type RowAssignment = {
     record: CsvRecord;
@@ -18,24 +18,26 @@ export type RowAssignment = {
 
 export async function persistPerRowAssignments(assignments: RowAssignment[]) {
     try {
-        await db.transaction(async (tx: any) => {
+        await logger.info(`Starting persistence for ${assignments.length} assignments`, null, "DB_PERSIST");
+
+        // Use synchronous transaction for better-sqlite3 compatibility
+        db.transaction((tx: any) => {
             for (const assignment of assignments) {
                 let finalClientId = assignment.clientId;
 
                 // 1. Create new client if needed
                 if (!finalClientId && assignment.newClient) {
-                    const newClientResult = await tx.insert(clients).values({
+                    const newClientResult = tx.insert(clients).values({
                         name: assignment.newClient.name,
                         username: assignment.newClient.username,
                         age: assignment.newClient.age,
                     }).returning();
                     finalClientId = newClientResult[0].id;
-                    await Logger.info(`Created new client: ${assignment.newClient.name}`, { clientId: finalClientId }, "DB_PERSIST");
                 }
 
                 // 2. Persist measurement if we have a client ID
                 if (finalClientId) {
-                    await tx.insert(measurements).values({
+                    tx.insert(measurements).values({
                         clientId: finalClientId,
                         date: assignment.record.date || new Date().toISOString(),
                         weight: assignment.record.weight,
@@ -71,16 +73,15 @@ export async function persistPerRowAssignments(assignments: RowAssignment[]) {
                         muscleTrunk: assignment.record.muscleTrunk,
 
                         notes: `Imported from CSV. Model: ${assignment.record.modelName || 'Unknown'}`,
-                    });
-                    await Logger.success(`Persisted measurement for client ID: ${finalClientId}`, { date: assignment.record.date }, "DB_PERSIST");
+                    }).run();
                 }
             }
         });
 
-        await Logger.success(`Successfully persisted ${assignments.length} assignments`, { count: assignments.length }, "DB_PERSIST");
+        await logger.success(`Successfully persisted ${assignments.length} assignments`, { count: assignments.length }, "DB_PERSIST");
         revalidatePath("/");
     } catch (error: any) {
-        await Logger.error(`Persistence error: ${error.message}`, { error: error.stack }, "DB_PERSIST");
+        await logger.error(`Persistence error: ${error.message}`, { error: error.stack }, "DB_PERSIST");
         throw error;
     }
 }

@@ -7,7 +7,8 @@ vi.mock("@/lib/db", () => ({
         transaction: vi.fn((cb) => cb({
             insert: vi.fn(() => ({
                 values: vi.fn(() => ({
-                    returning: vi.fn(() => Promise.resolve([{ id: 99 }])),
+                    returning: vi.fn(() => [{ id: 99 }]),
+                    run: vi.fn(() => ({ changes: 1, lastInsertRowid: 99 })),
                 })),
             })),
         })),
@@ -18,8 +19,8 @@ vi.mock("next/cache", () => ({
     revalidatePath: vi.fn(),
 }));
 
-vi.mock("@/lib/logger", () => ({
-    Logger: {
+vi.mock("../../logger", () => ({
+    logger: {
         info: vi.fn(),
         success: vi.fn(),
         warn: vi.fn(),

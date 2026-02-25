@@ -57,12 +57,11 @@ export const measurements = sqliteTable("measurements", {
     notes: text("notes"),
     createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
-
 export const systemLogs = sqliteTable("system_logs", {
     id: integer("id").primaryKey({ autoIncrement: true }),
     level: text("level").notNull(), // 'info' | 'success' | 'warning' | 'error'
     message: text("message").notNull(),
-    details: text("details"), // JSON stringified object
+    details: text("details"), // JSON stringified data
     source: text("source"), // e.g., 'CSV_UPLOAD', 'PDF_GEN'
     createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
 });

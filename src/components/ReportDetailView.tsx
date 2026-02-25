@@ -87,14 +87,20 @@ export default function ReportDetailView({
 
         // Add history items
         history.forEach(item => {
-            const dateStr = new Date(item.date).toISOString().split('T')[0];
-            dataMap.set(dateStr, { ...item });
+            const d = new Date(item.date);
+            if (!isNaN(d.getTime())) {
+                const dateStr = d.toISOString().split('T')[0];
+                dataMap.set(dateStr, { ...item });
+            }
         });
 
         // Add/Overwrite with current measurement
         if (measurement.date) {
-            const currentDateStr = new Date(measurement.date).toISOString().split('T')[0];
-            dataMap.set(currentDateStr, { ...measurement });
+            const d = new Date(measurement.date);
+            if (!isNaN(d.getTime())) {
+                const currentDateStr = d.toISOString().split('T')[0];
+                dataMap.set(currentDateStr, { ...measurement });
+            }
         }
 
         // Convert back to array and sort
@@ -120,8 +126,12 @@ export default function ReportDetailView({
         // Filter out current date to ensure we compare against past
         const past = history.filter(h => {
             // Simple string comparison YYYY-MM-DD
-            const hDate = new Date(h.date).toISOString().split('T')[0];
-            const cDate = new Date(measurement.date).toISOString().split('T')[0];
+            const hDateObj = new Date(h.date);
+            const cDateObj = new Date(measurement.date);
+            if (isNaN(hDateObj.getTime()) || isNaN(cDateObj.getTime())) return false;
+
+            const hDate = hDateObj.toISOString().split('T')[0];
+            const cDate = cDateObj.toISOString().split('T')[0];
             return hDate !== cDate;
         });
         // Sort descending by date
@@ -334,9 +344,10 @@ export default function ReportDetailView({
 
     const CustomChartTooltip = ({ active, payload, label, unit }: any) => {
         if (active && payload && payload.length) {
+            const d = new Date(label);
             return (
                 <div className="bg-white p-3 rounded-xl shadow-lg border border-gray-100 text-xs">
-                    <p className="font-bold text-gray-500 mb-1">{new Date(label).toLocaleDateString()}</p>
+                    <p className="font-bold text-gray-500 mb-1">{!isNaN(d.getTime()) ? d.toLocaleDateString() : 'Fecha Inválida'}</p>
                     <p className="font-bold text-plum text-sm">
                         {Number(payload[0].value).toFixed(1)}
                         <span className="text-[10px] ml-0.5 text-gray-400">{unit}</span>

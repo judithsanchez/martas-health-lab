@@ -92,7 +92,10 @@ export function RecordForm({ clientId, record, onClose, onSuccess }: RecordFormP
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                             <div className="col-span-2 sm:col-span-1">
                                 <label className="text-xs font-bold text-slate-500 uppercase">Date *</label>
-                                <input type="date" name="date" required defaultValue={record?.date ? new Date(record.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]} className="w-full p-2 border rounded" />
+                                <input type="date" name="date" required defaultValue={(() => {
+                                    const d = record?.date ? new Date(record.date) : new Date();
+                                    return !isNaN(d.getTime()) ? d.toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+                                })()} className="w-full p-2 border rounded" />
                             </div>
                             <div>
                                 <label className="text-xs font-bold text-slate-500 uppercase">Weight (kg) *</label>

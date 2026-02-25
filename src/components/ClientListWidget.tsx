@@ -53,7 +53,10 @@ export function ClientListWidget({ clients }: { clients: ClientWithLatestMeasure
                                             </span>
                                             {client.latestMeasurement && (
                                                 <span className="text-xs text-gray-400 ml-2">
-                                                    🗓️ {new Date(client.latestMeasurement.date).toLocaleDateString()}
+                                                    🗓️ {(() => {
+                                                        const d = new Date(client.latestMeasurement.date);
+                                                        return !isNaN(d.getTime()) ? d.toLocaleDateString() : 'Fecha Inválida';
+                                                    })()}
                                                 </span>
                                             )}
                                         </div>
