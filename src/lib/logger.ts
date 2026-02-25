@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { db } from "./db";
 import { systemLogs } from "./db/schema";
 
@@ -44,3 +45,52 @@ export class Logger {
         await this.persist({ level: "error", message, details, source });
     }
 }
+=======
+import { db } from "@/lib/db";
+import { systemLogs } from "@/lib/db/schema";
+
+type LogLevel = 'info' | 'success' | 'warning' | 'error';
+
+class Logger {
+    async log(level: LogLevel, message: string, details?: any, source?: string) {
+        // Console logging (with colors for development)
+        const timestamp = new Date().toISOString();
+        const color = level === 'error' ? '\x1b[31m' : level === 'warning' ? '\x1b[33m' : level === 'success' ? '\x1b[32m' : '\x1b[36m';
+        const reset = '\x1b[0m';
+
+        console.log(`${color}[${level.toUpperCase()}]${reset} [${timestamp}] ${message}`);
+        if (details) console.log(details);
+
+        try {
+            // DB persistence
+            // Using a background-safe approach if needed, but here simple insert
+            await db.insert(systemLogs).values({
+                level,
+                message,
+                details: details ? JSON.stringify(details) : null,
+                source,
+            });
+        } catch (dbError) {
+            console.error("CRITICAL: Failed to write to system_logs table. Is the migration applied?", dbError);
+        }
+    }
+
+    info(message: string, details?: any, source?: string) {
+        return this.log('info', message, details, source);
+    }
+
+    success(message: string, details?: any, source?: string) {
+        return this.log('success', message, details, source);
+    }
+
+    warn(message: string, details?: any, source?: string) {
+        return this.log('warning', message, details, source);
+    }
+
+    error(message: string, details?: any, source?: string) {
+        return this.log('error', message, details, source);
+    }
+}
+
+export const logger = new Logger();
+>>>>>>> 11dfda8 (fix: resolve upload delimiter mismatch, 2-digit year parsing, and missing logs table)

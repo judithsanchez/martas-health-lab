@@ -15,6 +15,20 @@ describe("TanitaParser", () => {
             });
         });
 
+        it("should handle European date format (DD/MM/YYYY)", () => {
+            // 25th of February 2024
+            const row = ["DT", "25/02/2024", "Wk", "70"];
+            const result = TanitaParser.parseRawRow(row);
+            expect(result.date).toBe("2024-02-25");
+        });
+
+        it("should handle US date format (MM/DD/YYYY)", () => {
+            // February 25th 2024
+            const row = ["DT", "02/25/2024", "Wk", "70"];
+            const result = TanitaParser.parseRawRow(row);
+            expect(result.date).toBe("2024-02-25");
+        });
+
         it("should handle unit conversion from Imperial to Metric", () => {
             // ~0;1 (inches? assume 1 is Imperial), ~1;1 (lbs? assume 1 is Imperial)
             // Weight: 100 lbs -> ~45.36 kg
@@ -113,6 +127,20 @@ describe("TanitaParser", () => {
             const row = ["Wk", "60", "Wk", "65", "DT", "01/01/2024"];
             const result = TanitaParser.parseRawRow(row);
             expect(result.weight).toBe(65);
+        });
+
+        it("should handle ambiguous dates by defaulting to a standard (currently MM/DD if both <= 12)", () => {
+            // 05/06/2024 -> Could be June 5th or May 6th.
+            // Our current logic defaults to MM/DD if no part is > 12.
+            const row = ["DT", "05/06/2024"];
+            const result = TanitaParser.parseRawRow(row);
+            expect(result.date).toBe("2024-05-06");
+        });
+
+        it("should handle single digit parts with padding", () => {
+            const row = ["DT", "1/2/2024"];
+            const result = TanitaParser.parseRawRow(row);
+            expect(result.date).toBe("2024-01-02");
         });
     });
 });

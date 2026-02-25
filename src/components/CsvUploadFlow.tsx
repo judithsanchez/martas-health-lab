@@ -12,6 +12,14 @@ export default function CsvUploadFlow() {
     const [loading, setLoading] = useState(false);
     const [existingClients, setExistingClients] = useState<any[]>([]);
 
+    const isInvalidDate = (dateStr: string) => {
+        if (!dateStr) return true;
+        const d = new Date(dateStr);
+        return isNaN(d.getTime());
+    };
+
+    const hasInvalidDates = assignments.some(a => isInvalidDate(a.record.date));
+
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
@@ -111,6 +119,18 @@ export default function CsvUploadFlow() {
                 </div>
             )}
 
+            {hasInvalidDates && (
+                <div className="mb-6 p-4 bg-amber-50 text-amber-700 border border-amber-100 rounded-xl text-sm flex items-start gap-3">
+                    <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <div>
+                        <p className="font-bold">Invalid Dates Detected</p>
+                        <p className="opacity-80">Some records have dates that couldn&apos;t be parsed correctly. You can fix them below or save them as today&apos;s date and edit them later.</p>
+                    </div>
+                </div>
+            )}
+
             {step === "upload" && (
                 <div className="flex flex-col items-center">
                     <div className="w-16 h-16 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mb-6">
@@ -163,10 +183,32 @@ export default function CsvUploadFlow() {
                             <div key={idx} data-testid="csv-row" className="p-4 bg-slate-50 rounded-2xl border border-slate-200 hover:border-slate-300 transition-colors">
                                 <div className="flex items-start justify-between gap-6">
                                     {/* Data Preview */}
-                                    <div className="flex-1 min-w-[200px]">
-                                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                    <div className="flex-1 min-w-[250px]">
+                                        {/* Date Editor */}
+                                        <div className={`mb-3 p-3 rounded-xl border-2 transition-all ${isInvalidDate(assignment.record.date) ? 'bg-red-50 border-red-200' : 'bg-white border-slate-100'}`}>
+                                            <label className="text-[10px] font-bold uppercase text-slate-400 mb-1 block">Measurement Date</label>
+                                            <div className="flex items-center gap-2">
+                                                <input
+                                                    type="date"
+                                                    className={`flex-1 text-sm font-bold bg-transparent border-none p-0 focus:ring-0 ${isInvalidDate(assignment.record.date) ? 'text-red-600' : 'text-slate-800'}`}
+                                                    value={(() => {
+                                                        const d = new Date(assignment.record.date);
+                                                        return !isNaN(d.getTime()) ? d.toISOString().split('T')[0] : "";
+                                                    })()}
+                                                    onChange={(e) => {
+                                                        const nextRecord = { ...assignment.record, date: e.target.value };
+                                                        updateAssignment(idx, { record: nextRecord });
+                                                    }}
+                                                />
+                                                {isInvalidDate(assignment.record.date) && (
+                                                    <span className="text-red-500" title="Invalid date format detected">⚠️</span>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-2">
                                             {Object.entries(assignment.record).map(([key, value]) => {
-                                                if (!value || typeof value !== 'string' && typeof value !== 'number') return null;
+                                                if (!value || key === 'date' || (typeof value !== 'string' && typeof value !== 'number')) return null;
                                                 return (
                                                     <div key={key} className="px-2 py-1 bg-white rounded border border-slate-100">
                                                         <span className="text-[10px] text-slate-400 font-bold uppercase block truncate">{key}</span>

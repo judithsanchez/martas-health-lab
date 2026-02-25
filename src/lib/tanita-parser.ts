@@ -32,7 +32,7 @@ export class TanitaParser {
         return null; // Placeholder for now - logic needs to handle array input
     }
 
-    static parseRawRow(rowValues: string[]): Record<string, any> {
+    static parseRawRow(rowValues: string[], dateFormat: 'auto' | 'DMY' | 'MDY' = 'auto'): Record<string, any> {
         const result: Record<string, any> = {};
         const metadata: any = {};
 
@@ -51,7 +51,7 @@ export class TanitaParser {
             // Check metrics
             else if (config.metrics[tag as keyof typeof config.metrics]) {
                 const metricConf = config.metrics[tag as keyof typeof config.metrics];
-                result[metricConf.field] = this.parseValue(value, metricConf);
+                result[metricConf.field] = this.parseValue(value, metricConf, dateFormat);
             }
             // Check segmental
             else if (config.segmental[tag as keyof typeof config.segmental]) {
@@ -60,13 +60,11 @@ export class TanitaParser {
             }
         }
 
-        // Post-processing
-        // Unit Conversion if needed
+        // ... existing post-processing ...
         if (metadata.unitWeight === 1) { // lbs -> kg
             if (result.weight) result.weight = result.weight * 0.453592;
             if (result.muscleMass) result.muscleMass = result.muscleMass * 0.453592;
             if (result.boneMass) result.boneMass = result.boneMass * 0.453592;
-            // Convert segmental muscle
             for (const key in result) {
                 if (key.startsWith('muscle')) {
                     result[key] = result[key] * 0.453592;
@@ -78,7 +76,6 @@ export class TanitaParser {
             if (result.height) result.height = result.height * 2.54;
         }
 
-        // Merge metadata into result if we want to store them (like physiqueRatingScale)
         if (metadata.physiqueRatingScale) {
             result.physiqueRatingScale = metadata.physiqueRatingScale;
         }
@@ -86,7 +83,7 @@ export class TanitaParser {
         return result;
     }
 
-    private static parseValue(value: string, config: any): any {
+    private static parseValue(value: string, config: any, dateFormat: 'auto' | 'DMY' | 'MDY' = 'auto'): any {
         if (config.type === 'int') {
             const intVal = parseInt(value, 10);
             if (config.field === 'gender') {
@@ -96,33 +93,56 @@ export class TanitaParser {
         }
         if (config.type === 'float') return parseFloat(value);
         if (config.type === 'date') {
-            // MO/DD/YYYY
             const parts = value.split('/');
             if (parts.length === 3) {
-                // Month is 0-indexed in JS Date? No, YYYY-MM-DD input string is standard.
-                // let's return ISO string YYYY-MM-DD
-                return `${parts[2]}-${parts[0].padStart(2, '0')}-${parts[1].padStart(2, '0')}`;
+                let p0 = parts[0];
+                let p1 = parts[1];
+                let year = parts[2];
+
+                let month = p0;
+                let day = p1;
+
+                if (dateFormat === 'DMY') {
+                    month = p1;
+                    day = p0;
+                } else if (dateFormat === 'MDY') {
+                    month = p0;
+                    day = p1;
+                } else {
+                    // auto
+                    if (parseInt(p0, 10) > 12) {
+                        // Definitely DD/MM
+                        month = p1;
+                        day = p0;
+                    } else if (parseInt(p1, 10) > 12) {
+                        // Definitely MM/DD
+                        month = p0;
+                        day = p1;
+                    }
+                }
+
+                if (year.length === 2) {
+                    year = `20${year}`;
+                }
+
+                const isoDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+                if (!isNaN(new Date(isoDate).getTime())) {
+                    return isoDate;
+                }
             }
             return value;
         }
         if (config.field === 'timeRaw') {
-            // Flexible/Regex parser for "7:00:34?a. m."
-            // Capture HH:MM:SS and whatever follows
             const timeMatch = value.match(/(\d{1,2}):(\d{2}):(\d{2})(.*)/);
             if (timeMatch) {
                 let [_, hh, mm, ss, remainder] = timeMatch;
                 let hour = parseInt(hh, 10);
-
-                // Check remainder for PM indicator
                 const isPM = remainder.toLowerCase().includes('p');
                 const isAM = remainder.toLowerCase().includes('a');
-
                 if (isPM && hour < 12) hour += 12;
-                if (isAM && hour === 12) hour = 0; // 12 AM is 00
-
+                if (isAM && hour === 12) hour = 0;
                 return `${hour.toString().padStart(2, '0')}:${mm}:${ss}`;
             }
-            // Fallback for clean times
             return value.split('?')[0];
         }
         return value;
