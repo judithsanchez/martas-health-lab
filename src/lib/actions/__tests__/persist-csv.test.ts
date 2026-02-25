@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { persistPerRowAssignments } from "../persist-csv";
+import { db } from "@/lib/db";
 
 vi.mock("@/lib/db", () => ({
     db: {

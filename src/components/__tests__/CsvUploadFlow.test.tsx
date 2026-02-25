@@ -37,7 +37,7 @@ describe("CsvUploadFlow", () => {
     it("should transition to identify step after successful upload", async () => {
         (csvActions.uploadCsv as any).mockResolvedValue({
             success: true,
-            records: [{ number: "100", age: "40" }],
+            data: [{ number: "100", age: "40" }],
             message: "Success"
         });
 
@@ -57,7 +57,7 @@ describe("CsvUploadFlow", () => {
     it("should allow assigning an existing client to a row", async () => {
         (csvActions.uploadCsv as any).mockResolvedValue({
             success: true,
-            records: [{ number: "100", age: "40" }],
+            data: [{ number: "100", age: "40" }],
             message: "Success"
         });
 
@@ -80,7 +80,7 @@ describe("CsvUploadFlow", () => {
     it("should support registering a new client inline", async () => {
         (csvActions.uploadCsv as any).mockResolvedValue({
             success: true,
-            records: [{ number: "100", age: "40" }],
+            data: [{ number: "100", age: "40" }],
             message: "Success"
         });
 
@@ -112,7 +112,7 @@ describe("CsvUploadFlow", () => {
     it("should support bulk assignment via 'Apply to All'", async () => {
         (csvActions.uploadCsv as any).mockResolvedValue({
             success: true,
-            records: [{ number: "100", age: "40" }, { number: "101", age: "40" }],
+            data: [{ number: "100", age: "40" }, { number: "101", age: "40" }],
             message: "Success"
         });
 
@@ -138,7 +138,7 @@ describe("CsvUploadFlow", () => {
     it("should show success state after persisting assignments", async () => {
         (csvActions.uploadCsv as any).mockResolvedValue({
             success: true,
-            records: [{ number: "100", age: "40" }],
+            data: [{ number: "100", age: "40" }],
             message: "Success"
         });
         (persistActions.persistPerRowAssignments as any).mockResolvedValue(undefined);

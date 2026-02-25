@@ -93,6 +93,6 @@ describe("uploadCsv", () => {
 
         const result = await uploadCsv(formData);
         expect(result.success).toBe(false);
-        expect(result.message).toContain("No valid data found");
+        expect(result.message).toContain("No valid measurement data found");
     });
 });

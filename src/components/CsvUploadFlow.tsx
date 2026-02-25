@@ -33,9 +33,9 @@ export default function CsvUploadFlow() {
 
             const result = await uploadCsv(formData);
 
-            if (result.success && result.records) {
+            if (result.success && result.data) {
                 // Initialize assignments for each row
-                const initialAssignments: RowAssignment[] = result.records.map((record: CsvRecord) => ({
+                const initialAssignments: RowAssignment[] = result.data.map((record: CsvRecord) => ({
                     record,
                     clientId: undefined,
                 }));
