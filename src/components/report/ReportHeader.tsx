@@ -9,6 +9,7 @@ import {
     ArrowLeft
 } from 'lucide-react';
 import Gauge from './Gauge';
+import { formatDateLong, formatDateDayMonth } from '@/lib/utils/date-utils';
 
 interface ReportHeaderProps {
     client: any;
@@ -79,7 +80,7 @@ export default function ReportHeader({ client, measurement, ffmi }: ReportHeader
                     <div className="flex items-center gap-2">
                         <Calendar size={16} />
                         <span className="text-xs font-bold tracking-widest uppercase">
-                            {measurement.date ? new Date(measurement.date).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' }) : new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
+                            {formatDateLong(measurement.date || new Date())}
                         </span>
                     </div>
 
@@ -120,7 +121,7 @@ export default function ReportHeader({ client, measurement, ffmi }: ReportHeader
                                     <div>
                                         <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Cumpleaños</p>
                                         <p className="font-semibold">
-                                            {new Date(client.birthday).toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}
+                                            {formatDateDayMonth(client.birthday)}
                                         </p>
                                     </div>
                                 </div>

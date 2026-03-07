@@ -12,13 +12,16 @@ export type CsvRecord = Record<string, any>;
 export async function uploadCsv(formData: FormData) {
     try {
         const file = formData.get("file") as File;
+        console.log(`[Upload DEBUG] Starting uploadCsv for file: ${file?.name}`);
         if (!file) {
             throw new Error("No file uploaded");
         }
 
+        console.log(`[Upload DEBUG] File size: ${file.size}, type: ${file.type}`);
         await logger.info(`Received file: ${file.name}, type: ${file.type}, size: ${file.size} bytes`, null, "uploadCsv");
 
         const bytes = await file.arrayBuffer();
+        console.log(`[Upload DEBUG] ArrayBuffer received, length: ${bytes.byteLength}`);
         const buffer = Buffer.from(bytes);
 
         // 1. Audit Storage
@@ -73,7 +76,8 @@ export async function uploadCsv(formData: FormData) {
 
         // 3a. Detect Date Format across all rows
         let detectedFormat: 'auto' | 'DMY' | 'MDY' = 'auto';
-        for (const row of rawRows) {
+        for (const rawRow of rawRows) {
+            const row = TanitaParser.splitWrappedRow(rawRow);
             // Find "DT" tag index
             const dtIndex = row.indexOf("DT");
             if (dtIndex !== -1 && row[dtIndex + 1]) {
@@ -95,11 +99,17 @@ export async function uploadCsv(formData: FormData) {
         }
         console.log(`[Upload] Detected date format: ${detectedFormat}`);
 
-        const data: CsvRecord[] = rawRows
-            .map(row => TanitaParser.parseRawRow(row, detectedFormat))
-            .filter(record => record.date && record.weight !== undefined);
+        const data: CsvRecord[] = rawRows.map((rawRow, idx) => {
+            const split = TanitaParser.splitWrappedRow(rawRow);
+            const parsed = TanitaParser.parseRawRow(split, detectedFormat);
+            console.log(`[Upload] Row ${idx}: rawLen=${rawRow.length}, splitLen=${split.length}, hasDate=${!!parsed.date}, hasWeight=${parsed.weight !== undefined}`);
+            if (idx === 0) {
+                console.log(`[Upload] Row 0 split sample: ${JSON.stringify(split.slice(0, 4))}`);
+            }
+            return parsed;
+        }).filter(record => record.date && record.weight !== undefined);
 
-        console.log(`[Upload] Successfully parsed ${data.length} valid records`);
+        console.log(`[Upload] Successfully parsed ${data.length} valid records out of ${rawRows.length}`);
 
         if (data.length === 0) {
             const msg = `No valid measurement data found in the ${extension?.toUpperCase() || 'file'}. Please ensure it follows the Tanita export format.`;

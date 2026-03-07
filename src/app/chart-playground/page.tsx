@@ -6,6 +6,7 @@ import {
     LineChart, Line, BarChart, Bar
 } from 'recharts';
 import { TrendingUp, TrendingDown, Minus, Activity, Scale, Droplets } from 'lucide-react';
+import { formatDate, formatDateShort } from '@/lib/utils/date-utils';
 
 const DUMMY_HISTORY = Array.from({ length: 15 }).map((_, i) => {
     const date = new Date();
@@ -159,7 +160,7 @@ export default function ChartPlayground() {
                                     tick={{ fontSize: 10, fill: '#9ca3af' }}
                                     tickLine={false}
                                     axisLine={false}
-                                    tickFormatter={(d) => new Date(d).toLocaleDateString('es-ES', { month: 'short', day: 'numeric' })}
+                                    tickFormatter={(d) => formatDateShort(d)}
                                 />
                                 <YAxis
                                     domain={['dataMin - 1', 'dataMax + 1']}
