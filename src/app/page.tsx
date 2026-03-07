@@ -33,7 +33,7 @@ export default async function Home() {
                             <h3 className="text-2xl md:text-4xl font-bold mb-4">Transformando datos en salud. 🍎</h3>
                             <p className="opacity-70 mb-6 md:mb-8 leading-relaxed text-sm md:text-lg">Tienes nuevas métricas para analizar hoy. ¿Empezamos?</p>
                             <Link href="/upload" className="inline-flex items-center gap-2 px-6 py-3 md:px-8 md:py-4 rounded-xl md:rounded-2xl font-bold transform transition-all hover:-translate-y-1 shadow-xl bg-gold text-plum border border-transparent hover:bg-white text-sm md:text-base">
-                                <Plus size={20} /> Nuevo Registro
+                                <Plus size={20} /> Importar Archivo
                             </Link>
                         </div>
                         {/* Abstract Shape */}

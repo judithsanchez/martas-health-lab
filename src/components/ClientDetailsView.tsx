@@ -48,14 +48,14 @@ export default function ClientDetailsView({ client, measurements }: { client: an
                             className="px-6 py-3 bg-white text-plum border border-slate-200 rounded-xl hover:bg-slate-50 transition font-bold shadow-sm flex items-center gap-2"
                         >
                             <FileUp size={18} className="text-sage" />
-                            <span>Importar Tanita</span>
+                            <span>Importar desde Archivo</span>
                         </button>
                         <button
                             onClick={() => setIsCreating(true)}
                             className="px-6 py-3 bg-plum text-cream rounded-xl hover:bg-slate-800 transition font-bold shadow-md hover:shadow-lg flex items-center gap-2"
                         >
                             <Plus size={18} />
-                            <span>Añadir Registro</span>
+                            <span>Entrada Manual</span>
                         </button>
                     </div>
                 </div>
@@ -168,7 +168,7 @@ export default function ClientDetailsView({ client, measurements }: { client: an
                                 <X size={24} />
                             </button>
                             <div className="p-8 pb-4">
-                                <h3 className="text-2xl font-bold text-plum mb-1">Importar Mediciones</h3>
+                                <h3 className="text-2xl font-bold text-plum mb-1">Importación desde Archivo</h3>
                                 <p className="text-gray-500 text-sm">Carga un archivo CSV o Excel exportado de Tanita para {client.name}.</p>
                             </div>
                             <div className="p-2 overflow-hidden">
