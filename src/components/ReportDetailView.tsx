@@ -33,6 +33,7 @@ import {
     calculateAge,
     CalculationResult
 } from '@/lib/utils/health-calculations';
+import { formatDate } from '@/lib/utils/date-utils';
 import {
     LineChart,
     Line,
@@ -252,7 +253,7 @@ export default function ReportDetailView({
                         />
                         <RechartsTooltip
                             contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', fontSize: '12px' }}
-                            labelFormatter={(date) => new Date(date).toLocaleDateString()}
+                            labelFormatter={(date) => formatDate(date)}
                         />
                         <Area
                             type="monotone"
@@ -347,7 +348,7 @@ export default function ReportDetailView({
             const d = new Date(label);
             return (
                 <div className="bg-white p-3 rounded-xl shadow-lg border border-gray-100 text-xs">
-                    <p className="font-bold text-gray-500 mb-1">{!isNaN(d.getTime()) ? d.toLocaleDateString() : 'Fecha Inválida'}</p>
+                    <p className="font-bold text-gray-500 mb-1">{!isNaN(d.getTime()) ? formatDate(d) : 'Fecha Inválida'}</p>
                     <p className="font-bold text-plum text-sm">
                         {Number(payload[0].value).toFixed(1)}
                         <span className="text-[10px] ml-0.5 text-gray-400">{unit}</span>

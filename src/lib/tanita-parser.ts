@@ -19,20 +19,18 @@ export type TanitaData = {
 
 export class TanitaParser {
     static splitWrappedRow(row: string[]): string[] {
-        if (row.length === 1 && (row[0].startsWith("{0") || row[0].startsWith("~0"))) {
+        // More robust detection: if the first column starts with a known Tanita tag prefix
+        // and contains multiple segments, it's likely a wrapped record.
+        const firstCol = row[0] || "";
+        if (firstCol.includes(',') && (firstCol.includes('{0') || firstCol.includes('~0'))) {
             // This is a wrapped record (e.g. from Excel or quoted CSV)
-            // We use a simple comma split here because Tanita tags don't contain commas,
-            // but values might (though unlikely in this specific fixed-width-like format).
-            // However, the user's files show: "{0,16,~0,2..."" which is just a flat list of tags and values.
+            // We'll trust the pattern "{0,16,~0,2..."
 
-            // Remove potential surrounding braces if they exist (though PapaParse often includes them in the quoted string)
-            let content = row[0];
-            if (content.startsWith("{") && content.endsWith("}")) {
-                content = content.substring(1, content.length - 1);
-            }
+            // Trim outer quotes if PapaParse missed them, but keep braces as they are part of tags
+            const content = firstCol.trim().replace(/^"|"$/g, '');
 
-            // Split by comma and trim quotes from individual elements
-            return content.split(',').map(part => part.replace(/^"|"$/g, ''));
+            // Split by comma. For Tanita, simple split is usually safe as values don't contain commas.
+            return content.split(',').map(part => part.trim().replace(/^"|"$/g, ''));
         }
         return row;
     }

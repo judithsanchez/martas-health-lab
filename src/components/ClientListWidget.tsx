@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Search } from "lucide-react";
 import { type ClientWithLatestMeasurement } from "@/lib/actions/clients";
+import { formatDate } from "@/lib/utils/date-utils";
 
 export function ClientListWidget({ clients }: { clients: ClientWithLatestMeasurement[] }) {
     const [searchTerm, setSearchTerm] = useState("");
@@ -53,10 +54,7 @@ export function ClientListWidget({ clients }: { clients: ClientWithLatestMeasure
                                             </span>
                                             {client.latestMeasurement && (
                                                 <span className="text-xs text-gray-400 ml-2">
-                                                    🗓️ {(() => {
-                                                        const d = new Date(client.latestMeasurement.date);
-                                                        return !isNaN(d.getTime()) ? d.toLocaleDateString() : 'Fecha Inválida';
-                                                    })()}
+                                                    🗓️ {formatDate(client.latestMeasurement.date)}
                                                 </span>
                                             )}
                                         </div>

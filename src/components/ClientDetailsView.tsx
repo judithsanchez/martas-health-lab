@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { deleteRecord } from "@/lib/actions/records";
 import { RecordForm } from "@/components/RecordForm";
+import { formatDate } from "@/lib/utils/date-utils";
 
 export default function ClientDetailsView({ client, measurements }: { client: any, measurements: any[] }) {
     const router = useRouter();
@@ -85,7 +86,7 @@ export default function ClientDetailsView({ client, measurements }: { client: an
                                         return (
                                             <tr key={record.id} className="hover:bg-cream/30 transition duration-150 group">
                                                 <td className="p-5 text-slate-800 font-semibold group-hover:text-plum transition-colors whitespace-nowrap">
-                                                    {new Date(record.date).toLocaleDateString()}
+                                                    {formatDate(record.date)}
                                                 </td>
                                                 <td className="p-5 text-slate-600 font-medium">{formatValue(record.weight)} kg</td>
                                                 <td className="p-5 text-slate-600">{formatValue(record.bmi)}</td>
