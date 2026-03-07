@@ -5,7 +5,7 @@ import { uploadCsv, CsvRecord } from "@/lib/actions/csv-upload";
 import { getClients } from "@/lib/actions/clients";
 import { persistPerRowAssignments, RowAssignment } from "@/lib/actions/persist-csv";
 
-export default function CsvUploadFlow() {
+export default function CsvUploadFlow({ preselectedClientId }: { preselectedClientId?: number }) {
     const [step, setStep] = useState<"upload" | "identify" | "success">("upload");
     const [assignments, setAssignments] = useState<RowAssignment[]>([]);
     const [error, setError] = useState<string | null>(null);
@@ -37,7 +37,7 @@ export default function CsvUploadFlow() {
                 // Initialize assignments for each row
                 const initialAssignments: RowAssignment[] = result.data.map((record: CsvRecord) => ({
                     record,
-                    clientId: undefined,
+                    clientId: preselectedClientId || undefined,
                 }));
                 setAssignments(initialAssignments);
 
@@ -170,7 +170,7 @@ export default function CsvUploadFlow() {
                                 data-testid="bulk-select"
                                 className="text-xs font-medium border-slate-200 rounded-lg focus:ring-slate-900 focus:border-slate-900 p-2 pr-8 bg-slate-50"
                                 onChange={(e) => handleApplyToAll(parseInt(e.target.value))}
-                                defaultValue=""
+                                defaultValue={preselectedClientId || ""}
                             >
                                 <option value="" disabled>Select Client...</option>
                                 {existingClients.map(c => <option key={c.id} value={c.id}>{c.name} (@{c.username})</option>)}

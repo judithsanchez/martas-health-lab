@@ -6,11 +6,14 @@ import { useRouter } from "next/navigation";
 import { deleteRecord } from "@/lib/actions/records";
 import { RecordForm } from "@/components/RecordForm";
 import { formatDate } from "@/lib/utils/date-utils";
+import CsvUploadFlow from "@/components/CsvUploadFlow";
+import { FileUp, Plus, X } from "lucide-react";
 
 export default function ClientDetailsView({ client, measurements }: { client: any, measurements: any[] }) {
     const router = useRouter();
     const [editingRecord, setEditingRecord] = useState<any | null>(null);
     const [isCreating, setIsCreating] = useState(false);
+    const [isImporting, setIsImporting] = useState(false);
 
     async function handleDelete(id: number) {
         if (confirm("¿Estás seguro de que quieres eliminar esta medición?")) {
@@ -39,12 +42,22 @@ export default function ClientDetailsView({ client, measurements }: { client: an
                             <span>{client.height ? `${client.height} cm` : 'Sin Altura'}</span>
                         </div>
                     </div>
-                    <button
-                        onClick={() => setIsCreating(true)}
-                        className="px-6 py-3 bg-plum text-cream rounded-lg hover:bg-slate-800 transition font-medium shadow-md hover:shadow-lg flex items-center gap-2"
-                    >
-                        <span>+</span> Añadir Registro
-                    </button>
+                    <div className="flex gap-3">
+                        <button
+                            onClick={() => setIsImporting(true)}
+                            className="px-6 py-3 bg-white text-plum border border-slate-200 rounded-xl hover:bg-slate-50 transition font-bold shadow-sm flex items-center gap-2"
+                        >
+                            <FileUp size={18} className="text-sage" />
+                            <span>Importar Tanita</span>
+                        </button>
+                        <button
+                            onClick={() => setIsCreating(true)}
+                            className="px-6 py-3 bg-plum text-cream rounded-xl hover:bg-slate-800 transition font-bold shadow-md hover:shadow-lg flex items-center gap-2"
+                        >
+                            <Plus size={18} />
+                            <span>Añadir Registro</span>
+                        </button>
+                    </div>
                 </div>
 
                 {/* Measurements Table */}
@@ -140,6 +153,29 @@ export default function ClientDetailsView({ client, measurements }: { client: an
                             router.refresh();
                         }}
                     />
+                )}
+                {/* Import Modal */}
+                {isImporting && (
+                    <div className="fixed inset-0 bg-plum/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                        <div className="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-4xl overflow-hidden relative animate-in fade-in zoom-in duration-300">
+                            <button
+                                onClick={() => {
+                                    setIsImporting(false);
+                                    router.refresh();
+                                }}
+                                className="absolute top-6 right-6 p-2 h-10 w-10 hover:bg-gray-100 rounded-full transition-colors z-50 flex items-center justify-center text-gray-400"
+                            >
+                                <X size={24} />
+                            </button>
+                            <div className="p-8 pb-4">
+                                <h3 className="text-2xl font-bold text-plum mb-1">Importar Mediciones</h3>
+                                <p className="text-gray-500 text-sm">Carga un archivo CSV o Excel exportado de Tanita para {client.name}.</p>
+                            </div>
+                            <div className="p-2 overflow-hidden">
+                                <CsvUploadFlow preselectedClientId={client.id} />
+                            </div>
+                        </div>
+                    </div>
                 )}
             </div>
         </main>
