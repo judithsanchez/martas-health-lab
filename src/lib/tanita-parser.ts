@@ -18,6 +18,25 @@ export type TanitaData = {
 };
 
 export class TanitaParser {
+    static splitWrappedRow(row: string[]): string[] {
+        if (row.length === 1 && (row[0].startsWith("{0") || row[0].startsWith("~0"))) {
+            // This is a wrapped record (e.g. from Excel or quoted CSV)
+            // We use a simple comma split here because Tanita tags don't contain commas,
+            // but values might (though unlikely in this specific fixed-width-like format).
+            // However, the user's files show: "{0,16,~0,2..."" which is just a flat list of tags and values.
+
+            // Remove potential surrounding braces if they exist (though PapaParse often includes them in the quoted string)
+            let content = row[0];
+            if (content.startsWith("{") && content.endsWith("}")) {
+                content = content.substring(1, content.length - 1);
+            }
+
+            // Split by comma and trim quotes from individual elements
+            return content.split(',').map(part => part.replace(/^"|"$/g, ''));
+        }
+        return row;
+    }
+
     static parseRow(csvRow: Record<string, any>): Record<string, any> | null {
         // The csvRow input here is expected to be a key-value object where keys are column headers or indices.
         // However, Tanita CSVs are "Tag-Value" based. 

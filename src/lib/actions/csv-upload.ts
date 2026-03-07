@@ -73,7 +73,8 @@ export async function uploadCsv(formData: FormData) {
 
         // 3a. Detect Date Format across all rows
         let detectedFormat: 'auto' | 'DMY' | 'MDY' = 'auto';
-        for (const row of rawRows) {
+        for (const rawRow of rawRows) {
+            const row = TanitaParser.splitWrappedRow(rawRow);
             // Find "DT" tag index
             const dtIndex = row.indexOf("DT");
             if (dtIndex !== -1 && row[dtIndex + 1]) {
@@ -96,6 +97,7 @@ export async function uploadCsv(formData: FormData) {
         console.log(`[Upload] Detected date format: ${detectedFormat}`);
 
         const data: CsvRecord[] = rawRows
+            .map(row => TanitaParser.splitWrappedRow(row))
             .map(row => TanitaParser.parseRawRow(row, detectedFormat))
             .filter(record => record.date && record.weight !== undefined);
 

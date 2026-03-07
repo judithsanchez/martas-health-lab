@@ -34,3 +34,5 @@ yarn-error.log*
 data/
 dev.db
 uploads/
+
+migration-data

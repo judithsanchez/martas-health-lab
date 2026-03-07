@@ -143,4 +143,31 @@ describe("TanitaParser", () => {
             expect(result.date).toBe("2024-01-02");
         });
     });
+
+    describe("Wrapped Record Handling", () => {
+        it("should split and parse a wrapped record starting with {0", () => {
+            const wrappedRow = ["{0,16,~0,2,~1,2,DT,02/19/2026,Wk,75.0,CS,ED}"];
+            const splitRow = TanitaParser.splitWrappedRow(wrappedRow);
+            const result = TanitaParser.parseRawRow(splitRow);
+            expect(result).toMatchObject({
+                date: "2026-02-19",
+                weight: 75.0
+            });
+        });
+
+        it("should split and parse a wrapped record starting with ~0", () => {
+            const wrappedRow = ["~0,2,~1,2,DT,02/27/2026,Wk,77.1,CS,B6"];
+            const splitRow = TanitaParser.splitWrappedRow(wrappedRow);
+            const result = TanitaParser.parseRawRow(splitRow);
+            expect(result).toMatchObject({
+                date: "2026-02-27",
+                weight: 77.1
+            });
+        });
+
+        it("should return the same row if it's already split", () => {
+            const splitRow = ["DT", "01/01/2024", "Wk", "60"];
+            expect(TanitaParser.splitWrappedRow(splitRow)).toEqual(splitRow);
+        });
+    });
 });
