@@ -36,6 +36,9 @@ export default function ClientDetailsView({ client, measurements }: { client: an
                         <h1 className="text-4xl font-bold text-plum">{client.name} {client.lastname}</h1>
                         <div className="flex flex-wrap gap-4 text-slate-500 mt-2 text-sm items-center">
                             <span className="bg-white px-2 py-1 rounded shadow-sm">@{client.username}</span>
+                            <span className={`px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider ${client.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                                {client.isActive ? 'Activo' : 'Inactivo'}
+                            </span>
                             <span>•</span>
                             <span>Nivel Actividad {client.activityLevel?.toString() ?? '-'}</span>
                             <span>•</span>

@@ -168,7 +168,7 @@ export async function getClientByUsername(username: string) {
 export type ClientWithLatestMeasurement = Awaited<ReturnType<typeof getClientsWithLatestMeasurement>>[number];
 
 export async function getClientsWithLatestMeasurement() {
-    const allClients = await db.select().from(clients);
+    const allClients = await db.select().from(clients).where(eq(clients.isActive, true));
 
     // For each client, fetch latest 2 measurements to determine trend and total count
     const clientsWithData = await Promise.all(allClients.map(async (client: any) => {
