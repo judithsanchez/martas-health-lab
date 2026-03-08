@@ -59,6 +59,12 @@ pnpm db:studio
 
 ---
 
+## 📚 Documentation
+
+- [Calculation Formulas](CALCULATIONS.md) - Scientific equations and heuristics used for body metrics.
+
+---
+
 ## ✅ Quality Control
 
 Run these commands periodically to ensure code quality:

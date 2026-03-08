@@ -8,6 +8,6 @@ export default {
   out: "./drizzle",
   driver: "better-sqlite",
   dbCredentials: {
-    url: process.env.DATABASE_URL || "data/dev.db",
+    url: process.env.DATABASE_URL || "./data/dev.db",
   },
 } satisfies Config;

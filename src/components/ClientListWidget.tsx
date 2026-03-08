@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Search } from "lucide-react";
 import { type ClientWithLatestMeasurement } from "@/lib/actions/clients";
-import { formatDate } from "@/lib/utils/date-utils";
+import { formatDate, formatDateShort, calculateAge } from "@/lib/utils/date-utils";
 
 export function ClientListWidget({ clients }: { clients: ClientWithLatestMeasurement[] }) {
     const [searchTerm, setSearchTerm] = useState("");
@@ -46,11 +46,23 @@ export function ClientListWidget({ clients }: { clients: ClientWithLatestMeasure
                                         {client.name.charAt(0)}{(client.lastname ?? '').charAt(0)}
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-lg md:text-xl mb-1 text-plum group-hover:text-gold transition-colors">{client.name} {client.lastname}</h4>
+                                        <div className="flex items-center gap-2">
+                                            <h4 className="font-bold text-lg md:text-xl text-plum group-hover:text-gold transition-colors">{client.name} {client.lastname}</h4>
+                                            {client.birthday && (
+                                                <span className="text-sm font-medium text-slate-400 bg-slate-50 px-2 py-0.5 rounded-lg border border-slate-100">
+                                                    {calculateAge(client.birthday)} años
+                                                </span>
+                                            )}
+                                        </div>
                                         <div className="flex items-center gap-2">
                                             <div className={`w-2 h-2 rounded-full ${client.latestMeasurement ? 'bg-green-400' : 'bg-gray-300'}`}></div>
                                             <span className={`text-xs font-bold uppercase tracking-wider ${client.latestMeasurement ? 'text-green-600' : 'text-gray-400'}`}>
                                                 {client.latestMeasurement ? 'ACTIVO' : 'SIN DATOS'}
+                                                {client.totalMeasurements > 0 && (
+                                                    <span className="ml-2 px-2 py-0.5 bg-gray-100 text-gray-500 rounded-full text-[10px]">
+                                                        {client.totalMeasurements} {client.totalMeasurements === 1 ? 'registro' : 'registros'}
+                                                    </span>
+                                                )}
                                             </span>
                                             {client.latestMeasurement && (
                                                 <span className="text-xs text-gray-400 ml-2">
