@@ -30,8 +30,8 @@ describe("CsvUploadFlow", () => {
 
     it("should render upload state initially", () => {
         render(<CsvUploadFlow />);
-        expect(screen.getByText(/Assign Measurements/i)).toBeDefined();
-        expect(screen.getByText(/Choose file or drag & drop/i)).toBeDefined();
+        expect(screen.getByText(/Asignar Mediciones/i)).toBeDefined();
+        expect(screen.getByText(/Elige un archivo o arrastra y suelta/i)).toBeDefined();
     });
 
     it("should transition to identify step after successful upload", async () => {
@@ -44,13 +44,13 @@ describe("CsvUploadFlow", () => {
         render(<CsvUploadFlow />);
 
         const file = new File(["number,age\n100,40"], "test.csv", { type: "text/csv" });
-        const input = screen.getByLabelText(/Choose file or drag & drop/i);
+        const input = screen.getByLabelText(/Elige un archivo o arrastra y suelta/i);
 
         fireEvent.change(input, { target: { files: [file] } });
 
         await waitFor(() => {
-            expect(screen.getByText(/Identify Clients/i)).toBeDefined();
-            expect(screen.getByText(/Found 1 records/i)).toBeDefined();
+            expect(screen.getByText(/Identificar Clientes/i)).toBeDefined();
+            expect(screen.getByText(/Se encontraron 1 registros/i)).toBeDefined();
         });
     });
 
@@ -63,11 +63,11 @@ describe("CsvUploadFlow", () => {
 
         render(<CsvUploadFlow />);
 
-        fireEvent.change(screen.getByLabelText(/Choose file or drag & drop/i), {
+        fireEvent.change(screen.getByLabelText(/Elige un archivo o arrastra y suelta/i), {
             target: { files: [new File([], "test.csv")] }
         });
 
-        await waitFor(() => screen.getByText(/Identify Clients/i));
+        await waitFor(() => screen.getByText(/Identificar Clientes/i));
 
         // Use data-testid for robust row finding
         const row = screen.getByTestId("csv-row");
@@ -86,11 +86,11 @@ describe("CsvUploadFlow", () => {
 
         render(<CsvUploadFlow />);
 
-        fireEvent.change(screen.getByLabelText(/Choose file or drag & drop/i), {
+        fireEvent.change(screen.getByLabelText(/Elige un archivo o arrastra y suelta/i), {
             target: { files: [new File([], "test.csv")] }
         });
 
-        await waitFor(() => screen.getByText(/Identify Clients/i));
+        await waitFor(() => screen.getByText(/Identificar Clientes/i));
 
         const row = screen.getByTestId("csv-row");
         const select = within(row).getByRole("combobox");
@@ -99,8 +99,8 @@ describe("CsvUploadFlow", () => {
         fireEvent.change(select, { target: { value: "new" } });
 
         // Verify inputs appear
-        const nameInput = screen.getByPlaceholderText("Name");
-        const usernameInput = screen.getByPlaceholderText("Username");
+        const nameInput = screen.getByPlaceholderText("Nombre");
+        const usernameInput = screen.getByPlaceholderText(/Usuario/i);
 
         fireEvent.change(nameInput, { target: { value: "New Guy" } });
         fireEvent.change(usernameInput, { target: { value: "newguy" } });
@@ -118,11 +118,11 @@ describe("CsvUploadFlow", () => {
 
         render(<CsvUploadFlow />);
 
-        fireEvent.change(screen.getByLabelText(/Choose file or drag & drop/i), {
+        fireEvent.change(screen.getByLabelText(/Elige un archivo o arrastra y suelta/i), {
             target: { files: [new File([], "test.csv")] }
         });
 
-        await waitFor(() => screen.getByText(/Identify Clients/i));
+        await waitFor(() => screen.getByText(/Identificar Clientes/i));
 
         const bulkSelect = screen.getByTestId("bulk-select");
         fireEvent.change(bulkSelect, { target: { value: "1" } });
@@ -145,19 +145,19 @@ describe("CsvUploadFlow", () => {
 
         render(<CsvUploadFlow />);
 
-        fireEvent.change(screen.getByLabelText(/Choose file or drag & drop/i), {
+        fireEvent.change(screen.getByLabelText(/Elige un archivo o arrastra y suelta/i), {
             target: { files: [new File([], "test.csv")] }
         });
 
-        await waitFor(() => screen.getByText(/Identify Clients/i));
+        await waitFor(() => screen.getByText(/Identificar Clientes/i));
 
         const bulkSelect = screen.getByTestId("bulk-select");
         fireEvent.change(bulkSelect, { target: { value: "1" } });
 
-        fireEvent.click(screen.getByText(/Persist All Data/i));
+        fireEvent.click(screen.getByText(/Guardar todos los datos/i));
 
         await waitFor(() => {
-            expect(screen.getByText(/Data Imported!/i)).toBeDefined();
+            expect(screen.getByText(/¡Datos Importados!/i)).toBeDefined();
         });
     });
 });

@@ -62,7 +62,7 @@ export function ClientForm({ client, onClose, onSuccess }: ClientFormProps) {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
                 <div className="p-6 border-b">
-                    <h2 className="text-xl font-bold">{client ? "Edit Client" : "New Client"}</h2>
+                    <h2 className="text-xl font-bold">{client ? "Editar Cliente" : "Nuevo Cliente"}</h2>
                 </div>
 
                 <form action={handleSubmit} className="p-6 space-y-6">
@@ -74,7 +74,7 @@ export function ClientForm({ client, onClose, onSuccess }: ClientFormProps) {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-700">First Name *</label>
+                            <label className="text-sm font-medium text-slate-700">Nombre *</label>
                             <input
                                 name="name"
                                 defaultValue={client?.name}
@@ -83,7 +83,7 @@ export function ClientForm({ client, onClose, onSuccess }: ClientFormProps) {
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-700">Last Name</label>
+                            <label className="text-sm font-medium text-slate-700">Apellido</label>
                             <input
                                 name="lastname"
                                 defaultValue={client?.lastname || ""}
@@ -91,7 +91,7 @@ export function ClientForm({ client, onClose, onSuccess }: ClientFormProps) {
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-700">Username</label>
+                            <label className="text-sm font-medium text-slate-700">Usuario</label>
                             <input
                                 name="username"
                                 defaultValue={client?.username || ""}
@@ -99,7 +99,7 @@ export function ClientForm({ client, onClose, onSuccess }: ClientFormProps) {
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-700">Birthday</label>
+                            <label className="text-sm font-medium text-slate-700">Fecha de Nacimiento</label>
                             <input
                                 type="date"
                                 name="birthday"
@@ -108,18 +108,18 @@ export function ClientForm({ client, onClose, onSuccess }: ClientFormProps) {
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-700">Gender</label>
+                            <label className="text-sm font-medium text-slate-700">Género</label>
                             <select
                                 name="gender"
                                 defaultValue={client?.gender || "female"}
                                 className="w-full px-3 py-2 border rounded-md"
                             >
-                                <option value="female">Female</option>
-                                <option value="male">Male</option>
+                                <option value="female">Femenino</option>
+                                <option value="male">Masculino</option>
                             </select>
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-700">Height (cm)</label>
+                            <label className="text-sm font-medium text-slate-700">Altura (cm)</label>
                             <input
                                 type="number"
                                 step="0.1"
@@ -129,20 +129,20 @@ export function ClientForm({ client, onClose, onSuccess }: ClientFormProps) {
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-700">Activity Level</label>
+                            <label className="text-sm font-medium text-slate-700">Nivel de Actividad</label>
                             <select
                                 name="activityLevel"
                                 defaultValue={client?.activityLevel || ""}
                                 className="w-full px-3 py-2 border rounded-md"
                             >
-                                <option value="">Select...</option>
-                                <option value="1">1 - Sedentary</option>
-                                <option value="2">2 - Active</option>
-                                <option value="3">3 - Very Active</option>
+                                <option value="">Seleccionar...</option>
+                                <option value="1">1 - Sedentario</option>
+                                <option value="2">2 - Activo</option>
+                                <option value="3">3 - Muy Activo</option>
                             </select>
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-700">Sessions / Week</label>
+                            <label className="text-sm font-medium text-slate-700">Sesiones / Semana</label>
                             <input
                                 type="number"
                                 name="sessionsPerWeek"
@@ -151,7 +151,7 @@ export function ClientForm({ client, onClose, onSuccess }: ClientFormProps) {
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-700">Start Date</label>
+                            <label className="text-sm font-medium text-slate-700">Fecha de Inicio</label>
                             <input
                                 type="date"
                                 name="startDate"
@@ -160,7 +160,7 @@ export function ClientForm({ client, onClose, onSuccess }: ClientFormProps) {
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-700">Email</label>
+                            <label className="text-sm font-medium text-slate-700">Correo Electrónico</label>
                             <input
                                 type="email"
                                 name="email"
@@ -169,7 +169,7 @@ export function ClientForm({ client, onClose, onSuccess }: ClientFormProps) {
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-700">Phone</label>
+                            <label className="text-sm font-medium text-slate-700">Teléfono</label>
                             <input
                                 type="tel"
                                 name="phone"
@@ -185,14 +185,14 @@ export function ClientForm({ client, onClose, onSuccess }: ClientFormProps) {
                             onClick={onClose}
                             className="px-4 py-2 text-slate-700 hover:bg-slate-100 rounded-md"
                         >
-                            Cancel
+                            Cancelar
                         </button>
                         <button
                             type="submit"
                             disabled={loading}
                             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
                         >
-                            {loading ? "Saving..." : "Save Client"}
+                            {loading ? "Guardando..." : "Guardar Cliente"}
                         </button>
                     </div>
                 </form>

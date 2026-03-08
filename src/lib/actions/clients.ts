@@ -168,22 +168,23 @@ export async function getClientByUsername(username: string) {
 export type ClientWithLatestMeasurement = Awaited<ReturnType<typeof getClientsWithLatestMeasurement>>[number];
 
 export async function getClientsWithLatestMeasurement() {
-    const allClients = await db.select().from(clients);
+    const allClients = await db.select().from(clients).where(eq(clients.isActive, true));
 
-    // For each client, fetch latest 2 measurements to determine trend
+    // For each client, fetch latest 2 measurements to determine trend and total count
     const clientsWithData = await Promise.all(allClients.map(async (client: any) => {
         const history = await db.select()
             .from(measurements)
             .where(eq(measurements.clientId, client.id))
-            .orderBy(desc(measurements.date))
-            .limit(2);
+            .orderBy(desc(measurements.date));
 
         const latest = history[0];
         const previous = history[1];
+        const totalMeasurements = history.length;
 
         return {
             ...client,
             latestMeasurement: latest || null,
+            totalMeasurements,
             trends: {
                 weight: calculateTrend(latest?.weight, previous?.weight),
                 fatPercent: calculateTrend(latest?.fatPercent, previous?.fatPercent),

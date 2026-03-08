@@ -29,8 +29,8 @@ export class TanitaParser {
             // Trim outer quotes if PapaParse missed them, but keep braces as they are part of tags
             const content = firstCol.trim().replace(/^"|"$/g, '');
 
-            // Split by comma. For Tanita, simple split is usually safe as values don't contain commas.
-            return content.split(',').map(part => part.trim().replace(/^"|"$/g, ''));
+            // Split by comma and strip ALL quotes from each part
+            return content.split(',').map(part => part.trim().replace(/"/g, ''));
         }
         return row;
     }

@@ -21,14 +21,14 @@ export default function ClientManager({ clients }: { clients: any[] }) {
     });
 
     async function handleToggleStatus(id: number, currentStatus: boolean) {
-        if (confirm(`Are you sure you want to ${currentStatus ? 'deactivate' : 'activate'} this client?`)) {
+        if (confirm(`¿Estás seguro de que quieres ${currentStatus ? 'desactivar' : 'activar'} este cliente?`)) {
             await toggleClientStatus(id, !currentStatus);
             router.refresh();
         }
     }
 
     async function handleDelete(id: number) {
-        if (confirm("Are you sure? This cannot be done if the client has records (archive instead).")) {
+        if (confirm("¿Estás seguro? Esto no se puede hacer si el cliente tiene registros (desactívalo en su lugar).")) {
             try {
                 await deleteClient(id);
                 router.refresh();
@@ -43,21 +43,21 @@ export default function ClientManager({ clients }: { clients: any[] }) {
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 md:mb-8">
                 <div>
-                    <h1 className="text-2xl md:text-3xl font-bold text-plum">Manage Clients</h1>
-                    <p className="text-plum/60 mt-1">{clients.length} Total Clients</p>
+                    <h1 className="text-2xl md:text-3xl font-bold text-plum">Administrar Clientes</h1>
+                    <p className="text-plum/60 mt-1">{clients.length} Clientes en Total</p>
                 </div>
                 <div className="flex gap-3 w-full md:w-auto">
                     <Link
                         href="/"
                         className="flex-1 md:flex-none px-6 py-3 border border-plum/10 text-plum rounded-2xl hover:bg-white hover:shadow-md transition font-medium text-center"
                     >
-                        Dashboard
+                        Inicio
                     </Link>
                     <button
                         onClick={() => setIsCreating(true)}
                         className="flex-1 md:flex-none px-6 py-3 bg-gold text-plum rounded-2xl hover:bg-white hover:shadow-xl transition font-bold shadow-md"
                     >
-                        + New Client
+                        + Nuevo Cliente
                     </button>
                 </div>
             </div>
@@ -68,7 +68,7 @@ export default function ClientManager({ clients }: { clients: any[] }) {
                 <div className="mb-6 md:mb-8 max-w-md">
                     <input
                         type="text"
-                        placeholder="Search clients..."
+                        placeholder="Buscar clientes..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="w-full bg-gray-50 pl-6 pr-4 py-4 rounded-2xl border border-transparent focus:border-gold focus:ring-0 outline-none transition-all placeholder:text-gray-400 text-plum"
@@ -88,17 +88,17 @@ export default function ClientManager({ clients }: { clients: any[] }) {
                                     <div className="text-gray-400 text-xs font-medium">@{client.username}</div>
                                 </div>
                                 <span className={`ml-auto px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider ${client.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
-                                    {client.isActive ? 'Active' : 'Inactive'}
+                                    {client.isActive ? 'Activo' : 'Inactivo'}
                                 </span>
                             </div>
 
                             <div className="grid grid-cols-2 gap-2 text-sm mb-4">
                                 <div className="bg-white p-3 rounded-xl">
-                                    <span className="text-xs text-gray-400 block uppercase tracking-wider mb-1">Sessions/Wk</span>
+                                    <span className="text-xs text-gray-400 block uppercase tracking-wider mb-1">Sesiones/Sem</span>
                                     <span className="font-bold text-plum">{client.sessionsPerWeek || '-'}</span>
                                 </div>
                                 <div className="bg-white p-3 rounded-xl">
-                                    <span className="text-xs text-gray-400 block uppercase tracking-wider mb-1">Start Date</span>
+                                    <span className="text-xs text-gray-400 block uppercase tracking-wider mb-1">Fecha Inicio</span>
                                     <span className="font-bold text-plum">{client.startDate || '-'}</span>
                                 </div>
                             </div>
@@ -108,19 +108,19 @@ export default function ClientManager({ clients }: { clients: any[] }) {
                                     onClick={() => setEditingClient(client)}
                                     className="flex-1 py-2 text-sm font-bold text-plum bg-white rounded-xl border border-gray-200 hover:border-gold hover:text-gold transition-colors"
                                 >
-                                    Edit
+                                    Editar
                                 </button>
                                 <button
                                     onClick={() => handleToggleStatus(client.id, client.isActive)}
                                     className="flex-1 py-2 text-sm font-medium text-gray-500 bg-white rounded-xl border border-gray-200 hover:text-plum transition-colors"
                                 >
-                                    {client.isActive ? 'Deactivate' : 'Activate'}
+                                    {client.isActive ? 'Desactivar' : 'Activar'}
                                 </button>
                                 <button
                                     onClick={() => handleDelete(client.id)}
                                     className="px-4 py-2 text-sm font-bold text-red-500 bg-white rounded-xl border border-gray-200 hover:bg-red-50 transition-colors"
                                 >
-                                    Delete
+                                    Eliminar
                                 </button>
                             </div>
                         </div>
@@ -132,11 +132,11 @@ export default function ClientManager({ clients }: { clients: any[] }) {
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr>
-                                <th className="py-4 pl-4 font-bold text-xs uppercase tracking-widest text-gray-400 border-b border-gray-100">Client</th>
-                                <th className="py-4 font-bold text-xs uppercase tracking-widest text-gray-400 border-b border-gray-100">Status</th>
-                                <th className="py-4 font-bold text-xs uppercase tracking-widest text-gray-400 border-b border-gray-100">Sessions/Wk</th>
-                                <th className="py-4 font-bold text-xs uppercase tracking-widest text-gray-400 border-b border-gray-100">Start Date</th>
-                                <th className="py-4 pr-4 font-bold text-xs uppercase tracking-widest text-gray-400 border-b border-gray-100 text-right">Actions</th>
+                                <th className="py-4 pl-4 font-bold text-xs uppercase tracking-widest text-gray-400 border-b border-gray-100">Cliente</th>
+                                <th className="py-4 font-bold text-xs uppercase tracking-widest text-gray-400 border-b border-gray-100">Estado</th>
+                                <th className="py-4 font-bold text-xs uppercase tracking-widest text-gray-400 border-b border-gray-100">Sesiones/Sem</th>
+                                <th className="py-4 font-bold text-xs uppercase tracking-widest text-gray-400 border-b border-gray-100">Fecha Inicio</th>
+                                <th className="py-4 pr-4 font-bold text-xs uppercase tracking-widest text-gray-400 border-b border-gray-100 text-right">Acciones</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50">
@@ -155,7 +155,7 @@ export default function ClientManager({ clients }: { clients: any[] }) {
                                     </td>
                                     <td className="py-6">
                                         <span className={`px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider ${client.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
-                                            {client.isActive ? 'Active' : 'Inactive'}
+                                            {client.isActive ? 'Activo' : 'Inactivo'}
                                         </span>
                                     </td>
                                     <td className="py-6 text-plum font-medium">{client.sessionsPerWeek || '-'}</td>
@@ -165,19 +165,19 @@ export default function ClientManager({ clients }: { clients: any[] }) {
                                             onClick={() => setEditingClient(client)}
                                             className="text-plum/70 hover:text-gold font-bold text-sm transition-colors"
                                         >
-                                            Edit
+                                            Editar
                                         </button>
                                         <button
                                             onClick={() => handleToggleStatus(client.id, client.isActive)}
                                             className="text-gray-400 hover:text-plum font-medium text-sm transition-colors"
                                         >
-                                            {client.isActive ? 'Deactivate' : 'Activate'}
+                                            {client.isActive ? 'Desactivar' : 'Activar'}
                                         </button>
                                         <button
                                             onClick={() => handleDelete(client.id)}
                                             className="text-red-400 hover:text-red-600 font-medium text-sm transition-colors ml-2"
                                         >
-                                            Delete
+                                            Eliminar
                                         </button>
                                     </td>
                                 </tr>
@@ -187,7 +187,7 @@ export default function ClientManager({ clients }: { clients: any[] }) {
 
                     {filteredClients.length === 0 && (
                         <div className="text-center py-12 text-gray-400">
-                            No clients found matching &quot;{searchTerm}&quot;
+                            Ningún cliente coincide con &quot;{searchTerm}&quot;
                         </div>
                     )}
                 </div>

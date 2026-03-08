@@ -3,6 +3,7 @@ import { sql } from "drizzle-orm";
 
 export const clients = sqliteTable("clients", {
     id: integer("id").primaryKey({ autoIncrement: true }),
+    legacyId: integer("legacy_id"), // ID imported from old systems (Tanita / Healthy Edge)
     name: text("name").notNull(),
     lastname: text("lastname"),
     username: text("username").unique(),
@@ -41,6 +42,7 @@ export const measurements = sqliteTable("measurements", {
     bmi: real("bmi"),
 
     // Segmental Fat %
+
     fatArmRight: real("fat_arm_right"),
     fatArmLeft: real("fat_arm_left"),
     fatLegRight: real("fat_leg_right"),

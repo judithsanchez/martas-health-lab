@@ -5,9 +5,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { deleteRecord } from "@/lib/actions/records";
 import { RecordForm } from "@/components/RecordForm";
-import { formatDate } from "@/lib/utils/date-utils";
+import { formatDate, calculateAge } from "@/lib/utils/date-utils";
 import CsvUploadFlow from "@/components/CsvUploadFlow";
-import { FileUp, Plus, X } from "lucide-react";
+import { FileUp, Plus, X, User, Ruler, Activity, Calendar, Hash } from "lucide-react";
 
 export default function ClientDetailsView({ client, measurements }: { client: any, measurements: any[] }) {
     const router = useRouter();
@@ -36,6 +36,9 @@ export default function ClientDetailsView({ client, measurements }: { client: an
                         <h1 className="text-4xl font-bold text-plum">{client.name} {client.lastname}</h1>
                         <div className="flex flex-wrap gap-4 text-slate-500 mt-2 text-sm items-center">
                             <span className="bg-white px-2 py-1 rounded shadow-sm">@{client.username}</span>
+                            <span className={`px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider ${client.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                                {client.isActive ? 'Activo' : 'Inactivo'}
+                            </span>
                             <span>•</span>
                             <span>Nivel Actividad {client.activityLevel?.toString() ?? '-'}</span>
                             <span>•</span>
@@ -57,6 +60,56 @@ export default function ClientDetailsView({ client, measurements }: { client: an
                             <Plus size={18} />
                             <span>Entrada Manual</span>
                         </button>
+                    </div>
+                </div>
+                {/* Basic Information Cards */}
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
+                    <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-col gap-1">
+                        <div className="flex items-center gap-2 text-slate-400 mb-1">
+                            <User size={14} className="text-sage" />
+                            <span className="text-[10px] uppercase font-bold tracking-wider">Género</span>
+                        </div>
+                        <p className="font-bold text-plum capitalize">{client.gender === 'female' ? 'Femenino' : client.gender === 'male' ? 'Masculino' : 'Otro'}</p>
+                    </div>
+
+                    <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-col gap-1">
+                        <div className="flex items-center gap-2 text-slate-400 mb-1">
+                            <Calendar size={14} className="text-sage" />
+                            <span className="text-[10px] uppercase font-bold tracking-wider">Edad</span>
+                        </div>
+                        <p className="font-bold text-plum">{calculateAge(client.birthday) ?? '-'} años</p>
+                    </div>
+
+                    <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-col gap-1">
+                        <div className="flex items-center gap-2 text-slate-400 mb-1">
+                            <Ruler size={14} className="text-sage" />
+                            <span className="text-[10px] uppercase font-bold tracking-wider">Altura</span>
+                        </div>
+                        <p className="font-bold text-plum">{client.height ? `${client.height} cm` : '-'}</p>
+                    </div>
+
+                    <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-col gap-1">
+                        <div className="flex items-center gap-2 text-slate-400 mb-1">
+                            <Activity size={14} className="text-sage" />
+                            <span className="text-[10px] uppercase font-bold tracking-wider">Actividad</span>
+                        </div>
+                        <p className="font-bold text-plum">Nivel {client.activityLevel?.toString() ?? '-'}</p>
+                    </div>
+
+                    <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-col gap-1">
+                        <div className="flex items-center gap-2 text-slate-400 mb-1">
+                            <Hash size={14} className="text-sage" />
+                            <span className="text-[10px] uppercase font-bold tracking-wider">Sesiones/Sem</span>
+                        </div>
+                        <p className="font-bold text-plum">{client.sessionsPerWeek?.toString() ?? '3'}</p>
+                    </div>
+
+                    <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-col gap-1">
+                        <div className="flex items-center gap-2 text-slate-400 mb-1">
+                            <Calendar size={14} className="text-sage" />
+                            <span className="text-[10px] uppercase font-bold tracking-wider">Inicio</span>
+                        </div>
+                        <p className="font-bold text-plum text-sm">{formatDate(client.startDate)}</p>
                     </div>
                 </div>
 
@@ -142,6 +195,7 @@ export default function ClientDetailsView({ client, measurements }: { client: an
                 {(isCreating || editingRecord) && (
                     <RecordForm
                         clientId={client.id}
+                        client={client}
                         record={editingRecord}
                         onClose={() => {
                             setIsCreating(false);
