@@ -195,6 +195,7 @@ export default function ClientDetailsView({ client, measurements }: { client: an
                 {(isCreating || editingRecord) && (
                     <RecordForm
                         clientId={client.id}
+                        client={client}
                         record={editingRecord}
                         onClose={() => {
                             setIsCreating(false);
