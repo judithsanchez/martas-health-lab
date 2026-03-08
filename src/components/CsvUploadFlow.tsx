@@ -164,17 +164,32 @@ export default function CsvUploadFlow({ preselectedClientId }: { preselectedClie
                             <p className="text-sm text-slate-500 mt-1">Found {assignments.length} records. Assign each to a client.</p>
                         </div>
 
-                        <div className="flex items-center gap-3">
-                            <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">Bulk Apply:</span>
-                            <select
-                                data-testid="bulk-select"
-                                className="text-xs font-medium border-slate-200 rounded-lg focus:ring-slate-900 focus:border-slate-900 p-2 pr-8 bg-slate-50"
-                                onChange={(e) => handleApplyToAll(parseInt(e.target.value))}
-                                defaultValue={preselectedClientId || ""}
-                            >
-                                <option value="" disabled>Select Client...</option>
-                                {existingClients.map(c => <option key={c.id} value={c.id}>{c.name} (@{c.username})</option>)}
-                            </select>
+                        <div className="flex flex-col items-end gap-2">
+                            <div className="flex items-center gap-3">
+                                <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">Bulk Apply:</span>
+                                <select
+                                    data-testid="bulk-select"
+                                    className="text-xs font-medium border-slate-200 rounded-lg focus:ring-slate-900 focus:border-slate-900 p-2 pr-8 bg-slate-50"
+                                    onChange={(e) => handleApplyToAll(parseInt(e.target.value))}
+                                    defaultValue={preselectedClientId || ""}
+                                >
+                                    <option value="" disabled>Select Client...</option>
+                                    {existingClients.map(c => <option key={c.id} value={c.id}>{c.name} (@{c.username})</option>)}
+                                </select>
+                            </div>
+
+                            {/* Legend */}
+                            <div className="flex items-center gap-4 px-3 py-1.5 bg-slate-50 rounded-lg border border-slate-100">
+                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">Leyenda:</span>
+                                <div className="flex items-center gap-1.5">
+                                    <div className="w-2 h-2 rounded-full bg-blue-400"></div>
+                                    <span className="text-[10px] font-semibold text-slate-600">Entrada</span>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                    <div className="w-2 h-2 rounded-full bg-purple-400"></div>
+                                    <span className="text-[10px] font-semibold text-slate-600">Calculado</span>
+                                </div>
+                            </div>
                         </div>
                     </header>
 
@@ -206,13 +221,45 @@ export default function CsvUploadFlow({ preselectedClientId }: { preselectedClie
                                             </div>
                                         </div>
 
-                                        <div className="grid grid-cols-2 gap-2">
-                                            {Object.entries(assignment.record).map(([key, value]) => {
-                                                if (!value || key === 'date' || (typeof value !== 'string' && typeof value !== 'number')) return null;
+                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                            {/* Primary Inputs - Blue-ish */}
+                                            {[
+                                                { key: 'weight', label: 'Weight', type: 'number', step: '0.1', cat: 'in' },
+                                                { key: 'fatPercent', label: 'Fat %', type: 'number', step: '0.1', cat: 'in' },
+                                                { key: 'visceralFat', label: 'Visc. Fat', type: 'number', step: '0.5', cat: 'in' },
+                                                { key: 'waterPercent', label: 'Water %', type: 'number', step: '0.1', cat: 'in' },
+                                                { key: 'physiqueRatingScale', label: 'Physique', type: 'number', step: '1', cat: 'in' },
+                                                // Calculated/Derived - Purple-ish
+                                                { key: 'muscleMass', label: 'Muscle (kg)', type: 'number', step: '0.1', cat: 'calc' },
+                                                { key: 'boneMass', label: 'Bone (kg)', type: 'number', step: '0.1', cat: 'calc' },
+                                                { key: 'metabolicAge', label: 'Met. Age', type: 'number', step: '1', cat: 'calc' },
+                                                { key: 'bmi', label: 'BMI', type: 'number', step: '0.1', cat: 'calc' },
+                                                { key: 'dciKcal', label: 'DCI (kcal)', type: 'number', step: '1', cat: 'calc' },
+                                            ].map((field) => {
+                                                const val = assignment.record[field.key];
+                                                const isCalc = field.cat === 'calc';
+
                                                 return (
-                                                    <div key={key} className="px-2 py-1 bg-white rounded border border-slate-100">
-                                                        <span className="text-[10px] text-slate-400 font-bold uppercase block truncate">{key}</span>
-                                                        <span className="text-sm font-bold text-slate-800 truncate block" title={String(value)}>{value}</span>
+                                                    <div
+                                                        key={field.key}
+                                                        className={`px-2 py-1.5 rounded-xl border-2 transition-all ${isCalc
+                                                            ? 'bg-purple-50/50 border-purple-100/50 focus-within:border-purple-300'
+                                                            : 'bg-blue-50/50 border-blue-100/50 focus-within:border-blue-300'
+                                                            }`}
+                                                    >
+                                                        <label className={`text-[9px] font-black uppercase mb-0.5 block ${isCalc ? 'text-purple-400' : 'text-blue-400'}`}>
+                                                            {field.label}
+                                                        </label>
+                                                        <input
+                                                            type={field.type}
+                                                            step={field.step}
+                                                            className="w-full text-xs font-bold bg-transparent border-none p-0 focus:ring-0 text-slate-800"
+                                                            value={val ?? ""}
+                                                            onChange={(e) => {
+                                                                const nextRecord = { ...assignment.record, [field.key]: e.target.value === "" ? null : parseFloat(e.target.value) };
+                                                                updateAssignment(idx, { record: nextRecord });
+                                                            }}
+                                                        />
                                                     </div>
                                                 );
                                             })}

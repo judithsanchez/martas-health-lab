@@ -41,6 +41,7 @@ export function RecordForm({ clientId, record, onClose, onSuccess }: RecordFormP
                 physiqueRatingScale: num("physiqueRatingScale"),
                 bodyType: num("bodyType"),
                 waist: num("waist"),
+                bmi: num("bmi"),
 
                 // Segmental Fat
                 fatArmRight: num("fatArmRight"),
@@ -86,60 +87,76 @@ export function RecordForm({ clientId, record, onClose, onSuccess }: RecordFormP
                         </div>
                     )}
 
-                    {/* Basic Info */}
-                    <div className="space-y-4">
-                        <h3 className="font-semibold text-slate-800 border-b pb-2">General & Body Composition</h3>
+                    <div className="space-y-6">
+                        <div className="flex items-center justify-between border-b pb-2">
+                            <h3 className="font-semibold text-slate-800">General & Body Composition</h3>
+                            <div className="flex items-center gap-4 px-3 py-1 bg-slate-50 rounded-lg border border-slate-100">
+                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">Leyenda:</span>
+                                <div className="flex items-center gap-1.5">
+                                    <div className="w-2 h-2 rounded-full bg-blue-400"></div>
+                                    <span className="text-[10px] font-semibold text-slate-600">Entrada</span>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                    <div className="w-2 h-2 rounded-full bg-purple-400"></div>
+                                    <span className="text-[10px] font-semibold text-slate-600">Calculado</span>
+                                </div>
+                            </div>
+                        </div>
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                             <div className="col-span-2 sm:col-span-1">
                                 <label className="text-xs font-bold text-slate-500 uppercase">Date *</label>
                                 <input type="date" name="date" required defaultValue={(() => {
                                     const d = record?.date ? new Date(record.date) : new Date();
                                     return !isNaN(d.getTime()) ? d.toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
-                                })()} className="w-full p-2 border rounded" />
+                                })()} className="w-full p-2 border rounded bg-blue-50/30 border-blue-100 focus:border-blue-300 outline-none" />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-slate-500 uppercase">Weight (kg) *</label>
-                                <input type="number" step="0.1" name="weight" required defaultValue={record?.weight} className="w-full p-2 border rounded" />
+                                <label className="text-xs font-bold text-blue-500 uppercase">Weight (kg) *</label>
+                                <input type="number" step="0.1" name="weight" required defaultValue={record?.weight} className="w-full p-2 border rounded bg-blue-50/30 border-blue-100 focus:border-blue-300 outline-none" />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-slate-500 uppercase">Height (cm)</label>
-                                <input type="number" step="0.1" name="height" defaultValue={record?.height ?? ""} className="w-full p-2 border rounded" />
+                                <label className="text-xs font-bold text-blue-500 uppercase">Height (cm)</label>
+                                <input type="number" step="0.1" name="height" defaultValue={record?.height ?? ""} className="w-full p-2 border rounded bg-blue-50/30 border-blue-100 focus:border-blue-300 outline-none" />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-slate-500 uppercase">Body Fat %</label>
-                                <input type="number" step="0.1" name="fatPercent" defaultValue={record?.fatPercent ?? ""} className="w-full p-2 border rounded" />
+                                <label className="text-xs font-bold text-blue-500 uppercase">Body Fat %</label>
+                                <input type="number" step="0.1" name="fatPercent" defaultValue={record?.fatPercent ?? ""} className="w-full p-2 border rounded bg-blue-50/30 border-blue-100 focus:border-blue-300 outline-none" />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-slate-500 uppercase">Muscle (kg)</label>
-                                <input type="number" step="0.1" name="muscleMass" defaultValue={record?.muscleMass ?? ""} className="w-full p-2 border rounded" />
+                                <label className="text-xs font-bold text-purple-500 uppercase">Muscle (kg)</label>
+                                <input type="number" step="0.1" name="muscleMass" defaultValue={record?.muscleMass ?? ""} className="w-full p-2 border rounded bg-purple-50/30 border-purple-100 focus:border-purple-300 outline-none" />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-slate-500 uppercase">Water %</label>
-                                <input type="number" step="0.1" name="waterPercent" defaultValue={record?.waterPercent ?? ""} className="w-full p-2 border rounded" />
+                                <label className="text-xs font-bold text-blue-500 uppercase">Water %</label>
+                                <input type="number" step="0.1" name="waterPercent" defaultValue={record?.waterPercent ?? ""} className="w-full p-2 border rounded bg-blue-50/30 border-blue-100 focus:border-blue-300 outline-none" />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-slate-500 uppercase">Bone (kg)</label>
-                                <input type="number" step="0.1" name="boneMass" defaultValue={record?.boneMass ?? ""} className="w-full p-2 border rounded" />
+                                <label className="text-xs font-bold text-purple-500 uppercase">Bone (kg)</label>
+                                <input type="number" step="0.1" name="boneMass" defaultValue={record?.boneMass ?? ""} className="w-full p-2 border rounded bg-purple-50/30 border-purple-100 focus:border-purple-300 outline-none" />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-slate-500 uppercase">Visceral Fat</label>
-                                <input type="number" step="0.5" name="visceralFat" defaultValue={record?.visceralFat ?? ""} className="w-full p-2 border rounded" />
+                                <label className="text-xs font-bold text-blue-500 uppercase">Visceral Fat</label>
+                                <input type="number" step="0.5" name="visceralFat" defaultValue={record?.visceralFat ?? ""} className="w-full p-2 border rounded bg-blue-50/30 border-blue-100 focus:border-blue-300 outline-none" />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-slate-500 uppercase">Metabolic Age</label>
-                                <input type="number" name="metabolicAge" defaultValue={record?.metabolicAge ?? ""} className="w-full p-2 border rounded" />
+                                <label className="text-xs font-bold text-purple-500 uppercase">Metabolic Age</label>
+                                <input type="number" name="metabolicAge" defaultValue={record?.metabolicAge ?? ""} className="w-full p-2 border rounded bg-purple-50/30 border-purple-100 focus:border-purple-300 outline-none" />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-slate-500 uppercase">BMR (kcal)</label>
-                                <input type="number" name="bmr" defaultValue={record?.bmr ?? ""} className="w-full p-2 border rounded" />
+                                <label className="text-xs font-bold text-purple-500 uppercase">BMR (kcal)</label>
+                                <input type="number" name="bmr" defaultValue={record?.bmr ?? ""} className="w-full p-2 border rounded bg-purple-50/30 border-purple-100 focus:border-purple-300 outline-none" />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-slate-500 uppercase">Physique Rating</label>
-                                <input type="number" name="physiqueRatingScale" defaultValue={record?.physiqueRatingScale ?? ""} className="w-full p-2 border rounded" />
+                                <label className="text-xs font-bold text-blue-500 uppercase">Physique Rating</label>
+                                <input type="number" name="physiqueRatingScale" defaultValue={record?.physiqueRatingScale ?? ""} className="w-full p-2 border rounded bg-blue-50/30 border-blue-100 focus:border-blue-300 outline-none" />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-slate-500 uppercase">Waist (cm)</label>
-                                <input type="number" step="0.1" name="waist" defaultValue={record?.waist ?? ""} className="w-full p-2 border rounded border-gold/30 focus:border-gold" />
+                                <label className="text-xs font-bold text-blue-500 uppercase">Waist (cm)</label>
+                                <input type="number" step="0.1" name="waist" defaultValue={record?.waist ?? ""} className="w-full p-2 border rounded bg-blue-50/30 border-blue-100 focus:border-blue-300 outline-none" />
+                            </div>
+                            <div>
+                                <label className="text-xs font-bold text-purple-500 uppercase">BMI</label>
+                                <input type="number" step="0.1" name="bmi" defaultValue={record?.bmi ?? ""} className="w-full p-2 border rounded bg-purple-50/30 border-purple-100 focus:border-purple-300 outline-none" />
                             </div>
                         </div>
                     </div>
@@ -149,24 +166,24 @@ export function RecordForm({ clientId, record, onClose, onSuccess }: RecordFormP
                         <h3 className="font-semibold text-slate-800 border-b pb-2">Segmental Fat %</h3>
                         <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
                             <div>
-                                <label className="text-xs font-bold text-slate-500 uppercase">L Arm</label>
-                                <input type="number" step="0.1" name="fatArmLeft" defaultValue={record?.fatArmLeft ?? ""} className="w-full p-2 border rounded bg-slate-50" />
+                                <label className="text-xs font-bold text-blue-500 uppercase">L Arm</label>
+                                <input type="number" step="0.1" name="fatArmLeft" defaultValue={record?.fatArmLeft ?? ""} className="w-full p-2 border rounded bg-blue-50/20 border-blue-100" />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-slate-500 uppercase">R Arm</label>
-                                <input type="number" step="0.1" name="fatArmRight" defaultValue={record?.fatArmRight ?? ""} className="w-full p-2 border rounded bg-slate-50" />
+                                <label className="text-xs font-bold text-blue-500 uppercase">R Arm</label>
+                                <input type="number" step="0.1" name="fatArmRight" defaultValue={record?.fatArmRight ?? ""} className="w-full p-2 border rounded bg-blue-50/20 border-blue-100" />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-slate-500 uppercase">Trunk</label>
-                                <input type="number" step="0.1" name="fatTrunk" defaultValue={record?.fatTrunk ?? ""} className="w-full p-2 border rounded bg-slate-50" />
+                                <label className="text-xs font-bold text-blue-500 uppercase">Trunk</label>
+                                <input type="number" step="0.1" name="fatTrunk" defaultValue={record?.fatTrunk ?? ""} className="w-full p-2 border rounded bg-blue-50/20 border-blue-100" />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-slate-500 uppercase">L Leg</label>
-                                <input type="number" step="0.1" name="fatLegLeft" defaultValue={record?.fatLegLeft ?? ""} className="w-full p-2 border rounded bg-slate-50" />
+                                <label className="text-xs font-bold text-blue-500 uppercase">L Leg</label>
+                                <input type="number" step="0.1" name="fatLegLeft" defaultValue={record?.fatLegLeft ?? ""} className="w-full p-2 border rounded bg-blue-50/20 border-blue-100" />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-slate-500 uppercase">R Leg</label>
-                                <input type="number" step="0.1" name="fatLegRight" defaultValue={record?.fatLegRight ?? ""} className="w-full p-2 border rounded bg-slate-50" />
+                                <label className="text-xs font-bold text-blue-500 uppercase">R Leg</label>
+                                <input type="number" step="0.1" name="fatLegRight" defaultValue={record?.fatLegRight ?? ""} className="w-full p-2 border rounded bg-blue-50/20 border-blue-100" />
                             </div>
                         </div>
                     </div>
@@ -176,24 +193,24 @@ export function RecordForm({ clientId, record, onClose, onSuccess }: RecordFormP
                         <h3 className="font-semibold text-slate-800 border-b pb-2">Segmental Muscle (kg)</h3>
                         <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
                             <div>
-                                <label className="text-xs font-bold text-slate-500 uppercase">L Arm</label>
-                                <input type="number" step="0.1" name="muscleArmLeft" defaultValue={record?.muscleArmLeft ?? ""} className="w-full p-2 border rounded bg-slate-50" />
+                                <label className="text-xs font-bold text-blue-500 uppercase">L Arm</label>
+                                <input type="number" step="0.1" name="muscleArmLeft" defaultValue={record?.muscleArmLeft ?? ""} className="w-full p-2 border rounded bg-blue-50/20 border-blue-100" />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-slate-500 uppercase">R Arm</label>
-                                <input type="number" step="0.1" name="muscleArmRight" defaultValue={record?.muscleArmRight ?? ""} className="w-full p-2 border rounded bg-slate-50" />
+                                <label className="text-xs font-bold text-blue-500 uppercase">R Arm</label>
+                                <input type="number" step="0.1" name="muscleArmRight" defaultValue={record?.muscleArmRight ?? ""} className="w-full p-2 border rounded bg-blue-50/20 border-blue-100" />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-slate-500 uppercase">Trunk</label>
-                                <input type="number" step="0.1" name="muscleTrunk" defaultValue={record?.muscleTrunk ?? ""} className="w-full p-2 border rounded bg-slate-50" />
+                                <label className="text-xs font-bold text-blue-500 uppercase">Trunk</label>
+                                <input type="number" step="0.1" name="muscleTrunk" defaultValue={record?.muscleTrunk ?? ""} className="w-full p-2 border rounded bg-blue-50/20 border-blue-100" />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-slate-500 uppercase">L Leg</label>
-                                <input type="number" step="0.1" name="muscleLegLeft" defaultValue={record?.muscleLegLeft ?? ""} className="w-full p-2 border rounded bg-slate-50" />
+                                <label className="text-xs font-bold text-blue-500 uppercase">L Leg</label>
+                                <input type="number" step="0.1" name="muscleLegLeft" defaultValue={record?.muscleLegLeft ?? ""} className="w-full p-2 border rounded bg-blue-50/20 border-blue-100" />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-slate-500 uppercase">R Leg</label>
-                                <input type="number" step="0.1" name="muscleLegRight" defaultValue={record?.muscleLegRight ?? ""} className="w-full p-2 border rounded bg-slate-50" />
+                                <label className="text-xs font-bold text-blue-500 uppercase">R Leg</label>
+                                <input type="number" step="0.1" name="muscleLegRight" defaultValue={record?.muscleLegRight ?? ""} className="w-full p-2 border rounded bg-blue-50/20 border-blue-100" />
                             </div>
                         </div>
                     </div>
