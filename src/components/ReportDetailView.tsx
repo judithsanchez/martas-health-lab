@@ -546,7 +546,7 @@ export default function ReportDetailView({
                             </div>
                         </div>
 
-                        <div className="space-y-2 flex-1 flex flex-col justify-center">
+                        <div className="space-y-4 flex-1 flex flex-col justify-center">
                             {/* Header Row */}
                             <div className="flex items-center justify-between pb-2 border-b border-gray-100 px-2">
                                 <span className="text-sm font-bold text-gray-400 uppercase tracking-widest">Zona</span>
@@ -564,7 +564,7 @@ export default function ReportDetailView({
                                 { label: 'Pierna Izquierda', muscle: measurement.muscleLegLeft, fat: measurement.fatLegLeft },
                                 { label: 'Tronco', muscle: measurement.muscleTrunk, fat: measurement.fatTrunk },
                             ].map((row, idx) => (
-                                <div key={idx} className="flex items-center justify-between py-3 border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors rounded-lg px-2">
+                                <div key={idx} className="flex items-center justify-between py-5 border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors rounded-lg px-2">
                                     <span className="text-sm font-bold text-gray-500">{row.label}</span>
                                     <div className="flex items-center gap-6">
                                         <div className="flex flex-col items-end w-16">
@@ -587,7 +587,7 @@ export default function ReportDetailView({
 
                             {/* Muscle Chart */}
                             <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 shadow-xl border border-gray-100">
-                                <h4 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Masa Muscular (kg)</h4>
+                                <h4 className="text-base font-bold text-gray-400 uppercase tracking-widest mb-4">Masa Muscular (kg)</h4>
                                 <div className="h-40">
                                     <ResponsiveContainer width="100%" height="100%">
                                         <AreaChart
@@ -610,7 +610,7 @@ export default function ReportDetailView({
                                                     const d = new Date(date);
                                                     return `${d.getDate()} ${d.toLocaleString('es-ES', { month: 'short' }).substring(0, 3)}`;
                                                 }}
-                                                tick={{ fill: '#9ca3af', fontSize: 11 }}
+                                                tick={{ fill: '#9ca3af', fontSize: 12 }}
                                                 tickLine={false}
                                                 axisLine={false}
                                                 dy={10}
@@ -624,6 +624,7 @@ export default function ReportDetailView({
                                                 strokeWidth={3}
                                                 fillOpacity={1}
                                                 fill="url(#colorMuscle)"
+                                                isAnimationActive={false}
                                                 dot={{ r: 4, fill: '#10b981', strokeWidth: 2, stroke: '#fff' }}
                                                 activeDot={{ r: 6, strokeWidth: 0 }}
                                             >
@@ -632,7 +633,7 @@ export default function ReportDetailView({
                                                     position="top"
                                                     offset={10}
                                                     formatter={(val: any) => typeof val === 'number' ? val.toFixed(1) : val}
-                                                    style={{ fontSize: '11px', fontWeight: 'bold', fill: '#10b981' }}
+                                                    style={{ fontSize: '12px', fontWeight: 'bold', fill: '#10b981' }}
                                                 />
                                             </Area>
                                         </AreaChart>
@@ -642,7 +643,7 @@ export default function ReportDetailView({
 
                             {/* Fat Chart */}
                             <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 shadow-xl border border-gray-100">
-                                <h4 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Grasa Corporal (%)</h4>
+                                <h4 className="text-base font-bold text-gray-400 uppercase tracking-widest mb-4">Grasa Corporal (%)</h4>
                                 <div className="h-40">
                                     <ResponsiveContainer width="100%" height="100%">
                                         <AreaChart
@@ -665,7 +666,7 @@ export default function ReportDetailView({
                                                     const d = new Date(date);
                                                     return `${d.getDate()} ${d.toLocaleString('es-ES', { month: 'short' }).substring(0, 3)}`;
                                                 }}
-                                                tick={{ fill: '#9ca3af', fontSize: 10 }}
+                                                tick={{ fill: '#9ca3af', fontSize: 12 }}
                                                 tickLine={false}
                                                 axisLine={false}
                                                 dy={10}
@@ -679,6 +680,7 @@ export default function ReportDetailView({
                                                 strokeWidth={3}
                                                 fillOpacity={1}
                                                 fill="url(#colorFat)"
+                                                isAnimationActive={false}
                                                 dot={{ r: 4, fill: '#eab308', strokeWidth: 2, stroke: '#fff' }}
                                                 activeDot={{ r: 6, strokeWidth: 0 }}
                                             >
@@ -687,7 +689,7 @@ export default function ReportDetailView({
                                                     position="top"
                                                     offset={10}
                                                     formatter={(val: any) => typeof val === 'number' ? val.toFixed(1) : val}
-                                                    style={{ fontSize: '11px', fontWeight: 'bold', fill: '#eab308' }}
+                                                    style={{ fontSize: '12px', fontWeight: 'bold', fill: '#eab308' }}
                                                 />
                                             </Area>
                                         </AreaChart>
