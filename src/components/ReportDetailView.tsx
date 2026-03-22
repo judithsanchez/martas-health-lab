@@ -422,7 +422,7 @@ export default function ReportDetailView({
                                     <h4 className="text-xl font-bold text-gray-500 uppercase tracking-widest">Índices Físicos</h4>
                                 </div>
 
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                     {/* Weight Card with Sparkline */}
                                     <MetricCard
                                         title="Peso"
@@ -458,7 +458,7 @@ export default function ReportDetailView({
                                     </div>
                                     <h4 className="text-xl font-bold text-gray-500 uppercase tracking-widest">Salud Metabólica</h4>
                                 </div>
-                                <div className="flex flex-col gap-4">
+                                <div className="flex flex-col gap-2">
                                     <StatusRow
                                         label="Tasa Metabólica Basal (BMR)"
                                         value={bmrCalc.value}
