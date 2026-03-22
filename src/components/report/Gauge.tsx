@@ -44,7 +44,7 @@ export default function Gauge({ value, min, max, unit, markers }: GaugeProps) {
             <div className="flex justify-center items-baseline mb-2">
                 <div className="flex items-baseline gap-1">
                     <span className="text-4xl font-black text-white tracking-tight">{value}</span>
-                    <span className="text-sm font-bold text-white/50 uppercase">{unit}</span>
+                    <span className="text-base font-bold text-white/50 uppercase">{unit}</span>
                 </div>
             </div>
 
@@ -73,7 +73,7 @@ export default function Gauge({ value, min, max, unit, markers }: GaugeProps) {
             </div>
 
             {/* Legend / Labels below */}
-            <div className="flex justify-center mt-2 text-[10px] uppercase font-bold text-white/30 tracking-widest">
+            <div className="flex justify-center mt-2 text-xs uppercase font-bold text-white/30 tracking-widest">
                 <div className="flex justify-between w-full px-1">
                     {ranges.map((r, i) => (
                         <span key={i}>{r.label}</span>
