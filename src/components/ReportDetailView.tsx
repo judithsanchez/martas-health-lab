@@ -617,6 +617,7 @@ export default function ReportDetailView({
                                             <Area
                                                 type="monotone"
                                                 dataKey="muscleMass"
+                                                isAnimationActive={false}
                                                 stroke="#10b981"
                                                 strokeWidth={3}
                                                 fillOpacity={1}
@@ -669,6 +670,7 @@ export default function ReportDetailView({
                                             <Area
                                                 type="monotone"
                                                 dataKey="fatPercent"
+                                                isAnimationActive={false}
                                                 stroke="#eab308"
                                                 strokeWidth={3}
                                                 fillOpacity={1}
