@@ -530,15 +530,15 @@ export default function ReportDetailView({
                                         { label: 'Pierna Izquierda', muscle: measurement.muscleLegLeft, fat: measurement.fatLegLeft },
                                         { label: 'Tronco', muscle: measurement.muscleTrunk, fat: measurement.fatTrunk },
                                     ].map((row, idx) => (
-                                        <div key={idx} className="flex items-center justify-between py-5 border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors rounded-lg px-2">
-                                            <span className="text-sm font-bold text-gray-500">{row.label}</span>
+                                        <div key={idx} className="flex items-center justify-between py-3 border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors rounded-lg px-2">
+                                            <span className="text-base font-bold text-gray-500">{row.label}</span>
                                             <div className="flex items-center gap-6">
                                                 <div className="flex flex-col items-end w-16">
-                                                    <span className="text-sm font-bold text-sage">{Number(row.muscle || 0).toFixed(1)} kg</span>
+                                                    <span className="text-base font-bold text-sage">{Number(row.muscle || 0).toFixed(1)} kg</span>
                                                 </div>
                                                 <div className="w-px h-4 bg-gray-100"></div>
                                                 <div className="flex flex-col items-end w-12">
-                                                    <span className="text-sm font-bold text-gold">{Number(row.fat || 0).toFixed(1)}%</span>
+                                                    <span className="text-base font-bold text-gold">{Number(row.fat || 0).toFixed(1)}%</span>
                                                 </div>
                                             </div>
                                         </div>
