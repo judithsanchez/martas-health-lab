@@ -549,11 +549,11 @@ export default function ReportDetailView({
                         <div className="space-y-2 flex-1 flex flex-col justify-center">
                             {/* Header Row */}
                             <div className="flex items-center justify-between pb-2 border-b border-gray-100 px-2">
-                                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Zona</span>
+                                <span className="text-sm font-bold text-gray-400 uppercase tracking-widest">Zona</span>
                                 <div className="flex items-center gap-6">
-                                    <span className="text-xs font-bold text-gray-400 uppercase tracking-widest w-16 text-right">Músculo</span>
+                                    <span className="text-sm font-bold text-gray-400 uppercase tracking-widest w-16 text-right">Músculo</span>
                                     <div className="w-px h-0"></div>
-                                    <span className="text-xs font-bold text-gray-400 uppercase tracking-widest w-12 text-right">Grasa</span>
+                                    <span className="text-sm font-bold text-gray-400 uppercase tracking-widest w-12 text-right">Grasa</span>
                                 </div>
                             </div>
 
@@ -565,14 +565,14 @@ export default function ReportDetailView({
                                 { label: 'Tronco', muscle: measurement.muscleTrunk, fat: measurement.fatTrunk },
                             ].map((row, idx) => (
                                 <div key={idx} className="flex items-center justify-between py-3 border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors rounded-lg px-2">
-                                    <span className="text-xs font-bold text-gray-500">{row.label}</span>
+                                    <span className="text-sm font-bold text-gray-500">{row.label}</span>
                                     <div className="flex items-center gap-6">
                                         <div className="flex flex-col items-end w-16">
-                                            <span className="text-xs font-bold text-sage">{Number(row.muscle || 0).toFixed(1)} kg</span>
+                                            <span className="text-sm font-bold text-sage">{Number(row.muscle || 0).toFixed(1)} kg</span>
                                         </div>
                                         <div className="w-px h-4 bg-gray-100"></div>
                                         <div className="flex flex-col items-end w-12">
-                                            <span className="text-xs font-bold text-gold">{Number(row.fat || 0).toFixed(1)}%</span>
+                                            <span className="text-sm font-bold text-gold">{Number(row.fat || 0).toFixed(1)}%</span>
                                         </div>
                                     </div>
                                 </div>
@@ -587,11 +587,14 @@ export default function ReportDetailView({
 
                             {/* Muscle Chart */}
                             <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 shadow-xl border border-gray-100">
-                                <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Masa Muscular (kg)</h4>
+                                <h4 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Masa Muscular (kg)</h4>
                                 <div className="h-40">
                                     <ResponsiveContainer width="100%" height="100%">
                                         <AreaChart
-                                            data={[...history].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).slice(-10)}
+                                            data={[...history]
+                                                .filter(h => new Date(h.date) <= new Date(measurement.date))
+                                                .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+                                                .slice(-5)}
                                             margin={{ top: 25, right: 15, left: 15, bottom: 5 }}
                                         >
                                             <defs>
@@ -607,7 +610,7 @@ export default function ReportDetailView({
                                                     const d = new Date(date);
                                                     return `${d.getDate()} ${d.toLocaleString('es-ES', { month: 'short' }).substring(0, 3)}`;
                                                 }}
-                                                tick={{ fill: '#9ca3af', fontSize: 10 }}
+                                                tick={{ fill: '#9ca3af', fontSize: 11 }}
                                                 tickLine={false}
                                                 axisLine={false}
                                                 dy={10}
@@ -629,7 +632,7 @@ export default function ReportDetailView({
                                                     position="top"
                                                     offset={10}
                                                     formatter={(val: any) => typeof val === 'number' ? val.toFixed(1) : val}
-                                                    style={{ fontSize: '10px', fontWeight: 'bold', fill: '#10b981' }}
+                                                    style={{ fontSize: '11px', fontWeight: 'bold', fill: '#10b981' }}
                                                 />
                                             </Area>
                                         </AreaChart>
@@ -639,11 +642,14 @@ export default function ReportDetailView({
 
                             {/* Fat Chart */}
                             <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 shadow-xl border border-gray-100">
-                                <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Grasa Corporal (%)</h4>
+                                <h4 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Grasa Corporal (%)</h4>
                                 <div className="h-40">
                                     <ResponsiveContainer width="100%" height="100%">
                                         <AreaChart
-                                            data={[...history].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).slice(-10)}
+                                            data={[...history]
+                                                .filter(h => new Date(h.date) <= new Date(measurement.date))
+                                                .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+                                                .slice(-5)}
                                             margin={{ top: 25, right: 15, left: 15, bottom: 5 }}
                                         >
                                             <defs>
@@ -681,7 +687,7 @@ export default function ReportDetailView({
                                                     position="top"
                                                     offset={10}
                                                     formatter={(val: any) => typeof val === 'number' ? val.toFixed(1) : val}
-                                                    style={{ fontSize: '10px', fontWeight: 'bold', fill: '#eab308' }}
+                                                    style={{ fontSize: '11px', fontWeight: 'bold', fill: '#eab308' }}
                                                 />
                                             </Area>
                                         </AreaChart>
