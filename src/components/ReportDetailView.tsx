@@ -316,17 +316,17 @@ export default function ReportDetailView({
             <div className="bg-white/50 p-4 rounded-3xl flex items-center justify-between group hover:bg-white transition-all border border-transparent hover:border-gray-100 relative overflow-hidden">
                 <div className="flex items-center gap-3 z-10 relative">
                     <div className="p-2 bg-white rounded-xl shadow-sm group-hover:shadow-md transition-shadow">
-                        <Icon size={16} className="text-plum" />
+                        <Icon size={18} className="text-plum" />
                     </div>
                     <div>
-                        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-0.5">{label}</p>
+                        <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-0.5">{label}</p>
                         <div className="flex items-baseline gap-2">
-                            <span className="text-base font-bold text-plum">{value}</span>
-                            <span className="text-xs text-gray-400 font-medium">{unit}</span>
+                            <span className="text-xl font-bold text-plum">{value}</span>
+                            <span className="text-sm text-gray-400 font-medium">{unit}</span>
 
                             {/* Trend Indicator */}
                             {trend !== undefined && trend !== null && !isNaN(trend) && Math.abs(trend) >= 0.1 && (
-                                <div className={`flex items-center text-[9px] font-bold ${trendColor} bg-white/50 px-1.5 py-0.5 rounded-md`}>
+                                <div className={`flex items-center text-xs font-bold ${trendColor} bg-white/50 px-1.5 py-0.5 rounded-md`}>
                                     {trend > 0 ? '▲' : trend < 0 ? '▼' : '-'}
                                     <span className="ml-0.5">{Math.abs(trend).toFixed(1)}</span>
                                 </div>
@@ -416,7 +416,7 @@ export default function ReportDetailView({
                                 <div className="p-2 bg-gold/10 rounded-xl">
                                     <Zap className="text-gold" size={18} />
                                 </div>
-                                <h4 className="text-base font-bold text-gray-500 uppercase tracking-widest">Salud Metabólica</h4>
+                                <h4 className="text-xl font-bold text-gray-500 uppercase tracking-widest">Salud Metabólica</h4>
                             </div>
                             <div className="flex flex-col gap-4">
                                 <StatusRow
@@ -469,7 +469,7 @@ export default function ReportDetailView({
                                 <div className="p-2 bg-plum/10 rounded-xl">
                                     <Scale className="text-plum" size={18} />
                                 </div>
-                                <h4 className="text-base font-bold text-gray-500 uppercase tracking-widest">Índices Físicos</h4>
+                                <h4 className="text-xl font-bold text-gray-500 uppercase tracking-widest">Índices Físicos</h4>
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -541,7 +541,7 @@ export default function ReportDetailView({
                                 <Activity className="text-gray-400" size={16} />
                             </div>
                             <div>
-                                <h4 className="text-base font-bold text-gray-500 uppercase tracking-widest">Análisis Segmental</h4>
+                                <h4 className="text-xl font-bold text-gray-500 uppercase tracking-widest">Análisis Segmental</h4>
                                 <p className="text-sm text-gray-400">Distribución muscular y de grasa</p>
                             </div>
                         </div>
