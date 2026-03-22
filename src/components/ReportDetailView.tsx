@@ -105,10 +105,13 @@ export default function ReportDetailView({
             }
         }
 
-        // Convert back to array and sort
+        const currentTimestamp = measurement.date ? new Date(measurement.date).getTime() : Date.now();
+
+        // Convert back to array, filter, and sort
         return Array.from(dataMap.values())
+            .filter(record => new Date(record.date).getTime() <= currentTimestamp)
             .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-            .slice(-10) // Keep only last 10
+            .slice(-5) // Keep only last 5 relative to current context
             .map(record => {
                 return {
                     ...record,
@@ -581,7 +584,7 @@ export default function ReportDetailView({
                     </section>
 
                     {/* Right Column: History Charts (Stacked Vertically) */}
-                    {history.length >= 2 ? (
+                    {chartData.length >= 2 ? (
                         <div className="flex flex-col gap-6 h-full">
 
 
@@ -591,7 +594,7 @@ export default function ReportDetailView({
                                 <div className="h-40">
                                     <ResponsiveContainer width="100%" height="100%">
                                         <AreaChart
-                                            data={[...history].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).slice(-10)}
+                                            data={chartData}
                                             margin={{ top: 25, right: 15, left: 15, bottom: 5 }}
                                         >
                                             <defs>
@@ -603,6 +606,7 @@ export default function ReportDetailView({
                                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
                                             <XAxis
                                                 dataKey="date"
+                                                interval="preserveStartEnd"
                                                 tickFormatter={(date) => {
                                                     const d = new Date(date);
                                                     return `${d.getDate()} ${d.toLocaleString('es-ES', { month: 'short' }).substring(0, 3)}`;
@@ -613,16 +617,16 @@ export default function ReportDetailView({
                                                 dy={10}
                                             />
                                             <YAxis domain={['dataMin - 0.5', 'dataMax + 0.5']} hide />
-                                            <RechartsTooltip content={<CustomChartTooltip unit="kg" />} />
                                             <Area
                                                 type="monotone"
                                                 dataKey="muscleMass"
+                                                isAnimationActive={false}
                                                 stroke="#10b981"
                                                 strokeWidth={3}
                                                 fillOpacity={1}
                                                 fill="url(#colorMuscle)"
                                                 dot={{ r: 4, fill: '#10b981', strokeWidth: 2, stroke: '#fff' }}
-                                                activeDot={{ r: 6, strokeWidth: 0 }}
+                                                activeDot={false}
                                             >
                                                 <LabelList
                                                     dataKey="muscleMass"
@@ -643,7 +647,7 @@ export default function ReportDetailView({
                                 <div className="h-40">
                                     <ResponsiveContainer width="100%" height="100%">
                                         <AreaChart
-                                            data={[...history].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).slice(-10)}
+                                            data={chartData}
                                             margin={{ top: 25, right: 15, left: 15, bottom: 5 }}
                                         >
                                             <defs>
@@ -655,6 +659,7 @@ export default function ReportDetailView({
                                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
                                             <XAxis
                                                 dataKey="date"
+                                                interval="preserveStartEnd"
                                                 tickFormatter={(date) => {
                                                     const d = new Date(date);
                                                     return `${d.getDate()} ${d.toLocaleString('es-ES', { month: 'short' }).substring(0, 3)}`;
@@ -665,16 +670,16 @@ export default function ReportDetailView({
                                                 dy={10}
                                             />
                                             <YAxis domain={['dataMin - 1', 'dataMax + 1']} hide />
-                                            <RechartsTooltip content={<CustomChartTooltip unit="%" />} />
                                             <Area
                                                 type="monotone"
                                                 dataKey="fatPercent"
+                                                isAnimationActive={false}
                                                 stroke="#eab308"
                                                 strokeWidth={3}
                                                 fillOpacity={1}
                                                 fill="url(#colorFat)"
                                                 dot={{ r: 4, fill: '#eab308', strokeWidth: 2, stroke: '#fff' }}
-                                                activeDot={{ r: 6, strokeWidth: 0 }}
+                                                activeDot={false}
                                             >
                                                 <LabelList
                                                     dataKey="fatPercent"
