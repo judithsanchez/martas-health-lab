@@ -95,7 +95,7 @@ export default function CompositionChart({ fatPercent, muscleMass, boneMass, wat
 
             {/* Variable Separada: Agua */}
             {/* Variable Separada: Agua (Less Protagonic) */}
-            <div className="bg-blue-50/50 p-4 rounded-2xl border border-blue-100/50 flex items-center justify-between">
+            <div className="bg-blue-50/50 p-4 rounded-2xl border border-blue-100/50 flex flex-wrap items-center gap-x-8 gap-y-2">
                 <div className="flex items-center gap-3">
                     <div className="p-2 bg-blue-100/50 text-blue-400 rounded-lg">
                         <Droplets size={16} />
