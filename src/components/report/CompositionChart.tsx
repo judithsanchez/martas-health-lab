@@ -100,11 +100,13 @@ export default function CompositionChart({ fatPercent, muscleMass, boneMass, wat
                     <div className="p-2 bg-blue-100/50 text-blue-400 rounded-lg">
                         <Droplets size={16} />
                     </div>
-                    <div>
-                        <h4 className="text-xs font-bold text-blue-900/70 uppercase tracking-wider">Agua Corporal</h4>
-                        <p className="text-sm text-blue-400/80 font-medium">Contenida en tejido magro</p>
-                    </div>
+                    <h4 className="text-xs font-bold text-blue-900/70 uppercase tracking-wider">Agua Corporal</h4>
                 </div>
+
+                <p className="text-sm text-blue-400/80 font-medium hidden md:block">
+                    Contenida en tejido magro
+                </p>
+
                 <div className="flex items-baseline gap-1">
                     <span className="text-xl font-black text-blue-500/80">{Number(waterPercent).toFixed(1)}</span>
                     <span className="text-xs font-bold text-blue-400/80">%</span>

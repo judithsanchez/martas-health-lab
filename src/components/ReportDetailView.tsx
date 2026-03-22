@@ -13,8 +13,6 @@ import {
     Zap,
     Scale,
     Droplets,
-    Dna,
-    AlertCircle,
     CheckCircle2,
     Zap as Flash,
     ArrowUpRight
@@ -316,7 +314,7 @@ export default function ReportDetailView({
         }
 
         return (
-            <div className="bg-white/50 p-4 rounded-3xl flex items-center justify-between group hover:bg-white transition-all border border-transparent hover:border-gray-100 relative overflow-hidden">
+            <div className="bg-white/50 py-2 px-4 rounded-3xl flex items-center justify-between group hover:bg-white transition-all border border-transparent hover:border-gray-100 relative overflow-hidden">
                 <div className="flex items-center gap-3 z-10 relative">
                     <div className="p-2 bg-white rounded-xl shadow-sm group-hover:shadow-md transition-shadow">
                         <Icon size={18} className="text-plum" />
@@ -392,7 +390,7 @@ export default function ReportDetailView({
                             </div>
                             <div>
                                 <h4 className="text-xl font-bold text-plum">Relación Músculo-Grasa (MFR)</h4>
-                                <p className="text-base text-plum/70 mt-1 max-w-2xl leading-relaxed">
+                                <p className="text-base text-plum/70 mt-1 leading-relaxed">
                                     Indica cuántos kg de músculo tienes por cada kg de grasa. Un valor &gt; 2.5 es saludable, &gt; 4.0 es ideal para atletas.
                                 </p>
                             </div>
@@ -412,297 +410,365 @@ export default function ReportDetailView({
                         />
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* 2) Metabolic Health Card */}
-                        <div className="bg-white rounded-[2rem] md:rounded-[3rem] p-6 md:p-8 border border-gray-100 shadow-xl">
-                            <div className="flex items-center gap-3 mb-8">
-                                <div className="p-2 bg-gold/10 rounded-xl">
-                                    <Zap className="text-gold" size={18} />
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+                        {/* Left Column: Metrics & Segmental */}
+                        <div className="flex flex-col justify-between h-full gap-6">
+                            {/* 1) Physical Indices Card */}
+                            <div className="bg-white rounded-[2rem] md:rounded-[3rem] p-4 md:p-6 border border-gray-100 shadow-xl flex flex-col">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="p-2 bg-plum/10 rounded-xl">
+                                        <Scale className="text-plum" size={18} />
+                                    </div>
+                                    <h4 className="text-xl font-bold text-gray-500 uppercase tracking-widest">Índices Físicos</h4>
                                 </div>
-                                <h4 className="text-xl font-bold text-gray-500 uppercase tracking-widest">Salud Metabólica</h4>
-                            </div>
-                            <div className="flex flex-col gap-4">
-                                <StatusRow
-                                    label="Tasa Metabólica Basal (BMR)"
-                                    value={bmrCalc.value}
-                                    unit="kcal/día (calc)"
-                                    status={bmrCalc.label}
-                                    statusColor={bmrCalc.color}
-                                    icon={Flame}
-                                    trend={prevValues ? bmrCalc.value - prevValues.bmr : null}
-                                    higherIsBetter={true}
-                                />
-                                <StatusRow
-                                    label="Ingesta Calórica (DCI)"
-                                    value={measurement.dciKcal}
-                                    unit="kcal/día (med)"
-                                    status="SUGERIDO"
-                                    statusColor="text-blue-400"
-                                    icon={Zap}
-                                    trend={prevValues ? measurement.dciKcal - prevValues.dci : null}
-                                />
-                                <StatusRow
-                                    label="Edad Metabólica"
-                                    value={metAgeCalc.value}
-                                    unit="años"
-                                    status={metAgeCalc.label}
-                                    statusColor={metAgeCalc.color}
-                                    icon={Calendar}
-                                    trend={prevValues ? metAgeCalc.value - prevValues.metAge : null}
-                                    higherIsBetter={false} // Lower is better
-                                />
-                                <StatusRow
-                                    label="Índice ASMI"
-                                    value={Number(asmi.value || 0).toFixed(1)}
-                                    unit="kg/m²"
-                                    status={asmi.label.toUpperCase()}
-                                    statusColor={asmi.color}
-                                    icon={Activity}
-                                    // No direct history for ASMI unless calculated for all past records? 
-                                    // Skipping graph for inferred index for now to ensure safety.
-                                    trend={prevValues ? asmi.value - prevValues.asmi : null}
-                                    higherIsBetter={true}
-                                />
-                            </div>
-                        </div>
 
-                        {/* 3) Physical Indices Grid (Replaces List) */}
-                        <div className="bg-white rounded-[2rem] md:rounded-[3rem] p-6 md:p-8 border border-gray-100 shadow-xl flex flex-col">
-                            <div className="flex items-center gap-3 mb-8">
-                                <div className="p-2 bg-plum/10 rounded-xl">
-                                    <Scale className="text-plum" size={18} />
-                                </div>
-                                <h4 className="text-xl font-bold text-gray-500 uppercase tracking-widest">Índices Físicos</h4>
-                            </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    {/* Weight Card with Sparkline */}
+                                    <MetricCard
+                                        title="Peso"
+                                        value={Number(measurement.weight || 0).toFixed(1)}
+                                        unit="kg"
+                                        icon={Weight}
+                                        color="text-plum bg-plum/5"
+                                        sparklineData={chartData}
+                                        sparklineKey="weight"
+                                        sparklineColor="#581c87"
+                                    />
 
-                            <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                {/* Weight Card with Sparkline */}
-                                <MetricCard
-                                    title="Peso"
-                                    value={Number(measurement.weight || 0).toFixed(1)}
-                                    unit="kg"
-                                    icon={Weight}
-                                    color="text-plum bg-plum/5"
-                                    sparklineData={chartData}
-                                    sparklineKey="weight"
-                                    sparklineColor="#581c87"
-                                />
-
-                                {/* BMI Card with Sparkline */}
-                                <MetricCard
-                                    title="BMI (IMC)"
-                                    value={bmi.value}
-                                    unit="kg/m²"
-                                    label={bmi.label.toUpperCase()}
-                                    icon={Scale}
-                                    color={bmi.color}
-                                    sparklineData={chartData}
-                                    sparklineKey="bmi"
-                                    sparklineColor="#581c87" // Purple for BMI
-                                />
-
-                                {/* Visceral Fat Card */}
-                                <MetricCard
-                                    title="Grasa Visceral"
-                                    value={Number(measurement.visceralFat || 0).toFixed(1)}
-                                    unit="ratio"
-                                    label={visceral.label}
-                                    icon={AlertCircle}
-                                    color={visceral.color}
-                                    sparklineData={chartData}
-                                    sparklineKey="visceralFat"
-                                    sparklineColor="#eab308" // Gold/Yellow
-                                />
-
-                                {/* Bone Mass Card */}
-                                <MetricCard
-                                    title="Masa Ósea"
-                                    value={Number(boneMassCalc.value || 0).toFixed(1)}
-                                    unit="kg"
-                                    label={boneMassCalc.label}
-                                    icon={Dna}
-                                    color={boneMassCalc.color}
-                                    sparklineData={chartData}
-                                    sparklineKey="boneMass"
-                                    sparklineColor="#10b981" // Emerald
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-
-                {/* Section: Progress History removed as requested */}
-
-                {/* Side-by-Side Layout: Segmental (Left) + Charts (Right) */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-0">
-
-                    {/* Left Column: Segmental Analysis (Clean vertical list) */}
-                    <section className="bg-white rounded-[2rem] md:rounded-[3rem] p-6 md:p-8 border border-gray-100 shadow-xl h-full flex flex-col">
-                        <div className="flex items-center gap-3 mb-8">
-                            <div className="p-2 bg-gray-50 rounded-xl">
-                                <Activity className="text-gray-400" size={16} />
-                            </div>
-                            <div>
-                                <h4 className="text-xl font-bold text-gray-500 uppercase tracking-widest">Análisis Segmental</h4>
-                                <p className="text-sm text-gray-400">Distribución muscular y de grasa</p>
-                            </div>
-                        </div>
-
-                        <div className="space-y-4 flex-1 flex flex-col justify-center">
-                            {/* Header Row */}
-                            <div className="flex items-center justify-between pb-2 border-b border-gray-100 px-2">
-                                <span className="text-sm font-bold text-gray-400 uppercase tracking-widest">Zona</span>
-                                <div className="flex items-center gap-6">
-                                    <span className="text-sm font-bold text-gray-400 uppercase tracking-widest w-16 text-right">Músculo</span>
-                                    <div className="w-px h-0"></div>
-                                    <span className="text-sm font-bold text-gray-400 uppercase tracking-widest w-12 text-right">Grasa</span>
+                                    {/* BMI Card with Sparkline */}
+                                    <MetricCard
+                                        title="BMI (IMC)"
+                                        value={bmi.value}
+                                        unit="kg/m²"
+                                        label={bmi.label.toUpperCase()}
+                                        icon={Scale}
+                                        color={bmi.color}
+                                        sparklineData={chartData}
+                                        sparklineKey="bmi"
+                                        sparklineColor="#581c87" // Purple for BMI
+                                    />
                                 </div>
                             </div>
 
-                            {[
-                                { label: 'Brazo Derecho', muscle: measurement.muscleArmRight, fat: measurement.fatArmRight },
-                                { label: 'Brazo Izquierdo', muscle: measurement.muscleArmLeft, fat: measurement.fatArmLeft },
-                                { label: 'Pierna Derecha', muscle: measurement.muscleLegRight, fat: measurement.fatLegRight },
-                                { label: 'Pierna Izquierda', muscle: measurement.muscleLegLeft, fat: measurement.fatLegLeft },
-                                { label: 'Tronco', muscle: measurement.muscleTrunk, fat: measurement.fatTrunk },
-                            ].map((row, idx) => (
-                                <div key={idx} className="flex items-center justify-between py-5 border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors rounded-lg px-2">
-                                    <span className="text-sm font-bold text-gray-500">{row.label}</span>
-                                    <div className="flex items-center gap-6">
-                                        <div className="flex flex-col items-end w-16">
-                                            <span className="text-sm font-bold text-sage">{Number(row.muscle || 0).toFixed(1)} kg</span>
-                                        </div>
-                                        <div className="w-px h-4 bg-gray-100"></div>
-                                        <div className="flex flex-col items-end w-12">
-                                            <span className="text-sm font-bold text-gold">{Number(row.fat || 0).toFixed(1)}%</span>
-                                        </div>
+                            {/* 2) Metabolic Health Card */}
+                            <div className="bg-white rounded-[2rem] md:rounded-[3rem] p-4 md:p-6 border border-gray-100 shadow-xl">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="p-2 bg-gold/10 rounded-xl">
+                                        <Zap className="text-gold" size={18} />
+                                    </div>
+                                    <h4 className="text-xl font-bold text-gray-500 uppercase tracking-widest">Salud Metabólica</h4>
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <StatusRow
+                                        label="Tasa Metabólica Basal (BMR)"
+                                        value={bmrCalc.value}
+                                        unit="kcal/día (calc)"
+                                        status={bmrCalc.label}
+                                        statusColor={bmrCalc.color}
+                                        icon={Flame}
+                                        trend={prevValues ? bmrCalc.value - prevValues.bmr : null}
+                                        higherIsBetter={true}
+                                    />
+                                    <StatusRow
+                                        label="Ingesta Calórica (DCI)"
+                                        value={measurement.dciKcal}
+                                        unit="kcal/día (med)"
+                                        status="SUGERIDO"
+                                        statusColor="text-blue-400"
+                                        icon={Zap}
+                                        trend={prevValues ? measurement.dciKcal - prevValues.dci : null}
+                                    />
+                                    <StatusRow
+                                        label="Edad Metabólica"
+                                        value={metAgeCalc.value}
+                                        unit="años"
+                                        status={metAgeCalc.label}
+                                        statusColor={metAgeCalc.color}
+                                        icon={Calendar}
+                                        trend={prevValues ? metAgeCalc.value - prevValues.metAge : null}
+                                        higherIsBetter={false} // Lower is better
+                                    />
+                                    <StatusRow
+                                        label="Índice ASMI"
+                                        value={Number(asmi.value || 0).toFixed(1)}
+                                        unit="kg/m²"
+                                        status={asmi.label.toUpperCase()}
+                                        statusColor={asmi.color}
+                                        icon={Activity}
+                                        trend={prevValues ? asmi.value - prevValues.asmi : null}
+                                        higherIsBetter={true}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* 3) Segmental Analysis Card */}
+                            <section className="bg-white rounded-[2rem] md:rounded-[3rem] p-4 md:p-6 border border-gray-100 shadow-xl flex flex-col">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="p-2 bg-gray-50 rounded-xl">
+                                        <Activity className="text-gray-400" size={16} />
+                                    </div>
+                                    <div>
+                                        <h4 className="text-xl font-bold text-gray-500 uppercase tracking-widest">Análisis Segmental</h4>
+                                        <p className="text-sm text-gray-400">Distribución muscular y de grasa</p>
                                     </div>
                                 </div>
-                            ))}
+
+                                <div className="space-y-2">
+                                    {/* Header Row */}
+                                    <div className="flex items-center justify-between pb-2 border-b border-gray-100 px-2">
+                                        <span className="text-sm font-bold text-gray-400 uppercase tracking-widest">Zona</span>
+                                        <div className="flex items-center gap-6">
+                                            <span className="text-sm font-bold text-gray-400 uppercase tracking-widest w-16 text-right">Músculo</span>
+                                            <span className="text-sm font-bold text-gray-400 uppercase tracking-widest w-12 text-right">Grasa</span>
+                                        </div>
+                                    </div>
+
+                                    {[
+                                        { label: 'Brazo Derecho', muscle: measurement.muscleArmRight, fat: measurement.fatArmRight },
+                                        { label: 'Brazo Izquierdo', muscle: measurement.muscleArmLeft, fat: measurement.fatArmLeft },
+                                        { label: 'Pierna Derecha', muscle: measurement.muscleLegRight, fat: measurement.fatLegRight },
+                                        { label: 'Pierna Izquierda', muscle: measurement.muscleLegLeft, fat: measurement.fatLegLeft },
+                                        { label: 'Tronco', muscle: measurement.muscleTrunk, fat: measurement.fatTrunk },
+                                    ].map((row, idx) => (
+                                        <div key={idx} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors rounded-lg px-2">
+                                            <span className="text-base font-bold text-gray-500">{row.label}</span>
+                                            <div className="flex items-center gap-6">
+                                                <div className="flex flex-col items-end w-16">
+                                                    <span className="text-base font-bold text-sage">{Number(row.muscle || 0).toFixed(1)} kg</span>
+                                                </div>
+                                                <div className="w-px h-4 bg-gray-100"></div>
+                                                <div className="flex flex-col items-end w-12">
+                                                    <span className="text-base font-bold text-gold">{Number(row.fat || 0).toFixed(1)}%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </section>
                         </div>
-                    </section>
 
-                    {/* Right Column: History Charts (Stacked Vertically) */}
-                    {history.length >= 2 ? (
-                        <div className="flex flex-col gap-6 h-full">
-
-
-                            {/* Muscle Chart */}
-                            <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 shadow-xl border border-gray-100">
-                                <h4 className="text-base font-bold text-gray-400 uppercase tracking-widest mb-4">Masa Muscular (kg)</h4>
-                                <div className="h-40">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <AreaChart
-                                            data={chartData}
-                                            margin={{ top: 25, right: 15, left: 15, bottom: 5 }}
-                                        >
-                                            <defs>
-                                                <linearGradient id="colorMuscle" x1="0" y1="0" x2="0" y2="1">
-                                                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.1} />
-                                                    <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                                                </linearGradient>
-                                            </defs>
-                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
-                                            <XAxis
-                                                dataKey="date"
-                                                interval="preserveStartEnd"
-                                                tickFormatter={(date) => {
-                                                    const d = new Date(date);
-                                                    return `${d.getDate()} ${d.toLocaleString('es-ES', { month: 'short' }).substring(0, 3)}`;
-                                                }}
-                                                tick={{ fill: '#9ca3af', fontSize: 12 }}
-                                                tickLine={false}
-                                                axisLine={false}
-                                                dy={10}
-                                            />
-                                            <YAxis domain={['dataMin - 0.5', 'dataMax + 0.5']} hide />
-
-                                            <Area
-                                                type="monotone"
-                                                dataKey="muscleMass"
-                                                stroke="#10b981"
-                                                strokeWidth={3}
-                                                fillOpacity={1}
-                                                fill="url(#colorMuscle)"
-                                                isAnimationActive={false}
-                                                dot={{ r: 4, fill: '#10b981', strokeWidth: 2, stroke: '#fff' }}
-                                                activeDot={false}
+                        {/* Right Column: History Charts */}
+                        {history.length >= 2 ? (
+                            <div className="flex flex-col justify-between h-full gap-6">
+                                {/* Muscle Chart */}
+                                <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 shadow-xl border border-gray-100">
+                                    <h4 className="text-base font-bold text-gray-400 uppercase tracking-widest mb-4">Masa Muscular (kg)</h4>
+                                    <div className="h-40">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <AreaChart
+                                                data={chartData}
+                                                margin={{ top: 25, right: 15, left: 15, bottom: 5 }}
                                             >
-                                                <LabelList
+                                                <defs>
+                                                    <linearGradient id="colorMuscle" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.1} />
+                                                        <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                                                    </linearGradient>
+                                                </defs>
+                                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+                                                <XAxis
+                                                    dataKey="date"
+                                                    interval="preserveStartEnd"
+                                                    tickFormatter={(date) => {
+                                                        const d = new Date(date);
+                                                        return `${d.getDate()} ${d.toLocaleString('es-ES', { month: 'short' }).substring(0, 3)}`;
+                                                    }}
+                                                    tick={{ fill: '#9ca3af', fontSize: 12 }}
+                                                    tickLine={false}
+                                                    axisLine={false}
+                                                    dy={10}
+                                                />
+                                                <YAxis domain={['dataMin - 0.5', 'dataMax + 0.5']} hide />
+                                                <Area
+                                                    type="monotone"
                                                     dataKey="muscleMass"
-                                                    position="top"
-                                                    offset={10}
-                                                    formatter={(val: any) => typeof val === 'number' ? val.toFixed(1) : val}
-                                                    style={{ fontSize: '12px', fontWeight: 'bold', fill: '#10b981' }}
-                                                />
-                                            </Area>
-                                        </AreaChart>
-                                    </ResponsiveContainer>
+                                                    stroke="#10b981"
+                                                    strokeWidth={3}
+                                                    fillOpacity={1}
+                                                    fill="url(#colorMuscle)"
+                                                    isAnimationActive={false}
+                                                    dot={{ r: 4, fill: '#10b981', strokeWidth: 2, stroke: '#fff' }}
+                                                    activeDot={false}
+                                                >
+                                                    <LabelList
+                                                        dataKey="muscleMass"
+                                                        position="top"
+                                                        offset={10}
+                                                        formatter={(val: any) => typeof val === 'number' ? val.toFixed(1) : val}
+                                                        style={{ fontSize: '12px', fontWeight: 'bold', fill: '#10b981' }}
+                                                    />
+                                                </Area>
+                                            </AreaChart>
+                                        </ResponsiveContainer>
+                                    </div>
                                 </div>
-                            </div>
 
-                            {/* Fat Chart */}
-                            <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 shadow-xl border border-gray-100">
-                                <h4 className="text-base font-bold text-gray-400 uppercase tracking-widest mb-4">Grasa Corporal (%)</h4>
-                                <div className="h-40">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <AreaChart
-                                            data={chartData}
-                                            margin={{ top: 25, right: 15, left: 15, bottom: 5 }}
-                                        >
-                                            <defs>
-                                                <linearGradient id="colorFat" x1="0" y1="0" x2="0" y2="1">
-                                                    <stop offset="5%" stopColor="#eab308" stopOpacity={0.1} />
-                                                    <stop offset="95%" stopColor="#eab308" stopOpacity={0} />
-                                                </linearGradient>
-                                            </defs>
-                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
-                                            <XAxis
-                                                dataKey="date"
-                                                interval="preserveStartEnd"
-                                                tickFormatter={(date) => {
-                                                    const d = new Date(date);
-                                                    return `${d.getDate()} ${d.toLocaleString('es-ES', { month: 'short' }).substring(0, 3)}`;
-                                                }}
-                                                tick={{ fill: '#9ca3af', fontSize: 12 }}
-                                                tickLine={false}
-                                                axisLine={false}
-                                                dy={10}
-                                            />
-                                            <YAxis domain={['dataMin - 1', 'dataMax + 1']} hide />
-
-                                            <Area
-                                                type="monotone"
-                                                dataKey="fatPercent"
-                                                stroke="#eab308"
-                                                strokeWidth={3}
-                                                fillOpacity={1}
-                                                fill="url(#colorFat)"
-                                                isAnimationActive={false}
-                                                dot={{ r: 4, fill: '#eab308', strokeWidth: 2, stroke: '#fff' }}
-                                                activeDot={false}
+                                {/* Fat Chart */}
+                                <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 shadow-xl border border-gray-100">
+                                    <h4 className="text-base font-bold text-gray-400 uppercase tracking-widest mb-4">Grasa Corporal (%)</h4>
+                                    <div className="h-40">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <AreaChart
+                                                data={chartData}
+                                                margin={{ top: 25, right: 15, left: 15, bottom: 5 }}
                                             >
-                                                <LabelList
-                                                    dataKey="fatPercent"
-                                                    position="top"
-                                                    offset={10}
-                                                    formatter={(val: any) => typeof val === 'number' ? val.toFixed(1) : val}
-                                                    style={{ fontSize: '12px', fontWeight: 'bold', fill: '#eab308' }}
+                                                <defs>
+                                                    <linearGradient id="colorFat" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="5%" stopColor="#eab308" stopOpacity={0.1} />
+                                                        <stop offset="95%" stopColor="#eab308" stopOpacity={0} />
+                                                    </linearGradient>
+                                                </defs>
+                                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+                                                <XAxis
+                                                    dataKey="date"
+                                                    interval="preserveStartEnd"
+                                                    tickFormatter={(date) => {
+                                                        const d = new Date(date);
+                                                        return `${d.getDate()} ${d.toLocaleString('es-ES', { month: 'short' }).substring(0, 3)}`;
+                                                    }}
+                                                    tick={{ fill: '#9ca3af', fontSize: 12 }}
+                                                    tickLine={false}
+                                                    axisLine={false}
+                                                    dy={10}
                                                 />
-                                            </Area>
-                                        </AreaChart>
-                                    </ResponsiveContainer>
+                                                <YAxis domain={['dataMin - 1', 'dataMax + 1']} hide />
+                                                <Area
+                                                    type="monotone"
+                                                    dataKey="fatPercent"
+                                                    stroke="#eab308"
+                                                    strokeWidth={3}
+                                                    fillOpacity={1}
+                                                    fill="url(#colorFat)"
+                                                    isAnimationActive={false}
+                                                    dot={{ r: 4, fill: '#eab308', strokeWidth: 2, stroke: '#fff' }}
+                                                    activeDot={false}
+                                                >
+                                                    <LabelList
+                                                        dataKey="fatPercent"
+                                                        position="top"
+                                                        offset={10}
+                                                        formatter={(val: any) => typeof val === 'number' ? val.toFixed(1) : val}
+                                                        style={{ fontSize: '12px', fontWeight: 'bold', fill: '#eab308' }}
+                                                    />
+                                                </Area>
+                                            </AreaChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                </div>
+
+                                {/* Bone Mass Chart */}
+                                <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 shadow-xl border border-gray-100">
+                                    <h4 className="text-base font-bold text-gray-400 uppercase tracking-widest mb-4">Masa Ósea (kg)</h4>
+                                    <div className="h-40">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <AreaChart
+                                                data={chartData}
+                                                margin={{ top: 25, right: 15, left: 15, bottom: 5 }}
+                                            >
+                                                <defs>
+                                                    <linearGradient id="colorBone" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="5%" stopColor="#79a6d2" stopOpacity={0.1} />
+                                                        <stop offset="95%" stopColor="#79a6d2" stopOpacity={0} />
+                                                    </linearGradient>
+                                                </defs>
+                                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+                                                <XAxis
+                                                    dataKey="date"
+                                                    interval="preserveStartEnd"
+                                                    tickFormatter={(date) => {
+                                                        const d = new Date(date);
+                                                        return `${d.getDate()} ${d.toLocaleString('es-ES', { month: 'short' }).substring(0, 3)}`;
+                                                    }}
+                                                    tick={{ fill: '#9ca3af', fontSize: 12 }}
+                                                    tickLine={false}
+                                                    axisLine={false}
+                                                    dy={10}
+                                                />
+                                                <YAxis domain={['dataMin - 0.1', 'dataMax + 0.1']} hide />
+                                                <Area
+                                                    type="monotone"
+                                                    dataKey="boneMass"
+                                                    stroke="#79a6d2"
+                                                    strokeWidth={3}
+                                                    fillOpacity={1}
+                                                    fill="url(#colorBone)"
+                                                    isAnimationActive={false}
+                                                    dot={{ r: 4, fill: '#79a6d2', strokeWidth: 2, stroke: '#fff' }}
+                                                    activeDot={false}
+                                                >
+                                                    <LabelList
+                                                        dataKey="boneMass"
+                                                        position="top"
+                                                        offset={10}
+                                                        formatter={(val: any) => typeof val === 'number' ? val.toFixed(1) : val}
+                                                        style={{ fontSize: '12px', fontWeight: 'bold', fill: '#79a6d2' }}
+                                                    />
+                                                </Area>
+                                            </AreaChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                </div>
+
+                                {/* Visceral Fat Chart */}
+                                <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 shadow-xl border border-gray-100">
+                                    <h4 className="text-base font-bold text-gray-400 uppercase tracking-widest mb-4">Grasa Visceral (ratio)</h4>
+                                    <div className="h-40">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <AreaChart
+                                                data={chartData}
+                                                margin={{ top: 25, right: 15, left: 15, bottom: 5 }}
+                                            >
+                                                <defs>
+                                                    <linearGradient id="colorVisceral" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="5%" stopColor="#9d8abd" stopOpacity={0.1} />
+                                                        <stop offset="95%" stopColor="#9d8abd" stopOpacity={0} />
+                                                    </linearGradient>
+                                                </defs>
+                                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+                                                <XAxis
+                                                    dataKey="date"
+                                                    interval="preserveStartEnd"
+                                                    tickFormatter={(date) => {
+                                                        const d = new Date(date);
+                                                        return `${d.getDate()} ${d.toLocaleString('es-ES', { month: 'short' }).substring(0, 3)}`;
+                                                    }}
+                                                    tick={{ fill: '#9ca3af', fontSize: 12 }}
+                                                    tickLine={false}
+                                                    axisLine={false}
+                                                    dy={10}
+                                                />
+                                                <YAxis domain={['dataMin - 1', 'dataMax + 1']} hide />
+                                                <Area
+                                                    type="monotone"
+                                                    dataKey="visceralFat"
+                                                    stroke="#9d8abd"
+                                                    strokeWidth={3}
+                                                    fillOpacity={1}
+                                                    fill="url(#colorVisceral)"
+                                                    isAnimationActive={false}
+                                                    dot={{ r: 4, fill: '#9d8abd', strokeWidth: 2, stroke: '#fff' }}
+                                                    activeDot={false}
+                                                >
+                                                    <LabelList
+                                                        dataKey="visceralFat"
+                                                        position="top"
+                                                        offset={10}
+                                                        formatter={(val: any) => typeof val === 'number' ? Math.round(val) : val}
+                                                        style={{ fontSize: '12px', fontWeight: 'bold', fill: '#9d8abd' }}
+                                                    />
+                                                </Area>
+                                            </AreaChart>
+                                        </ResponsiveContainer>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ) : (
-                        <div className="flex items-center justify-center p-8 bg-gray-50 rounded-[3rem] border border-dashed border-gray-200 text-gray-400 text-sm italic h-full">
-                            No hay suficiente historial para mostrar gráficos de progreso.
-                        </div>
-                    )}
+                        ) : (
+                            <div className="flex items-center justify-center p-8 bg-gray-50 rounded-[3rem] border border-dashed border-gray-200 text-gray-400 text-sm italic h-full">
+                                No hay suficiente historial para mostrar gráficos de progreso.
+                            </div>
+                        )}
+                    </div>
                 </div>
-
             </div>
         </main>
     );
