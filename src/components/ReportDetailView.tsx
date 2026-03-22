@@ -363,7 +363,7 @@ export default function ReportDetailView({
 
 
     return (
-        <main className="min-h-screen bg-cream pb-20">
+        <main className="bg-cream pb-20">
             {/* Minimal Header */}
             <div className="px-4 md:px-12 max-w-7xl mx-auto space-y-6 md:space-y-8 mt-4">
                 {/* Hero / Summary Area */}
@@ -410,6 +410,7 @@ export default function ReportDetailView({
                         />
                     </div>
 
+                    {/* 2) Reordered Columns: Metrics (Left) vs Charts (Right) */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
                         {/* Left Column: Metrics & Segmental */}
                         <div className="flex flex-col justify-between h-full gap-6">

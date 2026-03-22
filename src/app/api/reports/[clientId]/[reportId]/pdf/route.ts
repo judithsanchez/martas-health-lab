@@ -143,6 +143,27 @@ export async function GET(
         // Wait a bit for layout to settle (removed transitions should make this faster/safer)
         await new Promise(r => setTimeout(r, 1000));
 
+        // AGGRESSIVE HEIGHT REMOVAL
+        // We find any elements that have min-h-screen or h-screen and remove those classes
+        // to ensure the scrollHeight reflects the natural content height.
+        await page.evaluate(() => {
+            const heightSelectors = ['.min-h-screen', '.h-screen', '[class*="h-screen"]', '[class*="min-h-screen"]'];
+            heightSelectors.forEach(selector => {
+                document.querySelectorAll(selector).forEach(el => {
+                    // Remove both Tailwind classes and any inline height styles
+                    (el as HTMLElement).style.height = 'auto';
+                    (el as HTMLElement).style.minHeight = '0';
+                    el.classList.remove('h-screen', 'min-h-screen');
+                });
+            });
+            // Specifically target the main containers and body
+            document.body.style.height = 'auto';
+            document.body.style.minHeight = '0';
+            const html = document.documentElement;
+            html.style.height = 'auto';
+            html.style.minHeight = '0';
+        });
+
         // ---------------------------------------------------------
         // SCREENSHOT-TO-PDF STRATEGY (High Fidelity)
         // ---------------------------------------------------------
@@ -155,13 +176,19 @@ export async function GET(
         });
 
         // 2. We need to know the aspect ratio to set the PDF height correctly.
-        // The screenshot dimensions depend on the viewport we set earlier (width: 794).
-        // Let's get the actual body height from the page context to be precise.
+        // Important: The screenshot is captured at 1280px width (VIEWPORT_WIDTH).
+        // The PDF is printed at 794px width (PDF_WIDTH).
+        // We MUST scale the height by the same ratio (794/1280) to avoid blank space.
+        const VIEWPORT_WIDTH = 1280;
+        const PDF_WIDTH = 794;
+        const SCALE_RATIO = PDF_WIDTH / VIEWPORT_WIDTH; // ~0.6203
+
+        // Get the actual body height from the page context
         const bodyHeight = await page.evaluate(() => document.body.scrollHeight);
 
-        // The viewport width was 794. The screenshot height should be bodyHeight.
-        // We add a little padding to be safe.
-        const pdfHeight = bodyHeight + 20;
+        // The screenshot height at 1280px width is bodyHeight.
+        // At 794px width, the scaled height is bodyHeight * SCALE_RATIO.
+        const pdfHeight = Math.ceil(bodyHeight * SCALE_RATIO) + 20;
 
         // 3. setContent to an HTML page that just renders this image
         await page.setContent(`
