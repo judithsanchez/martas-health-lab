@@ -180,18 +180,18 @@ export default function ReportDetailView({
                     <Icon size={18} />
                 </div>
                 {label && (
-                    <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded-full bg-gray-50 ${color}`}>
+                    <span className={`text-xs font-bold uppercase tracking-wider px-2 py-1 rounded-full bg-gray-50 ${color}`}>
                         {label}
                     </span>
                 )}
             </div>
             <div className="flex items-center mb-1 relative z-10">
-                <h4 className="text-gray-500 text-[10px] font-bold uppercase tracking-widest">{title}</h4>
+                <h4 className="text-gray-500 text-xs font-bold uppercase tracking-widest">{title}</h4>
                 {fullTitle && <Tooltip text={fullTitle} />}
             </div>
             <div className="flex items-baseline gap-1 mb-1 relative z-10">
                 <span className="text-2xl font-bold text-plum">{value}</span>
-                <span className="text-xs font-medium text-gray-400">{unit}</span>
+                <span className="text-sm font-medium text-gray-400">{unit}</span>
             </div>
 
             {/* Sparkline Overlay */}
@@ -217,7 +217,7 @@ export default function ReportDetailView({
                 </div>
             )}
 
-            <p className="text-[10px] text-gray-400 mt-auto leading-relaxed relative z-10">{description}</p>
+            <p className="text-xs text-gray-400 mt-auto leading-relaxed relative z-10">{description}</p>
         </div>
     );
 
@@ -275,8 +275,8 @@ export default function ReportDetailView({
         return (
             <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
                 <div className="flex justify-between items-center mb-4">
-                    <h5 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{title}</h5>
-                    <span className="text-xl font-bold text-plum">{value}<span className="text-[10px] ml-1 opacity-50">{unit}</span></span>
+                    <h5 className="text-sm font-bold text-gray-400 uppercase tracking-widest">{title}</h5>
+                    <span className="text-xl font-bold text-plum">{value}<span className="text-xs ml-1 opacity-50">{unit}</span></span>
                 </div>
                 <div
                     className="h-3 rounded-full mb-2 w-full overflow-hidden"
@@ -288,7 +288,7 @@ export default function ReportDetailView({
                     {markers.map((m: any, i: number) => (
                         <div key={i} className="flex flex-col items-center">
                             <div className="w-px h-1 bg-gray-300 mb-1" />
-                            <span className="text-[8px] font-bold text-gray-300 uppercase tracking-tighter">{m.label}</span>
+                            <span className="text-xs font-bold text-gray-300 uppercase tracking-tighter">{m.label}</span>
                         </div>
                     ))}
                 </div>
@@ -319,10 +319,10 @@ export default function ReportDetailView({
                         <Icon size={16} className="text-plum" />
                     </div>
                     <div>
-                        <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">{label}</p>
+                        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-0.5">{label}</p>
                         <div className="flex items-baseline gap-2">
                             <span className="text-base font-bold text-plum">{value}</span>
-                            <span className="text-[9px] text-gray-400 font-medium">{unit}</span>
+                            <span className="text-xs text-gray-400 font-medium">{unit}</span>
 
                             {/* Trend Indicator */}
                             {trend !== undefined && trend !== null && !isNaN(trend) && Math.abs(trend) >= 0.1 && (
@@ -336,7 +336,7 @@ export default function ReportDetailView({
                 </div>
 
                 <div className="flex items-center gap-4 z-10 relative">
-                    <span className={`text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-full ${statusColor} bg-white shadow-sm border border-gray-50`}>
+                    <span className={`text-sm font-semibold uppercase tracking-widest px-3 py-1.5 rounded-full ${statusColor} bg-white shadow-sm border border-gray-50`}>
                         {status}
                     </span>
                 </div>
@@ -416,7 +416,7 @@ export default function ReportDetailView({
                                 <div className="p-2 bg-gold/10 rounded-xl">
                                     <Zap className="text-gold" size={18} />
                                 </div>
-                                <h4 className="text-sm font-bold text-gray-500 uppercase tracking-widest">Salud Metabólica</h4>
+                                <h4 className="text-base font-bold text-gray-500 uppercase tracking-widest">Salud Metabólica</h4>
                             </div>
                             <div className="flex flex-col gap-4">
                                 <StatusRow
@@ -469,7 +469,7 @@ export default function ReportDetailView({
                                 <div className="p-2 bg-plum/10 rounded-xl">
                                     <Scale className="text-plum" size={18} />
                                 </div>
-                                <h4 className="text-sm font-bold text-gray-500 uppercase tracking-widest">Índices Físicos</h4>
+                                <h4 className="text-base font-bold text-gray-500 uppercase tracking-widest">Índices Físicos</h4>
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -541,19 +541,19 @@ export default function ReportDetailView({
                                 <Activity className="text-gray-400" size={16} />
                             </div>
                             <div>
-                                <h4 className="text-sm font-bold text-gray-500 uppercase tracking-widest">Análisis Segmental</h4>
-                                <p className="text-[10px] text-gray-400">Distribución muscular y de grasa</p>
+                                <h4 className="text-base font-bold text-gray-500 uppercase tracking-widest">Análisis Segmental</h4>
+                                <p className="text-sm text-gray-400">Distribución muscular y de grasa</p>
                             </div>
                         </div>
 
                         <div className="space-y-2 flex-1 flex flex-col justify-center">
                             {/* Header Row */}
                             <div className="flex items-center justify-between pb-2 border-b border-gray-100 px-2">
-                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Zona</span>
+                                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Zona</span>
                                 <div className="flex items-center gap-6">
-                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest w-16 text-right">Músculo</span>
+                                    <span className="text-xs font-bold text-gray-400 uppercase tracking-widest w-16 text-right">Músculo</span>
                                     <div className="w-px h-0"></div>
-                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest w-12 text-right">Grasa</span>
+                                    <span className="text-xs font-bold text-gray-400 uppercase tracking-widest w-12 text-right">Grasa</span>
                                 </div>
                             </div>
 
