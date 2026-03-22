@@ -79,7 +79,7 @@ export default function ReportHeader({ client, measurement, ffmi }: ReportHeader
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
                         <Calendar size={16} />
-                        <span className="text-xs font-bold tracking-widest uppercase">
+                        <span className="text-sm font-bold tracking-widest uppercase">
                             {formatDateLong(measurement.date || new Date())}
                         </span>
                     </div>
@@ -91,7 +91,7 @@ export default function ReportHeader({ client, measurement, ffmi }: ReportHeader
                         title="Descargar PDF"
                     >
                         <Download size={14} className="text-gold" />
-                        <span className="text-[10px] font-bold uppercase tracking-wider">Descargar PDF</span>
+                        <span className="text-xs font-bold uppercase tracking-wider">Descargar PDF</span>
                     </button>
                 </div>
             </div>
@@ -104,23 +104,23 @@ export default function ReportHeader({ client, measurement, ffmi }: ReportHeader
                             <div className="flex items-center gap-3">
                                 <User size={20} className="text-white/50" />
                                 <div>
-                                    <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Género</p>
-                                    <p className="font-semibold">{client.gender === 'male' ? 'Hombre' : 'Mujer'}</p>
+                                    <p className="text-sm font-bold uppercase tracking-widest opacity-50">Género</p>
+                                    <p className="text-lg font-bold text-white tracking-wide">{client.gender === 'male' ? 'Hombre' : 'Mujer'}</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
                                 <Calendar size={20} className="text-white/50" />
                                 <div>
-                                    <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Edad</p>
-                                    <p className="font-semibold">{client.age || '--'} años</p>
+                                    <p className="text-sm font-bold uppercase tracking-widest opacity-50">Edad</p>
+                                    <p className="text-lg font-bold text-white tracking-wide">{client.age || '--'} años</p>
                                 </div>
                             </div>
                             {client.birthday && (
                                 <div className="flex items-center gap-3">
                                     <Calendar size={20} className="text-white/50" />
                                     <div>
-                                        <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Cumpleaños</p>
-                                        <p className="font-semibold">
+                                        <p className="text-sm font-bold uppercase tracking-widest opacity-50">Cumpleaños</p>
+                                        <p className="text-lg font-bold text-white tracking-wide">
                                             {formatDateDayMonth(client.birthday)}
                                         </p>
                                     </div>
@@ -129,23 +129,23 @@ export default function ReportHeader({ client, measurement, ffmi }: ReportHeader
                             <div className="flex items-center gap-3">
                                 <Ruler size={20} className="text-white/50" />
                                 <div>
-                                    <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Altura</p>
-                                    <p className="font-semibold">{measurement.height || client.height ? Number(measurement.height || client.height).toFixed(1) : '--'} cm</p>
+                                    <p className="text-sm font-bold uppercase tracking-widest opacity-50">Altura</p>
+                                    <p className="text-lg font-bold text-white tracking-wide">{measurement.height || client.height ? Number(measurement.height || client.height).toFixed(1) : '--'} cm</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
                                 <Activity size={20} className="text-white/50" />
                                 <div>
-                                    <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Nivel de Actividad</p>
-                                    <p className="font-semibold">{getActivityLevelLabel(measurement.activityLevel || client.activityLevel)}</p>
+                                    <p className="text-sm font-bold uppercase tracking-widest opacity-50">Nivel de Actividad</p>
+                                    <p className="text-lg font-bold text-white tracking-wide">{getActivityLevelLabel(measurement.activityLevel || client.activityLevel)}</p>
                                 </div>
                             </div>
                             {client.sessionsPerWeek && (
                                 <div className="flex items-center gap-3">
                                     <Zap size={20} className="text-white/50" />
                                     <div>
-                                        <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Sesiones por semana</p>
-                                        <p className="font-semibold">{client.sessionsPerWeek} sesiones</p>
+                                        <p className="text-sm font-bold uppercase tracking-widest opacity-50">Sesiones por semana</p>
+                                        <p className="text-lg font-bold text-white tracking-wide">{client.sessionsPerWeek} sesiones</p>
                                     </div>
                                 </div>
                             )}
@@ -164,7 +164,7 @@ export default function ReportHeader({ client, measurement, ffmi }: ReportHeader
                                 height={gaugeController.height}
                             />
                         </div>
-                        <div className="text-[10px] font-bold uppercase tracking-widest opacity-70 mt-4 text-center leading-tight">
+                        <div className="text-sm font-bold uppercase tracking-widest opacity-70 mt-4 text-center leading-tight">
                             Índice de Masa<br />Libre de Grasa
                         </div>
                     </div>

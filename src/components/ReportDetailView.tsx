@@ -105,10 +105,13 @@ export default function ReportDetailView({
             }
         }
 
-        // Convert back to array and sort
+        const currentTimestamp = measurement.date ? new Date(measurement.date).getTime() : Date.now();
+
+        // Convert back to array, filter, and sort
         return Array.from(dataMap.values())
+            .filter(record => new Date(record.date).getTime() <= currentTimestamp)
             .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-            .slice(-10) // Keep only last 10
+            .slice(-5) // Keep only last 5 relative to current context
             .map(record => {
                 return {
                     ...record,
@@ -174,24 +177,24 @@ export default function ReportDetailView({
     );
 
     const MetricCard = ({ title, value, unit, label, description, color, icon: Icon, fullTitle, sparklineData, sparklineKey, sparklineColor }: any) => (
-        <div className="bg-white rounded-3xl p-4 shadow-sm border border-gray-100 flex flex-col h-full hover:shadow-md transition-shadow group/card relative overflow-hidden">
+        <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 flex flex-col h-full hover:shadow-md transition-all group/card relative overflow-hidden">
             <div className="flex justify-between items-start mb-3 relative z-10">
                 <div className={`p-2 rounded-2xl bg-gray-50 ${color}`}>
                     <Icon size={18} />
                 </div>
                 {label && (
-                    <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded-full bg-gray-50 ${color}`}>
+                    <span className={`text-xs font-bold uppercase tracking-wider px-2 py-1 rounded-full bg-gray-50 ${color}`}>
                         {label}
                     </span>
                 )}
             </div>
             <div className="flex items-center mb-1 relative z-10">
-                <h4 className="text-gray-500 text-[10px] font-bold uppercase tracking-widest">{title}</h4>
+                <h4 className="text-gray-500 text-sm font-bold uppercase tracking-widest">{title}</h4>
                 {fullTitle && <Tooltip text={fullTitle} />}
             </div>
             <div className="flex items-baseline gap-1 mb-1 relative z-10">
-                <span className="text-2xl font-bold text-plum">{value}</span>
-                <span className="text-xs font-medium text-gray-400">{unit}</span>
+                <span className="text-3xl font-bold text-plum">{value}</span>
+                <span className="text-sm font-bold text-gray-400 opacity-60 uppercase">{unit}</span>
             </div>
 
             {/* Sparkline Overlay */}
@@ -217,7 +220,7 @@ export default function ReportDetailView({
                 </div>
             )}
 
-            <p className="text-[10px] text-gray-400 mt-auto leading-relaxed relative z-10">{description}</p>
+            {description && <p className="text-xs text-gray-400 mt-2 leading-relaxed relative z-10">{description}</p>}
         </div>
     );
 
@@ -275,8 +278,8 @@ export default function ReportDetailView({
         return (
             <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
                 <div className="flex justify-between items-center mb-4">
-                    <h5 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{title}</h5>
-                    <span className="text-xl font-bold text-plum">{value}<span className="text-[10px] ml-1 opacity-50">{unit}</span></span>
+                    <h5 className="text-sm font-bold text-gray-400 uppercase tracking-widest">{title}</h5>
+                    <span className="text-2xl font-bold text-plum">{value}<span className="text-sm ml-1 opacity-50">{unit}</span></span>
                 </div>
                 <div
                     className="h-3 rounded-full mb-2 w-full overflow-hidden"
@@ -288,7 +291,7 @@ export default function ReportDetailView({
                     {markers.map((m: any, i: number) => (
                         <div key={i} className="flex flex-col items-center">
                             <div className="w-px h-1 bg-gray-300 mb-1" />
-                            <span className="text-[8px] font-bold text-gray-300 uppercase tracking-tighter">{m.label}</span>
+                            <span className="text-sm font-bold text-gray-300 uppercase tracking-tighter">{m.label}</span>
                         </div>
                     ))}
                 </div>
@@ -316,17 +319,17 @@ export default function ReportDetailView({
             <div className="bg-white/50 p-4 rounded-3xl flex items-center justify-between group hover:bg-white transition-all border border-transparent hover:border-gray-100 relative overflow-hidden">
                 <div className="flex items-center gap-3 z-10 relative">
                     <div className="p-2 bg-white rounded-xl shadow-sm group-hover:shadow-md transition-shadow">
-                        <Icon size={16} className="text-plum" />
+                        <Icon size={18} className="text-plum" />
                     </div>
                     <div>
-                        <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">{label}</p>
+                        <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-0.5">{label}</p>
                         <div className="flex items-baseline gap-2">
-                            <span className="text-base font-bold text-plum">{value}</span>
-                            <span className="text-[9px] text-gray-400 font-medium">{unit}</span>
+                            <span className="text-xl font-bold text-plum">{value}</span>
+                            <span className="text-sm text-gray-400 font-medium">{unit}</span>
 
                             {/* Trend Indicator */}
                             {trend !== undefined && trend !== null && !isNaN(trend) && Math.abs(trend) >= 0.1 && (
-                                <div className={`flex items-center text-[9px] font-bold ${trendColor} bg-white/50 px-1.5 py-0.5 rounded-md`}>
+                                <div className={`flex items-center text-xs font-bold ${trendColor} bg-white/50 px-1.5 py-0.5 rounded-md`}>
                                     {trend > 0 ? '▲' : trend < 0 ? '▼' : '-'}
                                     <span className="ml-0.5">{Math.abs(trend).toFixed(1)}</span>
                                 </div>
@@ -336,7 +339,7 @@ export default function ReportDetailView({
                 </div>
 
                 <div className="flex items-center gap-4 z-10 relative">
-                    <span className={`text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-full ${statusColor} bg-white shadow-sm border border-gray-50`}>
+                    <span className={`text-sm font-semibold uppercase tracking-widest px-3 py-1.5 rounded-full ${statusColor} bg-white shadow-sm border border-gray-50`}>
                         {status}
                     </span>
                 </div>
@@ -389,7 +392,7 @@ export default function ReportDetailView({
                             </div>
                             <div>
                                 <h4 className="text-xl font-bold text-plum">Relación Músculo-Grasa (MFR)</h4>
-                                <p className="text-sm text-plum/70 mt-1 max-w-2xl leading-relaxed">
+                                <p className="text-base text-plum/70 mt-1 max-w-2xl leading-relaxed">
                                     Indica cuántos kg de músculo tienes por cada kg de grasa. Un valor &gt; 2.5 es saludable, &gt; 4.0 es ideal para atletas.
                                 </p>
                             </div>
@@ -416,7 +419,7 @@ export default function ReportDetailView({
                                 <div className="p-2 bg-gold/10 rounded-xl">
                                     <Zap className="text-gold" size={18} />
                                 </div>
-                                <h4 className="text-sm font-bold text-gray-500 uppercase tracking-widest">Salud Metabólica</h4>
+                                <h4 className="text-xl font-bold text-gray-500 uppercase tracking-widest">Salud Metabólica</h4>
                             </div>
                             <div className="flex flex-col gap-4">
                                 <StatusRow
@@ -464,15 +467,15 @@ export default function ReportDetailView({
                         </div>
 
                         {/* 3) Physical Indices Grid (Replaces List) */}
-                        <div className="bg-white rounded-[2rem] md:rounded-[3rem] p-6 md:p-8 border border-gray-100 shadow-xl">
+                        <div className="bg-white rounded-[2rem] md:rounded-[3rem] p-6 md:p-8 border border-gray-100 shadow-xl flex flex-col">
                             <div className="flex items-center gap-3 mb-8">
                                 <div className="p-2 bg-plum/10 rounded-xl">
                                     <Scale className="text-plum" size={18} />
                                 </div>
-                                <h4 className="text-sm font-bold text-gray-500 uppercase tracking-widest">Índices Físicos</h4>
+                                <h4 className="text-xl font-bold text-gray-500 uppercase tracking-widest">Índices Físicos</h4>
                             </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 {/* Weight Card with Sparkline */}
                                 <MetricCard
                                     title="Peso"
@@ -502,7 +505,7 @@ export default function ReportDetailView({
                                 <MetricCard
                                     title="Grasa Visceral"
                                     value={Number(measurement.visceralFat || 0).toFixed(1)}
-                                    unit="Rating"
+                                    unit="ratio"
                                     label={visceral.label}
                                     icon={AlertCircle}
                                     color={visceral.color}
@@ -541,19 +544,19 @@ export default function ReportDetailView({
                                 <Activity className="text-gray-400" size={16} />
                             </div>
                             <div>
-                                <h4 className="text-sm font-bold text-gray-500 uppercase tracking-widest">Análisis Segmental</h4>
-                                <p className="text-[10px] text-gray-400">Distribución muscular y de grasa</p>
+                                <h4 className="text-xl font-bold text-gray-500 uppercase tracking-widest">Análisis Segmental</h4>
+                                <p className="text-sm text-gray-400">Distribución muscular y de grasa</p>
                             </div>
                         </div>
 
-                        <div className="space-y-2 flex-1 flex flex-col justify-center">
+                        <div className="space-y-4 flex-1 flex flex-col justify-center">
                             {/* Header Row */}
                             <div className="flex items-center justify-between pb-2 border-b border-gray-100 px-2">
-                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Zona</span>
+                                <span className="text-sm font-bold text-gray-400 uppercase tracking-widest">Zona</span>
                                 <div className="flex items-center gap-6">
-                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest w-16 text-right">Músculo</span>
+                                    <span className="text-sm font-bold text-gray-400 uppercase tracking-widest w-16 text-right">Músculo</span>
                                     <div className="w-px h-0"></div>
-                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest w-12 text-right">Grasa</span>
+                                    <span className="text-sm font-bold text-gray-400 uppercase tracking-widest w-12 text-right">Grasa</span>
                                 </div>
                             </div>
 
@@ -564,15 +567,15 @@ export default function ReportDetailView({
                                 { label: 'Pierna Izquierda', muscle: measurement.muscleLegLeft, fat: measurement.fatLegLeft },
                                 { label: 'Tronco', muscle: measurement.muscleTrunk, fat: measurement.fatTrunk },
                             ].map((row, idx) => (
-                                <div key={idx} className="flex items-center justify-between py-3 border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors rounded-lg px-2">
-                                    <span className="text-xs font-bold text-gray-500">{row.label}</span>
+                                <div key={idx} className="flex items-center justify-between py-5 border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors rounded-lg px-2">
+                                    <span className="text-sm font-bold text-gray-500">{row.label}</span>
                                     <div className="flex items-center gap-6">
                                         <div className="flex flex-col items-end w-16">
-                                            <span className="text-xs font-bold text-sage">{Number(row.muscle || 0).toFixed(1)} kg</span>
+                                            <span className="text-sm font-bold text-sage">{Number(row.muscle || 0).toFixed(1)} kg</span>
                                         </div>
                                         <div className="w-px h-4 bg-gray-100"></div>
                                         <div className="flex flex-col items-end w-12">
-                                            <span className="text-xs font-bold text-gold">{Number(row.fat || 0).toFixed(1)}%</span>
+                                            <span className="text-sm font-bold text-gold">{Number(row.fat || 0).toFixed(1)}%</span>
                                         </div>
                                     </div>
                                 </div>
@@ -587,11 +590,11 @@ export default function ReportDetailView({
 
                             {/* Muscle Chart */}
                             <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 shadow-xl border border-gray-100">
-                                <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Masa Muscular (kg)</h4>
+                                <h4 className="text-base font-bold text-gray-400 uppercase tracking-widest mb-4">Masa Muscular (kg)</h4>
                                 <div className="h-40">
                                     <ResponsiveContainer width="100%" height="100%">
                                         <AreaChart
-                                            data={[...history].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).slice(-5)}
+                                            data={chartData}
                                             margin={{ top: 25, right: 15, left: 15, bottom: 5 }}
                                         >
                                             <defs>
@@ -608,20 +611,21 @@ export default function ReportDetailView({
                                                     const d = new Date(date);
                                                     return `${d.getDate()} ${d.toLocaleString('es-ES', { month: 'short' }).substring(0, 3)}`;
                                                 }}
-                                                tick={{ fill: '#9ca3af', fontSize: 10 }}
+                                                tick={{ fill: '#9ca3af', fontSize: 12 }}
                                                 tickLine={false}
                                                 axisLine={false}
                                                 dy={10}
                                             />
                                             <YAxis domain={['dataMin - 0.5', 'dataMax + 0.5']} hide />
+
                                             <Area
                                                 type="monotone"
                                                 dataKey="muscleMass"
-                                                isAnimationActive={false}
                                                 stroke="#10b981"
                                                 strokeWidth={3}
                                                 fillOpacity={1}
                                                 fill="url(#colorMuscle)"
+                                                isAnimationActive={false}
                                                 dot={{ r: 4, fill: '#10b981', strokeWidth: 2, stroke: '#fff' }}
                                                 activeDot={false}
                                             >
@@ -630,7 +634,7 @@ export default function ReportDetailView({
                                                     position="top"
                                                     offset={10}
                                                     formatter={(val: any) => typeof val === 'number' ? val.toFixed(1) : val}
-                                                    style={{ fontSize: '10px', fontWeight: 'bold', fill: '#10b981' }}
+                                                    style={{ fontSize: '12px', fontWeight: 'bold', fill: '#10b981' }}
                                                 />
                                             </Area>
                                         </AreaChart>
@@ -640,11 +644,11 @@ export default function ReportDetailView({
 
                             {/* Fat Chart */}
                             <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 shadow-xl border border-gray-100">
-                                <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Grasa Corporal (%)</h4>
+                                <h4 className="text-base font-bold text-gray-400 uppercase tracking-widest mb-4">Grasa Corporal (%)</h4>
                                 <div className="h-40">
                                     <ResponsiveContainer width="100%" height="100%">
                                         <AreaChart
-                                            data={[...history].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).slice(-5)}
+                                            data={chartData}
                                             margin={{ top: 25, right: 15, left: 15, bottom: 5 }}
                                         >
                                             <defs>
@@ -661,20 +665,21 @@ export default function ReportDetailView({
                                                     const d = new Date(date);
                                                     return `${d.getDate()} ${d.toLocaleString('es-ES', { month: 'short' }).substring(0, 3)}`;
                                                 }}
-                                                tick={{ fill: '#9ca3af', fontSize: 10 }}
+                                                tick={{ fill: '#9ca3af', fontSize: 12 }}
                                                 tickLine={false}
                                                 axisLine={false}
                                                 dy={10}
                                             />
                                             <YAxis domain={['dataMin - 1', 'dataMax + 1']} hide />
+
                                             <Area
                                                 type="monotone"
                                                 dataKey="fatPercent"
-                                                isAnimationActive={false}
                                                 stroke="#eab308"
                                                 strokeWidth={3}
                                                 fillOpacity={1}
                                                 fill="url(#colorFat)"
+                                                isAnimationActive={false}
                                                 dot={{ r: 4, fill: '#eab308', strokeWidth: 2, stroke: '#fff' }}
                                                 activeDot={false}
                                             >
@@ -683,7 +688,7 @@ export default function ReportDetailView({
                                                     position="top"
                                                     offset={10}
                                                     formatter={(val: any) => typeof val === 'number' ? val.toFixed(1) : val}
-                                                    style={{ fontSize: '10px', fontWeight: 'bold', fill: '#eab308' }}
+                                                    style={{ fontSize: '12px', fontWeight: 'bold', fill: '#eab308' }}
                                                 />
                                             </Area>
                                         </AreaChart>

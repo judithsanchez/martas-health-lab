@@ -61,8 +61,8 @@ export default function CompositionChart({ fatPercent, muscleMass, boneMass, wat
                         className="bg-orange-100 flex flex-col justify-center items-center relative transition-all duration-500"
                         style={{ width: `${fatWidth}%` }}
                     >
-                        <span className="text-[10px] font-bold uppercase opacity-60 text-orange-500 hidden sm:block">Grasa</span>
-                        <span className="text-xl font-black text-orange-500">{Number(fatPercent).toFixed(1)}%</span>
+                        <span className="text-sm font-bold uppercase opacity-60 text-orange-500 hidden sm:block">Grasa</span>
+                        <span className="text-2xl font-black text-orange-500">{Number(fatPercent).toFixed(1)}%</span>
                     </div>
 
                     {/* Muscle Segment */}
@@ -70,10 +70,10 @@ export default function CompositionChart({ fatPercent, muscleMass, boneMass, wat
                         className="bg-emerald-100 flex flex-col justify-center items-center relative transition-all duration-500"
                         style={{ width: `${muscleWidth}%` }}
                     >
-                        <span className="text-[10px] font-bold uppercase opacity-60 text-emerald-600 hidden sm:block">Músculo</span>
+                        <span className="text-sm font-bold uppercase opacity-60 text-emerald-600 hidden sm:block">Músculo</span>
                         <div className='flex items-baseline gap-0.5'>
                             {/* Calculate muscle % relative to total weight for display consistency */}
-                            <span className="text-xl font-black text-emerald-600">{((muscleMass / weight) * 100).toFixed(1)}%</span>
+                            <span className="text-2xl font-black text-emerald-600">{((muscleMass / weight) * 100).toFixed(1)}%</span>
                         </div>
                     </div>
 
@@ -82,9 +82,9 @@ export default function CompositionChart({ fatPercent, muscleMass, boneMass, wat
                         className="bg-slate-200 flex flex-col justify-center items-center relative transition-all duration-500"
                         style={{ width: `${boneWidth}%` }}
                     >
-                        <span className="text-[10px] font-bold uppercase opacity-60 text-slate-500 hidden sm:block">Hueso</span>
+                        <span className="text-sm font-bold uppercase opacity-60 text-slate-500 hidden sm:block">Hueso</span>
                         <div className='flex items-baseline gap-0.5'>
-                            <span className="text-sm font-black text-slate-500">{((boneMass / weight) * 100).toFixed(1)}%</span>
+                            <span className="text-base font-black text-slate-500">{((boneMass / weight) * 100).toFixed(1)}%</span>
                         </div>
                     </div>
                 </div>
@@ -102,7 +102,7 @@ export default function CompositionChart({ fatPercent, muscleMass, boneMass, wat
                     </div>
                     <div>
                         <h4 className="text-xs font-bold text-blue-900/70 uppercase tracking-wider">Agua Corporal</h4>
-                        <p className="text-[10px] text-blue-400/80 font-medium">Contenida en tejido magro</p>
+                        <p className="text-sm text-blue-400/80 font-medium">Contenida en tejido magro</p>
                     </div>
                 </div>
                 <div className="flex items-baseline gap-1">
@@ -112,7 +112,7 @@ export default function CompositionChart({ fatPercent, muscleMass, boneMass, wat
             </div>
 
             <div className="px-2">
-                <p className="text-[10px] text-gray-400 leading-relaxed text-center">
+                <p className="text-sm text-gray-400 leading-relaxed text-center">
                     <strong>Distribución de Peso:</strong> Gráfico de pila basado en Grasa + Músculo + Hueso. (El agua es intracelular).
                 </p>
             </div>
