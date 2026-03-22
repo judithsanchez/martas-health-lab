@@ -43,7 +43,8 @@ import {
     Tooltip as RechartsTooltip,
     ResponsiveContainer,
     AreaChart,
-    Area
+    Area,
+    LabelList
 } from 'recharts';
 import ReportHeader from '@/components/report/ReportHeader';
 import CompositionChart from '@/components/report/CompositionChart';
@@ -587,9 +588,12 @@ export default function ReportDetailView({
                             {/* Muscle Chart */}
                             <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 shadow-xl border border-gray-100">
                                 <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Masa Muscular (kg)</h4>
-                                <div className="h-32">
+                                <div className="h-40">
                                     <ResponsiveContainer width="100%" height="100%">
-                                        <AreaChart data={[...history].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).slice(-10)}>
+                                        <AreaChart
+                                            data={[...history].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).slice(-10)}
+                                            margin={{ top: 25, right: 15, left: 15, bottom: 5 }}
+                                        >
                                             <defs>
                                                 <linearGradient id="colorMuscle" x1="0" y1="0" x2="0" y2="1">
                                                     <stop offset="5%" stopColor="#10b981" stopOpacity={0.1} />
@@ -597,11 +601,19 @@ export default function ReportDetailView({
                                                 </linearGradient>
                                             </defs>
                                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
-                                            <XAxis dataKey="date" hide />
-                                            <YAxis domain={['dataMin - 0.5', 'dataMax + 0.5']} hide />
-                                            <RechartsTooltip
-                                                content={<CustomChartTooltip unit="kg" />}
+                                            <XAxis
+                                                dataKey="date"
+                                                tickFormatter={(date) => {
+                                                    const d = new Date(date);
+                                                    return `${d.getDate()} ${d.toLocaleString('es-ES', { month: 'short' }).substring(0, 3)}`;
+                                                }}
+                                                tick={{ fill: '#9ca3af', fontSize: 10 }}
+                                                tickLine={false}
+                                                axisLine={false}
+                                                dy={10}
                                             />
+                                            <YAxis domain={['dataMin - 0.5', 'dataMax + 0.5']} hide />
+                                            <RechartsTooltip content={<CustomChartTooltip unit="kg" />} />
                                             <Area
                                                 type="monotone"
                                                 dataKey="muscleMass"
@@ -611,7 +623,15 @@ export default function ReportDetailView({
                                                 fill="url(#colorMuscle)"
                                                 dot={{ r: 4, fill: '#10b981', strokeWidth: 2, stroke: '#fff' }}
                                                 activeDot={{ r: 6, strokeWidth: 0 }}
-                                            />
+                                            >
+                                                <LabelList
+                                                    dataKey="muscleMass"
+                                                    position="top"
+                                                    offset={10}
+                                                    formatter={(val: any) => typeof val === 'number' ? val.toFixed(1) : val}
+                                                    style={{ fontSize: '10px', fontWeight: 'bold', fill: '#10b981' }}
+                                                />
+                                            </Area>
                                         </AreaChart>
                                     </ResponsiveContainer>
                                 </div>
@@ -620,9 +640,12 @@ export default function ReportDetailView({
                             {/* Fat Chart */}
                             <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 shadow-xl border border-gray-100">
                                 <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Grasa Corporal (%)</h4>
-                                <div className="h-32">
+                                <div className="h-40">
                                     <ResponsiveContainer width="100%" height="100%">
-                                        <AreaChart data={[...history].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).slice(-10)}>
+                                        <AreaChart
+                                            data={[...history].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).slice(-10)}
+                                            margin={{ top: 25, right: 15, left: 15, bottom: 5 }}
+                                        >
                                             <defs>
                                                 <linearGradient id="colorFat" x1="0" y1="0" x2="0" y2="1">
                                                     <stop offset="5%" stopColor="#eab308" stopOpacity={0.1} />
@@ -630,11 +653,19 @@ export default function ReportDetailView({
                                                 </linearGradient>
                                             </defs>
                                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
-                                            <XAxis dataKey="date" hide />
-                                            <YAxis domain={['dataMin - 1', 'dataMax + 1']} hide />
-                                            <RechartsTooltip
-                                                content={<CustomChartTooltip unit="%" />}
+                                            <XAxis
+                                                dataKey="date"
+                                                tickFormatter={(date) => {
+                                                    const d = new Date(date);
+                                                    return `${d.getDate()} ${d.toLocaleString('es-ES', { month: 'short' }).substring(0, 3)}`;
+                                                }}
+                                                tick={{ fill: '#9ca3af', fontSize: 10 }}
+                                                tickLine={false}
+                                                axisLine={false}
+                                                dy={10}
                                             />
+                                            <YAxis domain={['dataMin - 1', 'dataMax + 1']} hide />
+                                            <RechartsTooltip content={<CustomChartTooltip unit="%" />} />
                                             <Area
                                                 type="monotone"
                                                 dataKey="fatPercent"
@@ -644,7 +675,15 @@ export default function ReportDetailView({
                                                 fill="url(#colorFat)"
                                                 dot={{ r: 4, fill: '#eab308', strokeWidth: 2, stroke: '#fff' }}
                                                 activeDot={{ r: 6, strokeWidth: 0 }}
-                                            />
+                                            >
+                                                <LabelList
+                                                    dataKey="fatPercent"
+                                                    position="top"
+                                                    offset={10}
+                                                    formatter={(val: any) => typeof val === 'number' ? val.toFixed(1) : val}
+                                                    style={{ fontSize: '10px', fontWeight: 'bold', fill: '#eab308' }}
+                                                />
+                                            </Area>
                                         </AreaChart>
                                     </ResponsiveContainer>
                                 </div>
