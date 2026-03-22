@@ -176,13 +176,19 @@ export async function GET(
         });
 
         // 2. We need to know the aspect ratio to set the PDF height correctly.
-        // The screenshot dimensions depend on the viewport we set earlier (width: 794).
-        // Let's get the actual body height from the page context to be precise.
+        // Important: The screenshot is captured at 1280px width (VIEWPORT_WIDTH).
+        // The PDF is printed at 794px width (PDF_WIDTH).
+        // We MUST scale the height by the same ratio (794/1280) to avoid blank space.
+        const VIEWPORT_WIDTH = 1280;
+        const PDF_WIDTH = 794;
+        const SCALE_RATIO = PDF_WIDTH / VIEWPORT_WIDTH; // ~0.6203
+
+        // Get the actual body height from the page context
         const bodyHeight = await page.evaluate(() => document.body.scrollHeight);
 
-        // The viewport width was 794. The screenshot height should be bodyHeight.
-        // We add a little padding to be safe.
-        const pdfHeight = bodyHeight + 20;
+        // The screenshot height at 1280px width is bodyHeight.
+        // At 794px width, the scaled height is bodyHeight * SCALE_RATIO.
+        const pdfHeight = Math.ceil(bodyHeight * SCALE_RATIO) + 20;
 
         // 3. setContent to an HTML page that just renders this image
         await page.setContent(`
