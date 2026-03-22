@@ -603,6 +603,7 @@ export default function ReportDetailView({
                                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
                                             <XAxis
                                                 dataKey="date"
+                                                interval="preserveStartEnd"
                                                 tickFormatter={(date) => {
                                                     const d = new Date(date);
                                                     return `${d.getDate()} ${d.toLocaleString('es-ES', { month: 'short' }).substring(0, 3)}`;
@@ -613,10 +614,10 @@ export default function ReportDetailView({
                                                 dy={10}
                                             />
                                             <YAxis domain={['dataMin - 0.5', 'dataMax + 0.5']} hide />
-                                            <RechartsTooltip content={<CustomChartTooltip unit="kg" />} />
                                             <Area
                                                 type="monotone"
                                                 dataKey="muscleMass"
+                                                isAnimationActive={false}
                                                 stroke="#10b981"
                                                 strokeWidth={3}
                                                 fillOpacity={1}
@@ -655,6 +656,7 @@ export default function ReportDetailView({
                                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
                                             <XAxis
                                                 dataKey="date"
+                                                interval="preserveStartEnd"
                                                 tickFormatter={(date) => {
                                                     const d = new Date(date);
                                                     return `${d.getDate()} ${d.toLocaleString('es-ES', { month: 'short' }).substring(0, 3)}`;
@@ -665,10 +667,10 @@ export default function ReportDetailView({
                                                 dy={10}
                                             />
                                             <YAxis domain={['dataMin - 1', 'dataMax + 1']} hide />
-                                            <RechartsTooltip content={<CustomChartTooltip unit="%" />} />
                                             <Area
                                                 type="monotone"
                                                 dataKey="fatPercent"
+                                                isAnimationActive={false}
                                                 stroke="#eab308"
                                                 strokeWidth={3}
                                                 fillOpacity={1}
