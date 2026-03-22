@@ -667,8 +667,8 @@ export default function ReportDetailView({
                                             >
                                                 <defs>
                                                     <linearGradient id="colorBone" x1="0" y1="0" x2="0" y2="1">
-                                                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.1} />
-                                                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                                                        <stop offset="5%" stopColor="#79a6d2" stopOpacity={0.1} />
+                                                        <stop offset="95%" stopColor="#79a6d2" stopOpacity={0} />
                                                     </linearGradient>
                                                 </defs>
                                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
@@ -688,12 +688,12 @@ export default function ReportDetailView({
                                                 <Area
                                                     type="monotone"
                                                     dataKey="boneMass"
-                                                    stroke="#3b82f6"
+                                                    stroke="#79a6d2"
                                                     strokeWidth={3}
                                                     fillOpacity={1}
                                                     fill="url(#colorBone)"
                                                     isAnimationActive={false}
-                                                    dot={{ r: 4, fill: '#3b82f6', strokeWidth: 2, stroke: '#fff' }}
+                                                    dot={{ r: 4, fill: '#79a6d2', strokeWidth: 2, stroke: '#fff' }}
                                                     activeDot={false}
                                                 >
                                                     <LabelList
@@ -701,7 +701,7 @@ export default function ReportDetailView({
                                                         position="top"
                                                         offset={10}
                                                         formatter={(val: any) => typeof val === 'number' ? val.toFixed(1) : val}
-                                                        style={{ fontSize: '12px', fontWeight: 'bold', fill: '#3b82f6' }}
+                                                        style={{ fontSize: '12px', fontWeight: 'bold', fill: '#79a6d2' }}
                                                     />
                                                 </Area>
                                             </AreaChart>
@@ -720,8 +720,8 @@ export default function ReportDetailView({
                                             >
                                                 <defs>
                                                     <linearGradient id="colorVisceral" x1="0" y1="0" x2="0" y2="1">
-                                                        <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.1} />
-                                                        <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
+                                                        <stop offset="5%" stopColor="#9d8abd" stopOpacity={0.1} />
+                                                        <stop offset="95%" stopColor="#9d8abd" stopOpacity={0} />
                                                     </linearGradient>
                                                 </defs>
                                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
@@ -741,12 +741,12 @@ export default function ReportDetailView({
                                                 <Area
                                                     type="monotone"
                                                     dataKey="visceralFat"
-                                                    stroke="#8b5cf6"
+                                                    stroke="#9d8abd"
                                                     strokeWidth={3}
                                                     fillOpacity={1}
                                                     fill="url(#colorVisceral)"
                                                     isAnimationActive={false}
-                                                    dot={{ r: 4, fill: '#8b5cf6', strokeWidth: 2, stroke: '#fff' }}
+                                                    dot={{ r: 4, fill: '#9d8abd', strokeWidth: 2, stroke: '#fff' }}
                                                     activeDot={false}
                                                 >
                                                     <LabelList
@@ -754,7 +754,7 @@ export default function ReportDetailView({
                                                         position="top"
                                                         offset={10}
                                                         formatter={(val: any) => typeof val === 'number' ? Math.round(val) : val}
-                                                        style={{ fontSize: '12px', fontWeight: 'bold', fill: '#8b5cf6' }}
+                                                        style={{ fontSize: '12px', fontWeight: 'bold', fill: '#9d8abd' }}
                                                     />
                                                 </Area>
                                             </AreaChart>
