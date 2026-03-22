@@ -174,7 +174,7 @@ export default function ReportDetailView({
     );
 
     const MetricCard = ({ title, value, unit, label, description, color, icon: Icon, fullTitle, sparklineData, sparklineKey, sparklineColor }: any) => (
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col h-full hover:shadow-md transition-all group/card relative overflow-hidden">
+        <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 flex flex-col hover:shadow-md transition-all group/card relative overflow-hidden">
             <div className="flex justify-between items-start mb-3 relative z-10">
                 <div className={`p-2 rounded-2xl bg-gray-50 ${color}`}>
                     <Icon size={18} />
@@ -217,7 +217,7 @@ export default function ReportDetailView({
                 </div>
             )}
 
-            <p className="text-xs text-gray-400 mt-auto leading-relaxed relative z-10">{description}</p>
+            {description && <p className="text-xs text-gray-400 mt-2 leading-relaxed relative z-10">{description}</p>}
         </div>
     );
 
@@ -472,7 +472,7 @@ export default function ReportDetailView({
                                 <h4 className="text-xl font-bold text-gray-500 uppercase tracking-widest">Índices Físicos</h4>
                             </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 h-full">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 {/* Weight Card with Sparkline */}
                                 <MetricCard
                                     title="Peso"
