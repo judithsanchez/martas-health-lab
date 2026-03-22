@@ -143,6 +143,27 @@ export async function GET(
         // Wait a bit for layout to settle (removed transitions should make this faster/safer)
         await new Promise(r => setTimeout(r, 1000));
 
+        // AGGRESSIVE HEIGHT REMOVAL
+        // We find any elements that have min-h-screen or h-screen and remove those classes
+        // to ensure the scrollHeight reflects the natural content height.
+        await page.evaluate(() => {
+            const heightSelectors = ['.min-h-screen', '.h-screen', '[class*="h-screen"]', '[class*="min-h-screen"]'];
+            heightSelectors.forEach(selector => {
+                document.querySelectorAll(selector).forEach(el => {
+                    // Remove both Tailwind classes and any inline height styles
+                    (el as HTMLElement).style.height = 'auto';
+                    (el as HTMLElement).style.minHeight = '0';
+                    el.classList.remove('h-screen', 'min-h-screen');
+                });
+            });
+            // Specifically target the main containers and body
+            document.body.style.height = 'auto';
+            document.body.style.minHeight = '0';
+            const html = document.documentElement;
+            html.style.height = 'auto';
+            html.style.minHeight = '0';
+        });
+
         // ---------------------------------------------------------
         // SCREENSHOT-TO-PDF STRATEGY (High Fidelity)
         // ---------------------------------------------------------
