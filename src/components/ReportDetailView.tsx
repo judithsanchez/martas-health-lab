@@ -390,7 +390,7 @@ export default function ReportDetailView({
                             </div>
                             <div>
                                 <h4 className="text-xl font-bold text-plum">Relación Músculo-Grasa (MFR)</h4>
-                                <p className="text-base text-plum/70 mt-1 max-w-2xl leading-relaxed">
+                                <p className="text-base text-plum/70 mt-1 leading-relaxed">
                                     Indica cuántos kg de músculo tienes por cada kg de grasa. Un valor &gt; 2.5 es saludable, &gt; 4.0 es ideal para atletas.
                                 </p>
                             </div>
