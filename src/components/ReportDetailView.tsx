@@ -617,7 +617,7 @@ export default function ReportDetailView({
                                                 dy={10}
                                             />
                                             <YAxis domain={['dataMin - 0.5', 'dataMax + 0.5']} hide />
-                                            <RechartsTooltip content={<CustomChartTooltip unit="kg" />} />
+
                                             <Area
                                                 type="monotone"
                                                 dataKey="muscleMass"
@@ -671,7 +671,7 @@ export default function ReportDetailView({
                                                 dy={10}
                                             />
                                             <YAxis domain={['dataMin - 1', 'dataMax + 1']} hide />
-                                            <RechartsTooltip content={<CustomChartTooltip unit="%" />} />
+
                                             <Area
                                                 type="monotone"
                                                 dataKey="fatPercent"
