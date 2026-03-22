@@ -623,7 +623,7 @@ export default function ReportDetailView({
                                                 fillOpacity={1}
                                                 fill="url(#colorMuscle)"
                                                 dot={{ r: 4, fill: '#10b981', strokeWidth: 2, stroke: '#fff' }}
-                                                activeDot={{ r: 6, strokeWidth: 0 }}
+                                                activeDot={false}
                                             >
                                                 <LabelList
                                                     dataKey="muscleMass"
@@ -676,7 +676,7 @@ export default function ReportDetailView({
                                                 fillOpacity={1}
                                                 fill="url(#colorFat)"
                                                 dot={{ r: 4, fill: '#eab308', strokeWidth: 2, stroke: '#fff' }}
-                                                activeDot={{ r: 6, strokeWidth: 0 }}
+                                                activeDot={false}
                                             >
                                                 <LabelList
                                                     dataKey="fatPercent"
