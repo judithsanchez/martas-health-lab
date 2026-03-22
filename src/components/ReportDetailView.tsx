@@ -13,8 +13,6 @@ import {
     Zap,
     Scale,
     Droplets,
-    Dna,
-    AlertCircle,
     CheckCircle2,
     Zap as Flash,
     ArrowUpRight
@@ -413,6 +411,43 @@ export default function ReportDetailView({
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* 1) Physical Indices Grid (Replaces List) */}
+                        <div className="bg-white rounded-[2rem] md:rounded-[3rem] p-6 md:p-8 border border-gray-100 shadow-xl flex flex-col">
+                            <div className="flex items-center gap-3 mb-8">
+                                <div className="p-2 bg-plum/10 rounded-xl">
+                                    <Scale className="text-plum" size={18} />
+                                </div>
+                                <h4 className="text-xl font-bold text-gray-500 uppercase tracking-widest">Índices Físicos</h4>
+                            </div>
+
+                            <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                {/* Weight Card with Sparkline */}
+                                <MetricCard
+                                    title="Peso"
+                                    value={Number(measurement.weight || 0).toFixed(1)}
+                                    unit="kg"
+                                    icon={Weight}
+                                    color="text-plum bg-plum/5"
+                                    sparklineData={chartData}
+                                    sparklineKey="weight"
+                                    sparklineColor="#581c87"
+                                />
+
+                                {/* BMI Card with Sparkline */}
+                                <MetricCard
+                                    title="BMI (IMC)"
+                                    value={bmi.value}
+                                    unit="kg/m²"
+                                    label={bmi.label.toUpperCase()}
+                                    icon={Scale}
+                                    color={bmi.color}
+                                    sparklineData={chartData}
+                                    sparklineKey="bmi"
+                                    sparklineColor="#581c87" // Purple for BMI
+                                />
+                            </div>
+                        </div>
+
                         {/* 2) Metabolic Health Card */}
                         <div className="bg-white rounded-[2rem] md:rounded-[3rem] p-6 md:p-8 border border-gray-100 shadow-xl">
                             <div className="flex items-center gap-3 mb-8">
@@ -458,73 +493,8 @@ export default function ReportDetailView({
                                     status={asmi.label.toUpperCase()}
                                     statusColor={asmi.color}
                                     icon={Activity}
-                                    // No direct history for ASMI unless calculated for all past records? 
-                                    // Skipping graph for inferred index for now to ensure safety.
                                     trend={prevValues ? asmi.value - prevValues.asmi : null}
                                     higherIsBetter={true}
-                                />
-                            </div>
-                        </div>
-
-                        {/* 3) Physical Indices Grid (Replaces List) */}
-                        <div className="bg-white rounded-[2rem] md:rounded-[3rem] p-6 md:p-8 border border-gray-100 shadow-xl flex flex-col">
-                            <div className="flex items-center gap-3 mb-8">
-                                <div className="p-2 bg-plum/10 rounded-xl">
-                                    <Scale className="text-plum" size={18} />
-                                </div>
-                                <h4 className="text-xl font-bold text-gray-500 uppercase tracking-widest">Índices Físicos</h4>
-                            </div>
-
-                            <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                {/* Weight Card with Sparkline */}
-                                <MetricCard
-                                    title="Peso"
-                                    value={Number(measurement.weight || 0).toFixed(1)}
-                                    unit="kg"
-                                    icon={Weight}
-                                    color="text-plum bg-plum/5"
-                                    sparklineData={chartData}
-                                    sparklineKey="weight"
-                                    sparklineColor="#581c87"
-                                />
-
-                                {/* BMI Card with Sparkline */}
-                                <MetricCard
-                                    title="BMI (IMC)"
-                                    value={bmi.value}
-                                    unit="kg/m²"
-                                    label={bmi.label.toUpperCase()}
-                                    icon={Scale}
-                                    color={bmi.color}
-                                    sparklineData={chartData}
-                                    sparklineKey="bmi"
-                                    sparklineColor="#581c87" // Purple for BMI
-                                />
-
-                                {/* Visceral Fat Card */}
-                                <MetricCard
-                                    title="Grasa Visceral"
-                                    value={Number(measurement.visceralFat || 0).toFixed(1)}
-                                    unit="ratio"
-                                    label={visceral.label}
-                                    icon={AlertCircle}
-                                    color={visceral.color}
-                                    sparklineData={chartData}
-                                    sparklineKey="visceralFat"
-                                    sparklineColor="#eab308" // Gold/Yellow
-                                />
-
-                                {/* Bone Mass Card */}
-                                <MetricCard
-                                    title="Masa Ósea"
-                                    value={Number(boneMassCalc.value || 0).toFixed(1)}
-                                    unit="kg"
-                                    label={boneMassCalc.label}
-                                    icon={Dna}
-                                    color={boneMassCalc.color}
-                                    sparklineData={chartData}
-                                    sparklineKey="boneMass"
-                                    sparklineColor="#10b981" // Emerald
                                 />
                             </div>
                         </div>
@@ -688,6 +658,112 @@ export default function ReportDetailView({
                                                     position="top"
                                                     offset={10}
                                                     formatter={(val: any) => typeof val === 'number' ? val.toFixed(1) : val}
+                                                    style={{ fontSize: '12px', fontWeight: 'bold', fill: '#eab308' }}
+                                                />
+                                            </Area>
+                                        </AreaChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </div>
+
+                            {/* Bone Mass Chart */}
+                            <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 shadow-xl border border-gray-100">
+                                <h4 className="text-base font-bold text-gray-400 uppercase tracking-widest mb-4">Masa Ósea (kg)</h4>
+                                <div className="h-40">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <AreaChart
+                                            data={chartData}
+                                            margin={{ top: 25, right: 15, left: 15, bottom: 5 }}
+                                        >
+                                            <defs>
+                                                <linearGradient id="colorBone" x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.1} />
+                                                    <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                                                </linearGradient>
+                                            </defs>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+                                            <XAxis
+                                                dataKey="date"
+                                                interval="preserveStartEnd"
+                                                tickFormatter={(date) => {
+                                                    const d = new Date(date);
+                                                    return `${d.getDate()} ${d.toLocaleString('es-ES', { month: 'short' }).substring(0, 3)}`;
+                                                }}
+                                                tick={{ fill: '#9ca3af', fontSize: 12 }}
+                                                tickLine={false}
+                                                axisLine={false}
+                                                dy={10}
+                                            />
+                                            <YAxis domain={['dataMin - 0.1', 'dataMax + 0.1']} hide />
+                                            <Area
+                                                type="monotone"
+                                                dataKey="boneMass"
+                                                stroke="#10b981"
+                                                strokeWidth={3}
+                                                fillOpacity={1}
+                                                fill="url(#colorBone)"
+                                                isAnimationActive={false}
+                                                dot={{ r: 4, fill: '#10b981', strokeWidth: 2, stroke: '#fff' }}
+                                                activeDot={false}
+                                            >
+                                                <LabelList
+                                                    dataKey="boneMass"
+                                                    position="top"
+                                                    offset={10}
+                                                    formatter={(val: any) => typeof val === 'number' ? val.toFixed(1) : val}
+                                                    style={{ fontSize: '12px', fontWeight: 'bold', fill: '#10b981' }}
+                                                />
+                                            </Area>
+                                        </AreaChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </div>
+
+                            {/* Visceral Fat Chart */}
+                            <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 shadow-xl border border-gray-100">
+                                <h4 className="text-base font-bold text-gray-400 uppercase tracking-widest mb-4">Grasa Visceral (ratio)</h4>
+                                <div className="h-40">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <AreaChart
+                                            data={chartData}
+                                            margin={{ top: 25, right: 15, left: 15, bottom: 5 }}
+                                        >
+                                            <defs>
+                                                <linearGradient id="colorVisceral" x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="5%" stopColor="#eab308" stopOpacity={0.1} />
+                                                    <stop offset="95%" stopColor="#eab308" stopOpacity={0} />
+                                                </linearGradient>
+                                            </defs>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+                                            <XAxis
+                                                dataKey="date"
+                                                interval="preserveStartEnd"
+                                                tickFormatter={(date) => {
+                                                    const d = new Date(date);
+                                                    return `${d.getDate()} ${d.toLocaleString('es-ES', { month: 'short' }).substring(0, 3)}`;
+                                                }}
+                                                tick={{ fill: '#9ca3af', fontSize: 12 }}
+                                                tickLine={false}
+                                                axisLine={false}
+                                                dy={10}
+                                            />
+                                            <YAxis domain={['dataMin - 1', 'dataMax + 1']} hide />
+                                            <Area
+                                                type="monotone"
+                                                dataKey="visceralFat"
+                                                stroke="#eab308"
+                                                strokeWidth={3}
+                                                fillOpacity={1}
+                                                fill="url(#colorVisceral)"
+                                                isAnimationActive={false}
+                                                dot={{ r: 4, fill: '#eab308', strokeWidth: 2, stroke: '#fff' }}
+                                                activeDot={false}
+                                            >
+                                                <LabelList
+                                                    dataKey="visceralFat"
+                                                    position="top"
+                                                    offset={10}
+                                                    formatter={(val: any) => typeof val === 'number' ? Math.round(val) : val}
                                                     style={{ fontSize: '12px', fontWeight: 'bold', fill: '#eab308' }}
                                                 />
                                             </Area>
