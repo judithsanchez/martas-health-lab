@@ -513,7 +513,7 @@ export default function ReportDetailView({
                                     </div>
                                 </div>
 
-                                <div className="space-y-4">
+                                <div className="space-y-2">
                                     {/* Header Row */}
                                     <div className="flex items-center justify-between pb-2 border-b border-gray-100 px-2">
                                         <span className="text-sm font-bold text-gray-400 uppercase tracking-widest">Zona</span>
@@ -530,7 +530,7 @@ export default function ReportDetailView({
                                         { label: 'Pierna Izquierda', muscle: measurement.muscleLegLeft, fat: measurement.fatLegLeft },
                                         { label: 'Tronco', muscle: measurement.muscleTrunk, fat: measurement.fatTrunk },
                                     ].map((row, idx) => (
-                                        <div key={idx} className="flex items-center justify-between py-3 border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors rounded-lg px-2">
+                                        <div key={idx} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors rounded-lg px-2">
                                             <span className="text-base font-bold text-gray-500">{row.label}</span>
                                             <div className="flex items-center gap-6">
                                                 <div className="flex flex-col items-end w-16">
