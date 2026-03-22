@@ -276,7 +276,7 @@ export default function ReportDetailView({
             <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
                 <div className="flex justify-between items-center mb-4">
                     <h5 className="text-sm font-bold text-gray-400 uppercase tracking-widest">{title}</h5>
-                    <span className="text-xl font-bold text-plum">{value}<span className="text-xs ml-1 opacity-50">{unit}</span></span>
+                    <span className="text-2xl font-bold text-plum">{value}<span className="text-sm ml-1 opacity-50">{unit}</span></span>
                 </div>
                 <div
                     className="h-3 rounded-full mb-2 w-full overflow-hidden"
@@ -288,7 +288,7 @@ export default function ReportDetailView({
                     {markers.map((m: any, i: number) => (
                         <div key={i} className="flex flex-col items-center">
                             <div className="w-px h-1 bg-gray-300 mb-1" />
-                            <span className="text-xs font-bold text-gray-300 uppercase tracking-tighter">{m.label}</span>
+                            <span className="text-sm font-bold text-gray-300 uppercase tracking-tighter">{m.label}</span>
                         </div>
                     ))}
                 </div>
@@ -389,7 +389,7 @@ export default function ReportDetailView({
                             </div>
                             <div>
                                 <h4 className="text-xl font-bold text-plum">Relación Músculo-Grasa (MFR)</h4>
-                                <p className="text-sm text-plum/70 mt-1 max-w-2xl leading-relaxed">
+                                <p className="text-base text-plum/70 mt-1 max-w-2xl leading-relaxed">
                                     Indica cuántos kg de músculo tienes por cada kg de grasa. Un valor &gt; 2.5 es saludable, &gt; 4.0 es ideal para atletas.
                                 </p>
                             </div>
