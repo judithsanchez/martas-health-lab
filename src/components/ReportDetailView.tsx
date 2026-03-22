@@ -174,7 +174,7 @@ export default function ReportDetailView({
     );
 
     const MetricCard = ({ title, value, unit, label, description, color, icon: Icon, fullTitle, sparklineData, sparklineKey, sparklineColor }: any) => (
-        <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 flex flex-col hover:shadow-md transition-all group/card relative overflow-hidden">
+        <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 flex flex-col h-full hover:shadow-md transition-all group/card relative overflow-hidden">
             <div className="flex justify-between items-start mb-3 relative z-10">
                 <div className={`p-2 rounded-2xl bg-gray-50 ${color}`}>
                     <Icon size={18} />
@@ -464,7 +464,7 @@ export default function ReportDetailView({
                         </div>
 
                         {/* 3) Physical Indices Grid (Replaces List) */}
-                        <div className="bg-white rounded-[2rem] md:rounded-[3rem] p-6 md:p-8 border border-gray-100 shadow-xl">
+                        <div className="bg-white rounded-[2rem] md:rounded-[3rem] p-6 md:p-8 border border-gray-100 shadow-xl flex flex-col">
                             <div className="flex items-center gap-3 mb-8">
                                 <div className="p-2 bg-plum/10 rounded-xl">
                                     <Scale className="text-plum" size={18} />
@@ -472,7 +472,7 @@ export default function ReportDetailView({
                                 <h4 className="text-xl font-bold text-gray-500 uppercase tracking-widest">Índices Físicos</h4>
                             </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 {/* Weight Card with Sparkline */}
                                 <MetricCard
                                     title="Peso"
