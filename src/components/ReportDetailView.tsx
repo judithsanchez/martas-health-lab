@@ -174,7 +174,7 @@ export default function ReportDetailView({
     );
 
     const MetricCard = ({ title, value, unit, label, description, color, icon: Icon, fullTitle, sparklineData, sparklineKey, sparklineColor }: any) => (
-        <div className="bg-white rounded-3xl p-4 shadow-sm border border-gray-100 flex flex-col h-full hover:shadow-md transition-shadow group/card relative overflow-hidden">
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col h-full hover:shadow-md transition-all group/card relative overflow-hidden">
             <div className="flex justify-between items-start mb-3 relative z-10">
                 <div className={`p-2 rounded-2xl bg-gray-50 ${color}`}>
                     <Icon size={18} />
@@ -186,12 +186,12 @@ export default function ReportDetailView({
                 )}
             </div>
             <div className="flex items-center mb-1 relative z-10">
-                <h4 className="text-gray-500 text-xs font-bold uppercase tracking-widest">{title}</h4>
+                <h4 className="text-gray-500 text-sm font-bold uppercase tracking-widest">{title}</h4>
                 {fullTitle && <Tooltip text={fullTitle} />}
             </div>
             <div className="flex items-baseline gap-1 mb-1 relative z-10">
-                <span className="text-2xl font-bold text-plum">{value}</span>
-                <span className="text-sm font-medium text-gray-400">{unit}</span>
+                <span className="text-3xl font-bold text-plum">{value}</span>
+                <span className="text-sm font-bold text-gray-400 opacity-60 uppercase">{unit}</span>
             </div>
 
             {/* Sparkline Overlay */}
@@ -472,7 +472,7 @@ export default function ReportDetailView({
                                 <h4 className="text-xl font-bold text-gray-500 uppercase tracking-widest">Índices Físicos</h4>
                             </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 h-full">
                                 {/* Weight Card with Sparkline */}
                                 <MetricCard
                                     title="Peso"
@@ -502,7 +502,7 @@ export default function ReportDetailView({
                                 <MetricCard
                                     title="Grasa Visceral"
                                     value={Number(measurement.visceralFat || 0).toFixed(1)}
-                                    unit="Rating"
+                                    unit="ratio"
                                     label={visceral.label}
                                     icon={AlertCircle}
                                     color={visceral.color}
