@@ -8,11 +8,11 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "node scripts/db-upgrade.js && next start",
     "lint": "next lint --dir src",
     "app:dev": "next dev",
     "app:build": "next build",
-    "app:start": "next start",
+    "app:start": "node scripts/db-upgrade.js && next start",
     "db:push": "drizzle-kit push:sqlite",
     "db:studio": "drizzle-kit studio",
     "db:view": "drizzle-kit studio",
