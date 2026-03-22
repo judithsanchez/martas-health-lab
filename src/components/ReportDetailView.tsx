@@ -363,7 +363,7 @@ export default function ReportDetailView({
 
 
     return (
-        <main className="min-h-screen bg-cream pb-20">
+        <main className="bg-cream pb-20">
             {/* Minimal Header */}
             <div className="px-4 md:px-12 max-w-7xl mx-auto space-y-6 md:space-y-8 mt-4">
                 {/* Hero / Summary Area */}
@@ -412,7 +412,7 @@ export default function ReportDetailView({
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
                         {/* Left Column: Metrics & Segmental */}
-                        <div className="flex flex-col justify-between h-full gap-6">
+                        <div className="flex flex-col justify-between gap-6">
                             {/* 1) Physical Indices Card */}
                             <div className="bg-white rounded-[2rem] md:rounded-[3rem] p-4 md:p-6 border border-gray-100 shadow-xl flex flex-col">
                                 <div className="flex items-center gap-3 mb-4">
@@ -549,7 +549,7 @@ export default function ReportDetailView({
 
                         {/* Right Column: History Charts */}
                         {history.length >= 2 ? (
-                            <div className="flex flex-col justify-between h-full gap-6">
+                            <div className="flex flex-col justify-between gap-6">
                                 {/* Muscle Chart */}
                                 <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 shadow-xl border border-gray-100">
                                     <h4 className="text-base font-bold text-gray-400 uppercase tracking-widest mb-4">Masa Muscular (kg)</h4>
