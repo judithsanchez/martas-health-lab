@@ -314,7 +314,7 @@ export default function ReportDetailView({
         }
 
         return (
-            <div className="bg-white/50 p-4 rounded-3xl flex items-center justify-between group hover:bg-white transition-all border border-transparent hover:border-gray-100 relative overflow-hidden">
+            <div className="bg-white/50 py-2 px-4 rounded-3xl flex items-center justify-between group hover:bg-white transition-all border border-transparent hover:border-gray-100 relative overflow-hidden">
                 <div className="flex items-center gap-3 z-10 relative">
                     <div className="p-2 bg-white rounded-xl shadow-sm group-hover:shadow-md transition-shadow">
                         <Icon size={18} className="text-plum" />
@@ -414,8 +414,8 @@ export default function ReportDetailView({
                         {/* Left Column: Metrics & Segmental */}
                         <div className="flex flex-col gap-6">
                             {/* 1) Physical Indices Card */}
-                            <div className="bg-white rounded-[2rem] md:rounded-[3rem] p-6 md:p-8 border border-gray-100 shadow-xl flex flex-col">
-                                <div className="flex items-center gap-3 mb-8">
+                            <div className="bg-white rounded-[2rem] md:rounded-[3rem] p-4 md:p-6 border border-gray-100 shadow-xl flex flex-col">
+                                <div className="flex items-center gap-3 mb-4">
                                     <div className="p-2 bg-plum/10 rounded-xl">
                                         <Scale className="text-plum" size={18} />
                                     </div>
@@ -451,8 +451,8 @@ export default function ReportDetailView({
                             </div>
 
                             {/* 2) Metabolic Health Card */}
-                            <div className="bg-white rounded-[2rem] md:rounded-[3rem] p-6 md:p-8 border border-gray-100 shadow-xl">
-                                <div className="flex items-center gap-3 mb-8">
+                            <div className="bg-white rounded-[2rem] md:rounded-[3rem] p-4 md:p-6 border border-gray-100 shadow-xl">
+                                <div className="flex items-center gap-3 mb-4">
                                     <div className="p-2 bg-gold/10 rounded-xl">
                                         <Zap className="text-gold" size={18} />
                                     </div>
@@ -502,8 +502,8 @@ export default function ReportDetailView({
                             </div>
 
                             {/* 3) Segmental Analysis Card */}
-                            <section className="bg-white rounded-[2rem] md:rounded-[3rem] p-6 md:p-8 border border-gray-100 shadow-xl flex flex-col">
-                                <div className="flex items-center gap-3 mb-8">
+                            <section className="bg-white rounded-[2rem] md:rounded-[3rem] p-4 md:p-6 border border-gray-100 shadow-xl flex flex-col">
+                                <div className="flex items-center gap-3 mb-4">
                                     <div className="p-2 bg-gray-50 rounded-xl">
                                         <Activity className="text-gray-400" size={16} />
                                     </div>
