@@ -591,7 +591,7 @@ export default function ReportDetailView({
                                 <div className="h-40">
                                     <ResponsiveContainer width="100%" height="100%">
                                         <AreaChart
-                                            data={[...history].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).slice(-10)}
+                                            data={[...history].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).slice(-5)}
                                             margin={{ top: 25, right: 15, left: 15, bottom: 5 }}
                                         >
                                             <defs>
@@ -644,7 +644,7 @@ export default function ReportDetailView({
                                 <div className="h-40">
                                     <ResponsiveContainer width="100%" height="100%">
                                         <AreaChart
-                                            data={[...history].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).slice(-10)}
+                                            data={[...history].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).slice(-5)}
                                             margin={{ top: 25, right: 15, left: 15, bottom: 5 }}
                                         >
                                             <defs>
