@@ -6,7 +6,8 @@ import {
     Ruler,
     Zap,
     Download,
-    ArrowLeft
+    ArrowLeft,
+    Pencil
 } from 'lucide-react';
 import Gauge from './Gauge';
 import { formatDateLong, formatDateDayMonth } from '@/lib/utils/date-utils';
@@ -20,9 +21,10 @@ interface ReportHeaderProps {
         description: string;
         color: string;
     };
+    onEdit?: () => void;
 }
 
-export default function ReportHeader({ client, measurement, ffmi }: ReportHeaderProps) {
+export default function ReportHeader({ client, measurement, ffmi, onEdit }: ReportHeaderProps) {
     const getActivityLevelLabel = (level: number | null) => {
         if (!level) return '--';
         const labels: Record<number, string> = {
@@ -84,6 +86,18 @@ export default function ReportHeader({ client, measurement, ffmi }: ReportHeader
                         </span>
                     </div>
 
+                    {/* Edit Option */}
+                    {onEdit && (
+                        <button
+                            onClick={onEdit}
+                            className="no-pdf flex items-center gap-2 bg-white text-plum border border-plum/10 hover:bg-plum/5 px-4 py-2 rounded-full transition-all shadow-sm group"
+                            title="Editar Medición"
+                        >
+                            <Pencil size={14} className="text-plum" />
+                            <span className="text-xs font-bold uppercase tracking-wider hidden sm:inline">Editar Medición</span>
+                        </button>
+                    )}
+
                     {/* PDF Download Button - Moved here */}
                     <button
                         onClick={() => window.open(`/api/reports/${client.id}/${measurement.id}/pdf`, '_blank')}
@@ -91,7 +105,7 @@ export default function ReportHeader({ client, measurement, ffmi }: ReportHeader
                         title="Descargar PDF"
                     >
                         <Download size={14} className="text-gold" />
-                        <span className="text-xs font-bold uppercase tracking-wider">Descargar PDF</span>
+                        <span className="text-xs font-bold uppercase tracking-wider hidden sm:inline">Descargar PDF</span>
                     </button>
                 </div>
             </div>

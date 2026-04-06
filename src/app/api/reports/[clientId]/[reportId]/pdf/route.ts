@@ -1,6 +1,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import puppeteer from 'puppeteer';
+import fs from 'fs';
 
 export async function GET(
     request: NextRequest,
@@ -12,13 +13,15 @@ export async function GET(
         // Ensure we have a valid URL to visit
         // In production, this should be the full domain. For dev, localhost:3000 is fine.
         const host = request.headers.get('host') || 'localhost:3000';
+        const portMatch = host.match(/:(\d+)/);
+        const port = portMatch ? portMatch[1] : (process.env.PORT || '3000');
 
         console.log(`[PDF] Request received. Host: ${host}, Client: ${clientId}, Report: ${reportId}`);
 
         // FORCE LOCALHOST STRATEGY
         // The incoming host (e.g., 100.117.x.y) might not be reachable from inside the Docker container.
         // Since Puppeteer is running on the same server/container, we can simply visit localhost.
-        const localHost = '127.0.0.1:3000';
+        const localHost = `127.0.0.1:${port}`;
         const protocol = 'http'; // Always http for localhost
         const reportUrl = `${protocol}://${localHost}/clients/${clientId}/reports/${reportId}`;
 
@@ -27,6 +30,9 @@ export async function GET(
         // Launch Puppeteer
         const browser = await puppeteer.launch({
             headless: true,
+            executablePath: fs.existsSync('/usr/bin/chromium-browser') 
+                ? '/usr/bin/chromium-browser' 
+                : undefined,
             args: ['--no-sandbox', '--disable-setuid-sandbox'],
         });
         const page = await browser.newPage();
