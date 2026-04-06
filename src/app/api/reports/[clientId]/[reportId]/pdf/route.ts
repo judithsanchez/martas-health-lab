@@ -1,6 +1,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import puppeteer from 'puppeteer';
+import fs from 'fs';
 
 export async function GET(
     request: NextRequest,
@@ -27,6 +28,9 @@ export async function GET(
         // Launch Puppeteer
         const browser = await puppeteer.launch({
             headless: true,
+            executablePath: fs.existsSync('/usr/bin/chromium-browser') 
+                ? '/usr/bin/chromium-browser' 
+                : undefined,
             args: ['--no-sandbox', '--disable-setuid-sandbox'],
         });
         const page = await browser.newPage();
