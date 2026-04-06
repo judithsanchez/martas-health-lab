@@ -9,7 +9,8 @@ export function formatDate(date: string | Date | number): string {
     return new Intl.DateTimeFormat('es-ES', {
         day: '2-digit',
         month: '2-digit',
-        year: 'numeric'
+        year: 'numeric',
+        timeZone: 'UTC'
     }).format(d);
 }
 
@@ -23,7 +24,8 @@ export function formatDateLong(date: string | Date | number): string {
     return new Intl.DateTimeFormat('es-ES', {
         day: 'numeric',
         month: 'long',
-        year: 'numeric'
+        year: 'numeric',
+        timeZone: 'UTC'
     }).format(d);
 }
 
@@ -36,7 +38,8 @@ export function formatDateDayMonth(date: string | Date | number): string {
     if (isNaN(d.getTime())) return String(date);
     return new Intl.DateTimeFormat('es-ES', {
         day: 'numeric',
-        month: 'long'
+        month: 'long',
+        timeZone: 'UTC'
     }).format(d);
 }
 
@@ -49,7 +52,8 @@ export function formatDateShort(date: string | Date | number): string {
     if (isNaN(d.getTime())) return String(date);
     return new Intl.DateTimeFormat('es-ES', {
         day: 'numeric',
-        month: 'short'
+        month: 'short',
+        timeZone: 'UTC'
     }).format(d);
 }
 /**

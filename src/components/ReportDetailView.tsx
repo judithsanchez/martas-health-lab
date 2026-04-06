@@ -17,6 +17,7 @@ import {
     Zap as Flash,
     ArrowUpRight
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
     calculateBMI,
@@ -46,6 +47,7 @@ import {
 } from 'recharts';
 import ReportHeader from '@/components/report/ReportHeader';
 import CompositionChart from '@/components/report/CompositionChart';
+import { RecordForm } from '@/components/RecordForm';
 
 export default function ReportDetailView({
     client,
@@ -56,6 +58,9 @@ export default function ReportDetailView({
     measurement: any,
     history?: any[]
 }) {
+    const router = useRouter();
+    const [isEditing, setIsEditing] = React.useState(false);
+    
     // activeGroup and metricGroups removed as they are no longer used
 
     // Calculate effective age
@@ -107,9 +112,9 @@ export default function ReportDetailView({
 
         // Convert back to array, filter, and sort
         return Array.from(dataMap.values())
-            .filter(record => new Date(record.date).getTime() <= currentTimestamp)
-            .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-            .slice(-5) // Keep only last 5 relative to current context
+            .filter((record: any) => new Date(record.date).getTime() <= currentTimestamp)
+            .sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime())
+            .slice(-6) // Keep only last 6 relative to current context
             .map(record => {
                 return {
                     ...record,
@@ -367,7 +372,12 @@ export default function ReportDetailView({
             {/* Minimal Header */}
             <div className="px-4 md:px-12 max-w-7xl mx-auto space-y-6 md:space-y-8 mt-4">
                 {/* Hero / Summary Area */}
-                <ReportHeader client={{ ...client, age: effectiveAge }} measurement={measurement} ffmi={{ ...ffmi, color: ffmi.color || '' }} />
+                <ReportHeader 
+                    client={{ ...client, age: effectiveAge }} 
+                    measurement={measurement} 
+                    ffmi={{ ...ffmi, color: ffmi.color || '' }} 
+                    onEdit={() => setIsEditing(true)}
+                />
 
                 {/* Master History Chart (Option A) removed as requested */}
 
@@ -771,6 +781,19 @@ export default function ReportDetailView({
                     </div>
                 </div>
             </div>
+
+            {isEditing && (
+                <RecordForm
+                    clientId={client.id}
+                    client={client}
+                    record={measurement}
+                    onClose={() => setIsEditing(false)}
+                    onSuccess={() => {
+                        setIsEditing(false);
+                        router.refresh();
+                    }}
+                />
+            )}
         </main>
     );
 }

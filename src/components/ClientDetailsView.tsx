@@ -5,14 +5,16 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { deleteRecord } from "@/lib/actions/records";
 import { RecordForm } from "@/components/RecordForm";
+import { ClientForm } from "@/components/ClientForm";
 import { formatDate, calculateAge } from "@/lib/utils/date-utils";
 import CsvUploadFlow from "@/components/CsvUploadFlow";
-import { FileUp, Plus, X, User, Ruler, Activity, Calendar, Hash } from "lucide-react";
+import { FileUp, Plus, X, User, Ruler, Activity, Calendar, Hash, Pencil } from "lucide-react";
 
 export default function ClientDetailsView({ client, measurements }: { client: any, measurements: any[] }) {
     const router = useRouter();
     const [editingRecord, setEditingRecord] = useState<any | null>(null);
     const [isCreating, setIsCreating] = useState(false);
+    const [isEditingProfile, setIsEditingProfile] = useState(false);
     const [isImporting, setIsImporting] = useState(false);
 
     async function handleDelete(id: number) {
@@ -51,14 +53,24 @@ export default function ClientDetailsView({ client, measurements }: { client: an
                             className="px-6 py-3 bg-white text-plum border border-slate-200 rounded-xl hover:bg-slate-50 transition font-bold shadow-sm flex items-center gap-2"
                         >
                             <FileUp size={18} className="text-sage" />
-                            <span>Importar desde Archivo</span>
+                            <span className="hidden md:inline">Importar desde Archivo</span>
+                            <span className="md:hidden">Importar</span>
+                        </button>
+                        <button
+                            onClick={() => setIsEditingProfile(true)}
+                            className="px-6 py-3 bg-white text-plum border border-slate-200 rounded-xl hover:bg-slate-50 transition font-bold shadow-sm flex items-center gap-2"
+                        >
+                            <Pencil size={18} className="text-sage" />
+                            <span className="hidden md:inline">Editar Perfil</span>
+                            <span className="md:hidden">Editar</span>
                         </button>
                         <button
                             onClick={() => setIsCreating(true)}
                             className="px-6 py-3 bg-plum text-cream rounded-xl hover:bg-slate-800 transition font-bold shadow-md hover:shadow-lg flex items-center gap-2"
                         >
                             <Plus size={18} />
-                            <span>Entrada Manual</span>
+                            <span className="hidden md:inline">Entrada Manual</span>
+                            <span className="md:hidden">Manual</span>
                         </button>
                     </div>
                 </div>
@@ -208,7 +220,6 @@ export default function ClientDetailsView({ client, measurements }: { client: an
                         }}
                     />
                 )}
-                {/* Import Modal */}
                 {isImporting && (
                     <div className="fixed inset-0 bg-plum/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
                         <div className="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-4xl overflow-hidden relative animate-in fade-in zoom-in duration-300">
@@ -230,6 +241,17 @@ export default function ClientDetailsView({ client, measurements }: { client: an
                             </div>
                         </div>
                     </div>
+                )}
+                {/* Profile Edit Modal */}
+                {isEditingProfile && (
+                    <ClientForm
+                        client={client}
+                        onClose={() => setIsEditingProfile(false)}
+                        onSuccess={() => {
+                            setIsEditingProfile(false);
+                            router.refresh();
+                        }}
+                    />
                 )}
             </div>
         </main>

@@ -52,16 +52,16 @@ export async function getClients() {
 
 export async function createClient(data: {
     name: string;
-    lastname?: string;
-    username?: string;
-    birthday?: string;
-    height?: number;
-    activityLevel?: number;
-    sessionsPerWeek?: number;
-    startDate?: string;
-    email?: string;
-    phone?: string;
-    gender?: string;
+    lastname?: string | null;
+    username?: string | null;
+    birthday?: string | null;
+    height?: number | null;
+    activityLevel?: number | null;
+    sessionsPerWeek?: number | null;
+    startDate?: string | null;
+    email?: string | null;
+    phone?: string | null;
+    gender?: string | null;
 }) {
     try {
         const result = await db.insert(clients).values({
@@ -90,17 +90,17 @@ export async function createClient(data: {
 export async function updateClient(
     id: number,
     data: {
-        name?: string;
-        lastname?: string;
-        username?: string;
-        birthday?: string;
-        height?: number;
-        activityLevel?: number;
-        sessionsPerWeek?: number;
-        startDate?: string;
-        email?: string;
-        phone?: string;
-        gender?: string;
+        name?: string | null;
+        lastname?: string | null;
+        username?: string | null;
+        birthday?: string | null;
+        height?: number | null;
+        activityLevel?: number | null;
+        sessionsPerWeek?: number | null;
+        startDate?: string | null;
+        email?: string | null;
+        phone?: string | null;
+        gender?: string | null;
     }
 ) {
     try {
