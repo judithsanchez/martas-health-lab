@@ -199,43 +199,43 @@ export function RecordForm({ clientId, client, record, onClose, onSuccess }: Rec
                                 <input type="number" step="0.1" name="height" value={formData.height} onChange={handleChange} className="w-full p-2 border rounded bg-blue-50/30 border-blue-100 focus:border-blue-300 outline-none" />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-blue-500 uppercase">Body Fat %</label>
+                                <label className="text-xs font-bold text-blue-500 uppercase">% Grasa Corporal</label>
                                 <input type="number" step="0.1" name="fatPercent" value={formData.fatPercent} onChange={handleChange} className="w-full p-2 border rounded bg-blue-50/30 border-blue-100 focus:border-blue-300 outline-none" />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-purple-500 uppercase">Muscle (kg)</label>
+                                <label className="text-xs font-bold text-purple-500 uppercase">Músculo (kg)</label>
                                 <input type="number" step="0.1" name="muscleMass" value={formData.muscleMass} onChange={handleChange} className="w-full p-2 border rounded bg-purple-50/30 border-purple-100 focus:border-purple-300 outline-none" />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-blue-500 uppercase">Water %</label>
+                                <label className="text-xs font-bold text-blue-500 uppercase">% Agua</label>
                                 <input type="number" step="0.1" name="waterPercent" value={formData.waterPercent} onChange={handleChange} className="w-full p-2 border rounded bg-blue-50/30 border-blue-100 focus:border-blue-300 outline-none" />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-purple-500 uppercase">Bone (kg)</label>
+                                <label className="text-xs font-bold text-purple-500 uppercase">Hueso (kg)</label>
                                 <input type="number" step="0.1" name="boneMass" value={formData.boneMass} onChange={handleChange} className="w-full p-2 border rounded bg-purple-50/30 border-purple-100 focus:border-purple-300 outline-none" />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-blue-500 uppercase">Visceral Fat</label>
+                                <label className="text-xs font-bold text-blue-500 uppercase">Grasa Visceral</label>
                                 <input type="number" step="0.5" name="visceralFat" value={formData.visceralFat} onChange={handleChange} className="w-full p-2 border rounded bg-blue-50/30 border-blue-100 focus:border-blue-300 outline-none" />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-purple-500 uppercase">Metabolic Age</label>
+                                <label className="text-xs font-bold text-purple-500 uppercase">Edad Metabólica</label>
                                 <input type="number" name="metabolicAge" value={formData.metabolicAge} onChange={handleChange} className="w-full p-2 border rounded bg-purple-50/30 border-purple-100 focus:border-purple-300 outline-none" />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-purple-500 uppercase">BMR (kcal)</label>
+                                <label className="text-xs font-bold text-purple-500 uppercase">TMB (kcal)</label>
                                 <input type="number" name="bmr" value={formData.bmr} onChange={handleChange} className="w-full p-2 border rounded bg-purple-50/30 border-purple-100 focus:border-purple-300 outline-none" />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-blue-500 uppercase">Physique Rating</label>
+                                <label className="text-xs font-bold text-blue-500 uppercase">Valoración Física</label>
                                 <input type="number" name="physiqueRatingScale" value={formData.physiqueRatingScale} onChange={handleChange} className="w-full p-2 border rounded bg-blue-50/30 border-blue-100 focus:border-blue-300 outline-none" />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-blue-500 uppercase">Waist (cm)</label>
+                                <label className="text-xs font-bold text-blue-500 uppercase">Cintura (cm)</label>
                                 <input type="number" step="0.1" name="waist" value={formData.waist} onChange={handleChange} className="w-full p-2 border rounded bg-blue-50/30 border-blue-100 focus:border-blue-300 outline-none" />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-purple-500 uppercase">BMI</label>
+                                <label className="text-xs font-bold text-purple-500 uppercase">IMC</label>
                                 <input type="number" step="0.1" name="bmi" value={formData.bmi} onChange={handleChange} className="w-full p-2 border rounded bg-purple-50/30 border-purple-100 focus:border-purple-300 outline-none" />
                             </div>
                         </div>

@@ -90,10 +90,10 @@ export default function ReportHeader({ client, measurement, ffmi, onEdit }: Repo
                     {onEdit && (
                         <button
                             onClick={onEdit}
-                            className="no-pdf flex items-center gap-2 bg-white/10 text-white hover:bg-white/20 px-4 py-2 rounded-full transition-all shadow-md group border border-white/10"
+                            className="no-pdf flex items-center gap-2 bg-white text-plum border border-plum/10 hover:bg-plum/5 px-4 py-2 rounded-full transition-all shadow-sm group"
                             title="Editar Medición"
                         >
-                            <Pencil size={14} className="text-white" />
+                            <Pencil size={14} className="text-plum" />
                             <span className="text-xs font-bold uppercase tracking-wider hidden sm:inline">Editar Medición</span>
                         </button>
                     )}
