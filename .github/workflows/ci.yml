@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+
 jobs:
   quality-checks:
     runs-on: ubuntu-latest
@@ -52,24 +55,52 @@ jobs:
     needs: quality-checks
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Connect to Tailscale
-        uses: tailscale/github-action@v3
+        uses: tailscale/github-action@v4
         with:
-          authkey: ${{ secrets.TAILSCALE_AUTH_KEY }}
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          audience: ${{ secrets.TS_AUDIENCE }}
+          tags: tag:ci
+          ping: ${{ secrets.PI_HOST }}
 
       - name: Deploy to Raspberry Pi
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v1.2.5
         with:
           host: ${{ secrets.PI_HOST }}
           username: ${{ secrets.PI_USERNAME }}
           key: ${{ secrets.PI_SSH_KEY }}
           script: |
-            cd /home/judithvsanchezc/Desktop/dev/martas-health-lab
+            set -eu
+
+            repo=/home/judithvsanchezc/Desktop/dev/martas-health-lab
+            cd "$repo"
+
+            # Preserve the live SQLite database before replacing the app.
+            backup_name="prod-$(date -u +%Y%m%dT%H%M%SZ).db"
+            docker exec martas-lab mkdir -p /app/data/backups
+            docker exec \
+              -e BACKUP_FILE="/app/data/backups/$backup_name" \
+              martas-lab \
+              node -e 'const Database = require("better-sqlite3"); const db = new Database("/app/data/prod.db"); db.backup(process.env.BACKUP_FILE).then(() => db.close()).catch((error) => { console.error(error); process.exit(1); });'
+
+            # Build from origin/main without modifying the dirty live worktree.
             git fetch origin main
-            git reset --hard origin/main
-            docker compose build
-            docker compose up -d
+            previous_image="$(docker inspect --format '{{.Image}}' martas-lab)"
+            docker image tag "$previous_image" martas-health-lab-app:rollback
+            git archive --format=tar origin/main | docker build --tag martas-health-lab-app:candidate -
+            docker image tag martas-health-lab-app:candidate martas-health-lab-app:latest
+
+            # Keep the existing ./data mount and automatically restore the old
+            # image if the new container does not become healthy.
+            if ! docker compose up -d --no-build --wait --wait-timeout 90 app; then
+              docker image tag martas-health-lab-app:rollback martas-health-lab-app:latest
+              docker compose up -d --no-build --wait --wait-timeout 90 app
+              exit 1
+            fi
