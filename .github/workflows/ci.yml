@@ -85,15 +85,15 @@ jobs:
 
             cleanup() {
               rm -f "$compose_file"
-              docker builder prune --force --filter "until=2h" >/dev/null 2>&1 || true
+              docker builder prune --force >/dev/null 2>&1 || true
             }
             trap cleanup EXIT
 
             cd "$repo"
             git fetch origin main
 
-            # Reclaim expired build cache before measuring deployment headroom.
-            docker builder prune --force --filter "until=2h" >/dev/null 2>&1 || true
+            # Reclaim disposable build cache before measuring deployment headroom.
+            docker builder prune --force >/dev/null 2>&1 || true
 
             # Build only when the Pi has enough non-reserved space to complete
             # the image alongside the currently running rollback candidate.
