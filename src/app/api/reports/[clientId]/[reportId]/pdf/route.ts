@@ -1,12 +1,14 @@
 
 import { NextRequest, NextResponse } from 'next/server';
-import puppeteer from 'puppeteer';
+import puppeteer, { type Browser } from 'puppeteer';
 import fs from 'fs';
 
 export async function GET(
     request: NextRequest,
     { params }: { params: { clientId: string; reportId: string } }
 ) {
+    let browser: Browser | undefined;
+
     try {
         const { clientId, reportId } = params;
 
@@ -28,11 +30,15 @@ export async function GET(
         console.log(`[PDF] Puppeteer visiting: ${reportUrl}`);
 
         // Launch Puppeteer
-        const browser = await puppeteer.launch({
+        const executablePath = [
+            process.env.PUPPETEER_EXECUTABLE_PATH,
+            '/usr/bin/chromium-browser',
+            '/usr/bin/chromium',
+        ].find((candidate): candidate is string => Boolean(candidate && fs.existsSync(candidate)));
+
+        browser = await puppeteer.launch({
             headless: true,
-            executablePath: fs.existsSync('/usr/bin/chromium-browser') 
-                ? '/usr/bin/chromium-browser' 
-                : undefined,
+            ...(executablePath ? { executablePath } : {}),
             args: ['--no-sandbox', '--disable-setuid-sandbox'],
         });
         const page = await browser.newPage();
@@ -215,8 +221,6 @@ export async function GET(
             margin: { top: 0, right: 0, bottom: 0, left: 0 }
         });
 
-        await browser.close();
-
         // Return PDF as response
         return new NextResponse(Buffer.from(pdfBuffer), {
             headers: {
@@ -231,5 +235,13 @@ export async function GET(
             { error: 'Failed to generate PDF', details: error instanceof Error ? error.message : String(error) },
             { status: 500 }
         );
+    } finally {
+        if (browser) {
+            try {
+                await browser.close();
+            } catch (closeError) {
+                console.error('Failed to close PDF browser:', closeError);
+            }
+        }
     }
 }

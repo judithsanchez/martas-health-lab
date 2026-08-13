@@ -1,9 +1,11 @@
 services:
   app:
+    image: martas-health-lab-app:latest
     build:
       context: .
       dockerfile: Dockerfile
     container_name: martas-lab
+    init: true
     restart: unless-stopped
     ports:
       - "3000:3000"
@@ -12,8 +14,18 @@ services:
     environment:
       - DATABASE_URL=file:/app/data/prod.db
       - NEXT_PUBLIC_APP_URL=http://localhost:3000
-    # healthcheck:
-    #   test: ["CMD", "curl", "-f", "http://localhost:3000"]
-    #   interval: 30s
-    #   timeout: 10s
-    #   retries: 3
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:3000').then((response) => process.exit(response.ok ? 0 : 1)).catch(() => process.exit(1))"
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
