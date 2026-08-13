@@ -89,6 +89,9 @@ jobs:
             cd "$repo"
             git fetch origin main
 
+            # Reclaim expired build cache before measuring deployment headroom.
+            docker builder prune --force --filter "until=2h" >/dev/null 2>&1 || true
+
             # Build only when the Pi has enough non-reserved space to complete
             # the image alongside the currently running rollback candidate.
             available_kb="$(df -Pk / | awk 'NR == 2 { print $4 }')"
@@ -138,8 +141,12 @@ jobs:
             # A stale candidate is never a rollback target.
             docker image rm martas-health-lab-app:candidate >/dev/null 2>&1 || true
 
-            git archive --format=tar origin/main \
-              | docker build --tag martas-health-lab-app:candidate -
+            if ! git archive --format=tar origin/main \
+              | docker build --tag martas-health-lab-app:candidate -; then
+              echo "Image build failed; removing dangling build cache."
+              docker builder prune --force >/dev/null 2>&1 || true
+              exit 1
+            fi
 
             candidate_image="$(docker image inspect --format '{{.Id}}' martas-health-lab-app:candidate)"
             docker image tag "$candidate_image" martas-health-lab-app:latest
@@ -152,6 +159,7 @@ jobs:
               fi
               docker image rm martas-health-lab-app:candidate >/dev/null 2>&1 || true
               docker image rm "$candidate_image" >/dev/null 2>&1 || true
+              docker builder prune --force >/dev/null 2>&1 || true
               exit 1
             fi
 
