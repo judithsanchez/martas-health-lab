@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+
 jobs:
   quality-checks:
     runs-on: ubuntu-latest
@@ -52,6 +55,9 @@ jobs:
     needs: quality-checks
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    concurrency:
+      group: martas-production
+      cancel-in-progress: false
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -62,14 +68,108 @@ jobs:
           authkey: ${{ secrets.TAILSCALE_AUTH_KEY }}
 
       - name: Deploy to Raspberry Pi
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v1.2.5
         with:
           host: ${{ secrets.PI_HOST }}
           username: ${{ secrets.PI_USERNAME }}
           key: ${{ secrets.PI_SSH_KEY }}
+          command_timeout: 20m
           script: |
-            cd /home/judithvsanchezc/Desktop/dev/martas-health-lab
+            set -eu
+
+            repo=/home/judithvsanchezc/Desktop/dev/martas-health-lab
+            compose_file="$(mktemp)"
+
+            cleanup() {
+              rm -f "$compose_file"
+              docker builder prune --force --filter "until=2h" >/dev/null 2>&1 || true
+            }
+            trap cleanup EXIT
+
+            cd "$repo"
             git fetch origin main
-            git reset --hard origin/main
-            docker compose build
-            docker compose up -d
+
+            # Reclaim expired build cache before measuring deployment headroom.
+            docker builder prune --force --filter "until=2h" >/dev/null 2>&1 || true
+
+            # Build only when the Pi has enough non-reserved space to complete
+            # the image alongside the currently running rollback candidate.
+            available_kb="$(df -Pk / | awk 'NR == 2 { print $4 }')"
+            minimum_kb=2097152
+            if [ "$available_kb" -lt "$minimum_kb" ]; then
+              echo "Deployment requires at least 2 GiB free; only ${available_kb} KiB is available."
+              exit 1
+            fi
+
+            # Read Compose from origin/main without resetting or otherwise
+            # modifying the developer's dirty checkout on the Pi.
+            git show origin/main:docker-compose.yml > "$compose_file"
+
+            compose_up() {
+              docker compose \
+                --project-name martas-health-lab \
+                --project-directory "$repo" \
+                --file "$compose_file" \
+                up -d --no-build --wait --wait-timeout 120 app
+            }
+
+            previous_image=""
+            previous_rollback=""
+
+            if docker inspect martas-lab >/dev/null 2>&1; then
+              previous_image="$(docker inspect --format '{{.Image}}' martas-lab)"
+              previous_rollback="$(docker image inspect --format '{{.Id}}' martas-health-lab-app:rollback 2>/dev/null || true)"
+
+              # Create an atomic, bounded pre-deploy database backup. A valid
+              # previous backup remains in place until the new one is complete.
+              docker exec martas-lab node -e '
+                const Database = require("better-sqlite3");
+                const fs = require("fs");
+                const target = "/app/data/backups/pre-deploy.db";
+                const temporary = `${target}.tmp`;
+                fs.mkdirSync("/app/data/backups", { recursive: true });
+                if (fs.existsSync(temporary)) fs.unlinkSync(temporary);
+                const db = new Database("/app/data/prod.db", { readonly: true });
+                db.backup(temporary)
+                  .then(() => { db.close(); fs.renameSync(temporary, target); })
+                  .catch((error) => { db.close(); console.error(error); process.exit(1); });
+              '
+
+              docker image tag "$previous_image" martas-health-lab-app:rollback
+            fi
+
+            # A stale candidate is never a rollback target.
+            docker image rm martas-health-lab-app:candidate >/dev/null 2>&1 || true
+
+            if ! git archive --format=tar origin/main \
+              | docker build --tag martas-health-lab-app:candidate -; then
+              echo "Image build failed; removing dangling build cache."
+              docker builder prune --force >/dev/null 2>&1 || true
+              exit 1
+            fi
+
+            candidate_image="$(docker image inspect --format '{{.Id}}' martas-health-lab-app:candidate)"
+            docker image tag "$candidate_image" martas-health-lab-app:latest
+
+            if ! compose_up; then
+              echo "Candidate failed its health check; restoring the previous image."
+              if [ -n "$previous_image" ]; then
+                docker image tag "$previous_image" martas-health-lab-app:latest
+                compose_up
+              fi
+              docker image rm martas-health-lab-app:candidate >/dev/null 2>&1 || true
+              docker image rm "$candidate_image" >/dev/null 2>&1 || true
+              docker builder prune --force >/dev/null 2>&1 || true
+              exit 1
+            fi
+
+            # Keep latest plus exactly one rollback. Remove the candidate alias,
+            # the rollback from two deployments ago, and older managed images.
+            docker image rm martas-health-lab-app:candidate >/dev/null 2>&1 || true
+            if [ -n "$previous_rollback" ] && [ "$previous_rollback" != "$previous_image" ]; then
+              docker image rm "$previous_rollback" >/dev/null 2>&1 || true
+            fi
+            docker image prune --force \
+              --filter "label=com.martas-health-lab.managed=true" >/dev/null
+
+            df -h /
