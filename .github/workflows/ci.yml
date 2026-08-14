@@ -15,15 +15,15 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node.js v20
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 20
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
 
       - name: Get pnpm store directory
         id: pnpm-cache
@@ -32,7 +32,7 @@ jobs:
           echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
 
       - name: Setup pnpm cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -51,8 +51,33 @@ jobs:
       - name: Run Tests
         run: pnpm test
 
-  deploy:
+  build-image:
     needs: quality-checks
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Build the production ARM64 image
+        run: docker build --tag martas-health-lab-app:candidate .
+
+      - name: Export the production image
+        run: |
+          mkdir -p .deployment
+          docker save martas-health-lab-app:candidate | gzip -1 > .deployment/martas-health-lab-image.tar.gz
+
+      - name: Retain the image only for this deployment
+        uses: actions/upload-artifact@v7
+        with:
+          name: martas-health-lab-image-${{ github.sha }}
+          path: .deployment/martas-health-lab-image.tar.gz
+          compression-level: 0
+          retention-days: 1
+          if-no-files-found: error
+
+  deploy:
+    needs: build-image
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     concurrency:
@@ -60,7 +85,13 @@ jobs:
       cancel-in-progress: false
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
+
+      - name: Download the production image
+        uses: actions/download-artifact@v8
+        with:
+          name: martas-health-lab-image-${{ github.sha }}
+          path: .deployment
 
       - name: Connect to Tailscale
         uses: tailscale/github-action@v4
@@ -70,109 +101,74 @@ jobs:
           tags: tag:ci
           ping: ${{ secrets.PI_HOST }}
 
-      - name: Deploy to Raspberry Pi
-        uses: appleboy/ssh-action@v1.2.5
+      - name: Load Raspberry Pi SSH key
+        uses: webfactory/ssh-agent@v0.10.0
         with:
-          host: ${{ secrets.PI_HOST }}
-          username: ${{ secrets.PI_USERNAME }}
-          key: ${{ secrets.PI_SSH_KEY }}
-          command_timeout: 20m
-          script: |
-            set -eu
+          ssh-private-key: ${{ secrets.PI_SSH_KEY }}
 
-            repo=/home/judithvsanchezc/Desktop/dev/martas-health-lab
-            compose_file="$(mktemp)"
-
-            cleanup() {
-              rm -f "$compose_file"
-              docker builder prune --force >/dev/null 2>&1 || true
-            }
-            trap cleanup EXIT
-
-            cd "$repo"
-            git fetch origin main
-
-            # Reclaim disposable build cache before measuring deployment headroom.
-            docker builder prune --force >/dev/null 2>&1 || true
-
-            # Build only when the Pi has enough non-reserved space to complete
-            # the image alongside the currently running rollback candidate.
-            available_kb="$(df -Pk / | awk 'NR == 2 { print $4 }')"
-            minimum_kb=2097152
-            if [ "$available_kb" -lt "$minimum_kb" ]; then
-              echo "Deployment requires at least 2 GiB free; only ${available_kb} KiB is available."
-              exit 1
+      - name: Trust Raspberry Pi host key
+        env:
+          PI_HOST: ${{ secrets.PI_HOST }}
+        run: |
+          mkdir -p ~/.ssh
+          SCAN_FILE="$(mktemp)"
+          trap 'rm -f "${SCAN_FILE}"' EXIT
+          for attempt in {1..6}; do
+            if ssh-keyscan -T 10 -H "${PI_HOST}" > "${SCAN_FILE}" && [[ -s "${SCAN_FILE}" ]]; then
+              cat "${SCAN_FILE}" >> ~/.ssh/known_hosts
+              exit 0
             fi
+            echo "Host-key scan attempt ${attempt} failed; retrying..." >&2
+            sleep 5
+          done
+          echo "Could not obtain the Raspberry Pi SSH host key." >&2
+          exit 1
 
-            # Read Compose from origin/main without resetting or otherwise
-            # modifying the developer's dirty checkout on the Pi.
-            git show origin/main:docker-compose.yml > "$compose_file"
-
-            compose_up() {
-              docker compose \
-                --project-name martas-health-lab \
-                --project-directory "$repo" \
-                --file "$compose_file" \
-                up -d --no-build --wait --wait-timeout 120 app
-            }
-
-            previous_image=""
-            previous_rollback=""
-
-            if docker inspect martas-lab >/dev/null 2>&1; then
-              previous_image="$(docker inspect --format '{{.Image}}' martas-lab)"
-              previous_rollback="$(docker image inspect --format '{{.Id}}' martas-health-lab-app:rollback 2>/dev/null || true)"
-
-              # Create an atomic, bounded pre-deploy database backup. A valid
-              # previous backup remains in place until the new one is complete.
-              docker exec martas-lab node -e '
-                const Database = require("better-sqlite3");
-                const fs = require("fs");
-                const target = "/app/data/backups/pre-deploy.db";
-                const temporary = `${target}.tmp`;
-                fs.mkdirSync("/app/data/backups", { recursive: true });
-                if (fs.existsSync(temporary)) fs.unlinkSync(temporary);
-                const db = new Database("/app/data/prod.db", { readonly: true });
-                db.backup(temporary)
-                  .then(() => { db.close(); fs.renameSync(temporary, target); })
-                  .catch((error) => { db.close(); console.error(error); process.exit(1); });
-              '
-
-              docker image tag "$previous_image" martas-health-lab-app:rollback
+      - name: Deploy to Raspberry Pi
+        env:
+          PI_HOST: ${{ secrets.PI_HOST }}
+          PI_USER: ${{ secrets.PI_USERNAME }}
+          DEPLOY_REF: ${{ github.sha }}
+        run: |
+          REMOTE_DIR="/home/${PI_USER}/Desktop/dev/martas-health-lab"
+          REMOTE_IMAGE="/tmp/martas-health-lab-production-image.tar.gz"
+          printf -v REMOTE_DIR_Q '%q' "${REMOTE_DIR}"
+          printf -v REMOTE_IMAGE_Q '%q' "${REMOTE_IMAGE}"
+          printf -v DEPLOY_REF_Q '%q' "${DEPLOY_REF}"
+          SSH_STATUS=255
+          for attempt in {1..4}; do
+            set +e
+            scp \
+              -o ConnectTimeout=15 \
+              -o ServerAliveInterval=15 \
+              -o ServerAliveCountMax=4 \
+              .deployment/martas-health-lab-image.tar.gz \
+              "${PI_USER}@${PI_HOST}:${REMOTE_IMAGE}"
+            SSH_STATUS=$?
+            if [[ "${SSH_STATUS}" -eq 0 ]]; then
+              ssh \
+                -o ConnectTimeout=15 \
+                -o ServerAliveInterval=15 \
+                -o ServerAliveCountMax=4 \
+                "${PI_USER}@${PI_HOST}" \
+                "PROJECT_DIR=${REMOTE_DIR_Q} IMAGE_ARCHIVE=${REMOTE_IMAGE_Q} DEPLOY_REF=${DEPLOY_REF_Q} bash -s" \
+                < scripts/deploy-production.sh
+              SSH_STATUS=$?
             fi
+            set -e
 
-            # A stale candidate is never a rollback target.
-            docker image rm martas-health-lab-app:candidate >/dev/null 2>&1 || true
-
-            if ! git archive --format=tar origin/main \
-              | docker build --tag martas-health-lab-app:candidate -; then
-              echo "Image build failed; removing dangling build cache."
-              docker builder prune --force >/dev/null 2>&1 || true
-              exit 1
+            if [[ "${SSH_STATUS}" -eq 0 ]]; then
+              exit 0
             fi
-
-            candidate_image="$(docker image inspect --format '{{.Id}}' martas-health-lab-app:candidate)"
-            docker image tag "$candidate_image" martas-health-lab-app:latest
-
-            if ! compose_up; then
-              echo "Candidate failed its health check; restoring the previous image."
-              if [ -n "$previous_image" ]; then
-                docker image tag "$previous_image" martas-health-lab-app:latest
-                compose_up
-              fi
-              docker image rm martas-health-lab-app:candidate >/dev/null 2>&1 || true
-              docker image rm "$candidate_image" >/dev/null 2>&1 || true
-              docker builder prune --force >/dev/null 2>&1 || true
-              exit 1
+            if [[ "${SSH_STATUS}" -ne 255 ]]; then
+              echo "Remote deployment failed with status ${SSH_STATUS}; not retrying a real deployment error." >&2
+              exit "${SSH_STATUS}"
             fi
-
-            # Keep latest plus exactly one rollback. Remove the candidate alias,
-            # the rollback from two deployments ago, and older managed images.
-            docker image rm martas-health-lab-app:candidate >/dev/null 2>&1 || true
-            if [ -n "$previous_rollback" ] && [ "$previous_rollback" != "$previous_image" ]; then
-              docker image rm "$previous_rollback" >/dev/null 2>&1 || true
+            if [[ "${attempt}" -lt 4 ]]; then
+              echo "SSH transport failed on attempt ${attempt}; waiting for the Pi before retrying..." >&2
+              sleep 30
             fi
-            docker image prune --force \
-              --filter "label=com.martas-health-lab.managed=true" >/dev/null
+          done
 
-            df -h /
+          echo "Raspberry Pi remained unreachable after four deployment attempts." >&2
+          exit "${SSH_STATUS}"
