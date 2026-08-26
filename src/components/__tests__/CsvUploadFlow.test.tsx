@@ -141,7 +141,7 @@ describe("CsvUploadFlow", () => {
             data: [{ number: "100", age: "40" }],
             message: "Success"
         });
-        (persistActions.persistPerRowAssignments as any).mockResolvedValue(undefined);
+        (persistActions.persistPerRowAssignments as any).mockResolvedValue({ success: true, count: 1 });
 
         render(<CsvUploadFlow />);
 

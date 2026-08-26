@@ -1,0 +1,5 @@
+# Raspberry Pi production identity override.
+# Keep the container aligned with the host account that owns restored SSD data.
+services:
+  app:
+    user: "1000:1000"
