@@ -16,7 +16,11 @@ export type RowAssignment = {
     };
 };
 
-export async function persistPerRowAssignments(assignments: RowAssignment[]) {
+export type PersistAssignmentsResult =
+    | { success: true; count: number }
+    | { success: false; code: "DATABASE_READ_ONLY" | "DATABASE_SAVE_FAILED"; message: string };
+
+export async function persistPerRowAssignments(assignments: RowAssignment[]): Promise<PersistAssignmentsResult> {
     try {
         await logger.info(`Starting persistence for ${assignments.length} assignments`, null, "DB_PERSIST");
 
@@ -80,8 +84,22 @@ export async function persistPerRowAssignments(assignments: RowAssignment[]) {
 
         await logger.success(`Successfully persisted ${assignments.length} assignments`, { count: assignments.length }, "DB_PERSIST");
         revalidatePath("/");
+        return { success: true, count: assignments.length };
     } catch (error: any) {
         await logger.error(`Persistence error: ${error.message}`, { error: error.stack }, "DB_PERSIST");
-        throw error;
+
+        if (error?.code === "SQLITE_READONLY" || error?.message?.includes("readonly database")) {
+            return {
+                success: false,
+                code: "DATABASE_READ_ONLY",
+                message: "El archivo se procesó correctamente, pero la base de datos no tiene permisos de escritura. No se guardó ninguna medición. Contacta con soporte antes de volver a intentarlo.",
+            };
+        }
+
+        return {
+            success: false,
+            code: "DATABASE_SAVE_FAILED",
+            message: "El archivo se procesó correctamente, pero ocurrió un error al guardar. No se guardó ninguna medición. Contacta con soporte antes de volver a intentarlo.",
+        };
     }
 }

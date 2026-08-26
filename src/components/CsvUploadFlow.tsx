@@ -23,6 +23,7 @@ export default function CsvUploadFlow({ preselectedClientId }: { preselectedClie
 
     // Real-time recalculation for a specific assignment
     const recalculateRecord = (record: any, client: any) => {
+        const hasValue = (value: any) => value !== undefined && value !== null && value !== "";
         const w = parseFloat(record.weight);
         const h = parseFloat(record.height) || client?.height;
         const f = parseFloat(record.fatPercent);
@@ -36,9 +37,9 @@ export default function CsvUploadFlow({ preselectedClientId }: { preselectedClie
             updates.bmi = parseFloat((w / ((h / 100) ** 2)).toFixed(1));
         }
 
-        // 2. Bone Mass (Heuristic)
+        // 2. Bone Mass (Heuristic fallback only)
         let currentBone = parseFloat(record.boneMass);
-        if (!isNaN(w)) {
+        if (!hasValue(record.boneMass) && !isNaN(w)) {
             if (gender === 'female') {
                 if (w < 50) currentBone = 1.95;
                 else if (w <= 75) currentBone = 2.40;
@@ -51,8 +52,8 @@ export default function CsvUploadFlow({ preselectedClientId }: { preselectedClie
             updates.boneMass = currentBone;
         }
 
-        // 3. Muscle Mass
-        if (!isNaN(w) && !isNaN(f) && !isNaN(currentBone)) {
+        // 3. Muscle Mass fallback
+        if (!hasValue(record.muscleMass) && !isNaN(w) && !isNaN(f) && !isNaN(currentBone)) {
             const fatMass = w * (f / 100);
             updates.muscleMass = parseFloat((w - fatMass - currentBone).toFixed(2));
         }
@@ -62,8 +63,8 @@ export default function CsvUploadFlow({ preselectedClientId }: { preselectedClie
             updates.bmr = calculateBMR(w, h, age, gender).value;
         }
 
-        // 5. Metabolic Age
-        if (!isNaN(f) && !isNaN(age)) {
+        // 5. Metabolic Age fallback
+        if (!hasValue(record.metabolicAge) && !isNaN(f) && !isNaN(age)) {
             const targetFat = gender === 'female' ? 23 : 15;
             let metAge = age + (f - targetFat) * 0.5;
             metAge = Math.max(12, Math.min(age + 15, Math.max(age - 15, metAge)));
@@ -146,10 +147,15 @@ export default function CsvUploadFlow({ preselectedClientId }: { preselectedClie
                 throw new Error("Por favor asigne todas las filas a un cliente o registre uno nuevo.");
             }
 
-            await persistPerRowAssignments(assignments);
+            const result = await persistPerRowAssignments(assignments);
+            if (!result.success) {
+                setError(result.message);
+                return;
+            }
+
             setStep("success");
-        } catch (err: any) {
-            setError(err.message || "Error al guardar los datos");
+        } catch {
+            setError("No se pudo conectar con el servidor para guardar los datos. No se guardó ninguna medición. Comprueba la conexión VPN e inténtalo de nuevo.");
         } finally {
             setLoading(false);
         }

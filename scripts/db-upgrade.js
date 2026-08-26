@@ -20,6 +20,23 @@ if (!fs.existsSync(dir)) {
 try {
   const db = new Database(dbPath, { timeout: 8000 });
 
+  // Prove the main database is writable without retaining any probe data.
+  // SQLite DDL is transactional, so ROLLBACK removes the temporary table/row.
+  try {
+    db.exec(`
+      BEGIN IMMEDIATE;
+      CREATE TABLE IF NOT EXISTS __marta_write_probe (id INTEGER);
+      INSERT INTO __marta_write_probe (id) VALUES (1);
+      ROLLBACK;
+    `);
+    console.log("[DB Upgrade] Database write check passed.");
+  } catch (writeError) {
+    if (db.inTransaction) {
+      db.exec("ROLLBACK;");
+    }
+    throw new Error(`Database is not writable: ${writeError.message}`);
+  }
+
   // Create system_logs table if missing
   db.exec(`
     CREATE TABLE IF NOT EXISTS system_logs (
@@ -56,4 +73,5 @@ try {
   console.log("[DB Upgrade] Database schema check completed successfully.");
 } catch (error) {
   console.error("[DB Upgrade] Failed to access or upgrade database:", error);
+  process.exitCode = 1;
 }

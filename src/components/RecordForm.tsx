@@ -48,6 +48,7 @@ export function RecordForm({ clientId, client, record, onClose, onSuccess }: Rec
 
     // Real-time recalculation
     useEffect(() => {
+        const hasValue = (value: string) => value !== "";
         const w = parseFloat(formData.weight);
         const h = parseFloat(formData.height);
         const f = parseFloat(formData.fatPercent);
@@ -61,9 +62,9 @@ export function RecordForm({ clientId, client, record, onClose, onSuccess }: Rec
             updates.bmi = (w / ((h / 100) ** 2)).toFixed(1);
         }
 
-        // 2. Bone Mass (Heuristic if not present)
+        // 2. Bone Mass (Heuristic fallback only)
         let currentBone = parseFloat(formData.boneMass);
-        if (!isNaN(w)) {
+        if (!hasValue(formData.boneMass) && !isNaN(w)) {
             if (gender === 'female') {
                 if (w < 50) currentBone = 1.95;
                 else if (w <= 75) currentBone = 2.40;
@@ -76,8 +77,8 @@ export function RecordForm({ clientId, client, record, onClose, onSuccess }: Rec
             updates.boneMass = currentBone.toString();
         }
 
-        // 3. Muscle Mass (Weight - FatMass - BoneMass)
-        if (!isNaN(w) && !isNaN(f) && !isNaN(currentBone)) {
+        // 3. Muscle Mass fallback (Weight - FatMass - BoneMass)
+        if (!hasValue(formData.muscleMass) && !isNaN(w) && !isNaN(f) && !isNaN(currentBone)) {
             const fatMass = w * (f / 100);
             updates.muscleMass = (w - fatMass - currentBone).toFixed(2);
         }
@@ -87,8 +88,8 @@ export function RecordForm({ clientId, client, record, onClose, onSuccess }: Rec
             updates.bmr = calculateBMR(w, h, age, gender).value.toString();
         }
 
-        // 5. Metabolic Age
-        if (!isNaN(f) && !isNaN(age)) {
+        // 5. Metabolic Age fallback
+        if (!hasValue(formData.metabolicAge) && !isNaN(f) && !isNaN(age)) {
             const targetFat = gender === 'female' ? 23 : 15;
             let metAge = age + (f - targetFat) * 0.5;
             // Bounds check same as backend logic
@@ -100,7 +101,7 @@ export function RecordForm({ clientId, client, record, onClose, onSuccess }: Rec
             setFormData(prev => ({ ...prev, ...updates }));
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [formData.weight, formData.height, formData.fatPercent, client]);
+    }, [formData.weight, formData.height, formData.fatPercent, formData.boneMass, formData.muscleMass, formData.metabolicAge, client]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;

@@ -50,18 +50,18 @@ ENV NODE_ENV=production \
     HOSTNAME=0.0.0.0 \
     PORT=3000
 
-RUN addgroup --system --gid 1001 nodejs \
-    && adduser --system --uid 1001 --ingroup nodejs nextjs \
-    && mkdir -p /app/data /app/scripts \
-    && chown -R nextjs:nodejs /app
+# The base image's non-root node account is UID/GID 1000, matching the Pi host
+# account that owns the bind-mounted production database.
+RUN mkdir -p /app/data /app/scripts \
+    && chown -R node:node /app
 
 # Next standalone output contains only traced production dependencies. The
 # database upgrade script remains an explicit startup prerequisite.
-COPY --chown=nextjs:nodejs --from=builder /app/.next/standalone ./
-COPY --chown=nextjs:nodejs --from=builder /app/.next/static ./.next/static
-COPY --chown=nextjs:nodejs --from=builder /app/scripts/db-upgrade.js ./scripts/db-upgrade.js
+COPY --chown=node:node --from=builder /app/.next/standalone ./
+COPY --chown=node:node --from=builder /app/.next/static ./.next/static
+COPY --chown=node:node --from=builder /app/scripts/db-upgrade.js ./scripts/db-upgrade.js
 
-USER nextjs
+USER node
 
 EXPOSE 3000
 

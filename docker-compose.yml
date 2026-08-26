@@ -6,6 +6,8 @@ services:
       dockerfile: Dockerfile
     container_name: martas-lab
     init: true
+    # Match the Raspberry Pi host user so restored bind-mounted data stays writable.
+    user: "1000:1000"
     restart: unless-stopped
     ports:
       - "3000:3000"
