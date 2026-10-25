@@ -6,7 +6,7 @@ dotenv.config({ path: ".env.local" });
 export default {
   schema: "./src/lib/db/schema.ts",
   out: "./drizzle",
-  driver: "better-sqlite",
+  dialect: "sqlite",
   dbCredentials: {
     url: process.env.DATABASE_URL || "./data/dev.db",
   },

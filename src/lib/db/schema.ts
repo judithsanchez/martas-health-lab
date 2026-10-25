@@ -17,7 +17,7 @@ export const clients = sqliteTable("clients", {
     isActive: integer("is_active", { mode: 'boolean' }).default(true),
     email: text("email"),
     phone: text("phone"),
-    createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
+    createdAt: text("created_at").default(sql`(CURRENT_TIMESTAMP)`),
 });
 
 export const measurements = sqliteTable("measurements", {
@@ -57,7 +57,7 @@ export const measurements = sqliteTable("measurements", {
     muscleTrunk: real("muscle_trunk"),
 
     notes: text("notes"),
-    createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
+    createdAt: text("created_at").default(sql`(CURRENT_TIMESTAMP)`),
 });
 export const systemLogs = sqliteTable("system_logs", {
     id: integer("id").primaryKey({ autoIncrement: true }),
@@ -65,5 +65,5 @@ export const systemLogs = sqliteTable("system_logs", {
     message: text("message").notNull(),
     details: text("details"), // JSON stringified data
     source: text("source"), // e.g., 'CSV_UPLOAD', 'PDF_GEN'
-    createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
+    createdAt: text("created_at").default(sql`(CURRENT_TIMESTAMP)`),
 });

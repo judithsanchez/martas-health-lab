@@ -86,7 +86,7 @@ export async function persistPerRowAssignments(assignments: RowAssignment[]): Pr
         revalidatePath("/");
         return { success: true, count: assignments.length };
     } catch (error: any) {
-        await logger.error(`Persistence error: ${error.message}`, { error: error.stack }, "DB_PERSIST");
+        await logger.error("Measurement persistence failed", null, "DB_PERSIST");
 
         if (error?.code === "SQLITE_READONLY" || error?.message?.includes("readonly database")) {
             return {

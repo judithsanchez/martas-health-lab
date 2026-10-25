@@ -78,12 +78,12 @@ export async function createClient(data: {
             phone: data.phone,
         }).returning();
 
-        await Logger.success(`Created client: ${data.name}`, { id: result[0].id }, "CLIENT_ACTION");
+        await Logger.success("Client created", null, "CLIENT_ACTION");
         revalidatePath("/");
         return result[0];
-    } catch (error: any) {
-        await Logger.error(`Failed to create client: ${data.name}`, { error: error.message }, "CLIENT_ACTION");
-        throw error;
+    } catch {
+        await Logger.error("Client creation failed", null, "CLIENT_ACTION");
+        throw new Error("Failed to create client.");
     }
 }
 
@@ -109,12 +109,12 @@ export async function updateClient(
             .where(eq(clients.id, id))
             .returning();
 
-        await Logger.info(`Updated client ID: ${id}`, { changes: data }, "CLIENT_ACTION");
+        await Logger.info("Client updated", null, "CLIENT_ACTION");
         revalidatePath("/");
         return result[0];
-    } catch (error: any) {
-        await Logger.error(`Failed to update client ID: ${id}`, { error: error.message }, "CLIENT_ACTION");
-        throw error;
+    } catch {
+        await Logger.error("Client update failed", null, "CLIENT_ACTION");
+        throw new Error("Failed to update client.");
     }
 }
 
@@ -125,12 +125,12 @@ export async function toggleClientStatus(id: number, isActive: boolean) {
             .where(eq(clients.id, id))
             .returning();
 
-        await Logger.info(`${isActive ? 'Activated' : 'Deactivated'} client ID: ${id}`, { id, isActive }, "CLIENT_ACTION");
+        await Logger.info(isActive ? 'Client activated' : 'Client deactivated', null, "CLIENT_ACTION");
         revalidatePath("/");
         return result[0];
-    } catch (error: any) {
-        await Logger.error(`Failed to toggle status for client ID: ${id}`, { error: error.message }, "CLIENT_ACTION");
-        throw error;
+    } catch {
+        await Logger.error("Client status update failed", null, "CLIENT_ACTION");
+        throw new Error("Failed to update client status.");
     }
 }
 
@@ -143,7 +143,7 @@ export async function deleteClient(id: number) {
             .limit(1);
 
         if (existingRecords.length > 0) {
-            await Logger.warn(`Attempted to delete client ID: ${id} with existing records`, null, "CLIENT_ACTION");
+            await Logger.warn("Client deletion blocked by existing records", null, "CLIENT_ACTION");
             throw new Error("Cannot delete client with existing records. Please archive/deactivate instead.");
         }
 
@@ -151,12 +151,15 @@ export async function deleteClient(id: number) {
             .where(eq(clients.id, id))
             .returning();
 
-        await Logger.success(`Deleted client ID: ${id}`, { id }, "CLIENT_ACTION");
+        await Logger.success("Client deleted", null, "CLIENT_ACTION");
         revalidatePath("/");
         return result[0];
-    } catch (error: any) {
-        await Logger.error(`Failed to delete client ID: ${id}`, { error: error.message }, "CLIENT_ACTION");
-        throw error;
+    } catch (error: unknown) {
+        await Logger.error("Client deletion failed", null, "CLIENT_ACTION");
+        if (error instanceof Error && error.message === "Cannot delete client with existing records. Please archive/deactivate instead.") {
+            throw new Error("Cannot delete client with existing records. Please archive/deactivate instead.");
+        }
+        throw new Error("Failed to delete client.");
     }
 }
 

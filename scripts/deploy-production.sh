@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+umask 077
 
 PROJECT_DIR="${PROJECT_DIR:-${PWD}}"
 DEPLOY_REF="${DEPLOY_REF:-origin/main}"
@@ -13,14 +14,10 @@ DATABASE_FILE="${PROJECT_DIR}/data/prod.db"
 MINIMUM_FREE_KB=$((2 * 1024 * 1024))
 COMPOSE_FILE="$(mktemp "${TMPDIR:-/tmp}/martas-health-lab-compose.XXXXXX.yml")"
 DEPLOY_LOCK="${DEPLOY_LOCK:-/tmp/raspberry-pi-production-deploy.lock}"
-LOCK_ACQUIRED=0
 
 cleanup() {
   rm -f "${COMPOSE_FILE}"
   rm -f "${IMAGE_ARCHIVE}"
-  if [[ "${LOCK_ACQUIRED}" == "1" ]]; then
-    docker builder prune --all --force >/dev/null 2>&1 || true
-  fi
 }
 trap cleanup EXIT
 
@@ -29,17 +26,30 @@ if ! flock --wait 1800 9; then
   echo "Timed out waiting for another production deployment to finish." >&2
   exit 1
 fi
-LOCK_ACQUIRED=1
 
 cd "${PROJECT_DIR}"
 
 echo "Fetching production metadata for ${DEPLOY_REF}..."
 git fetch origin main
-git cat-file -e "${DEPLOY_REF}^{commit}"
+DEPLOY_REF="$(git rev-parse --verify "${DEPLOY_REF}^{commit}")"
 git show "${DEPLOY_REF}:docker-compose.yml" >"${COMPOSE_FILE}"
 
-echo "Removing Docker build cache before the disk-space guard..."
-docker builder prune --all --force
+# Keep each policy file while images/backups may still need it. No cache/image pruning.
+mkdir -p "${PROJECT_DIR}/.deployment/security"
+POLICY_DIR="$(mktemp -d "${PROJECT_DIR}/.deployment/security/release.XXXXXX")"
+export HEALTH_LAB_SECCOMP_PROFILE="${POLICY_DIR}/chromium-seccomp.json"
+BOUNDARY_CHECK="${POLICY_DIR}/verify-production-boundary.py"
+git show "${DEPLOY_REF}:security/chromium-seccomp.json" >"${HEALTH_LAB_SECCOMP_PROFILE}"
+git show "${DEPLOY_REF}:scripts/verify-production-boundary.py" >"${BOUNDARY_CHECK}"
+
+verify_boundary() {
+  python3 "${BOUNDARY_CHECK}" --project "${PROJECT_DIR}" \
+    --profile "${HEALTH_LAB_SECCOMP_PROFILE}" --compose-file "${COMPOSE_FILE}"
+}
+
+# This release path requires the already-reviewed production boundary. It refuses
+# bootstrap or policy/configuration migrations, which need separate approval.
+verify_boundary
 
 available_kb="$(df -Pk "${PROJECT_DIR}" | awk 'NR == 2 { print $4 }')"
 if [[ -z "${available_kb}" || "${available_kb}" -lt "${MINIMUM_FREE_KB}" ]]; then
@@ -57,13 +67,13 @@ compose() {
 }
 
 previous_image=""
-previous_rollback=""
 if docker container inspect "${CONTAINER}" >/dev/null 2>&1; then
   previous_image="$(docker container inspect --format '{{.Image}}' "${CONTAINER}")"
 fi
-if docker image inspect "${IMAGE}:rollback" >/dev/null 2>&1; then
-  previous_rollback="$(docker image inspect --format '{{.Id}}' "${IMAGE}:rollback")"
-fi
+# Save the reviewed configuration and immutable recovery identity, not only a tag.
+printf '%s\n' "${previous_image}" >"${POLICY_DIR}/previous-image.id"
+printf '%s\n' "${DEPLOY_REF}" >"${POLICY_DIR}/release-commit.id"
+compose config --format json >"${POLICY_DIR}/compose.json"
 
 backup_database() {
   [[ -f "${DATABASE_FILE}" ]] || return 0
@@ -83,7 +93,7 @@ backup_database() {
     const db = new Database("/app/data/prod.db", { readonly: true });
     db.backup(temporary)
       .then(() => { db.close(); fs.renameSync(temporary, target); })
-      .catch((error) => { db.close(); console.error(error); process.exit(1); });
+      .catch(() => { db.close(); console.error("Consistent database backup failed; inspect locally."); process.exit(1); });
   '
   echo "Refreshed the bounded pre-deployment SQLite backup."
 }
@@ -107,28 +117,30 @@ if ! gzip -dc "${IMAGE_ARCHIVE}" | docker image load; then
 fi
 
 candidate_image="$(docker image inspect --format '{{.Id}}' "${IMAGE}:candidate")"
+if [[ "$(docker image inspect --format '{{.Architecture}}' "${IMAGE}:candidate")" != "arm64" ]]; then
+  echo "Refusing a non-ARM64 production image." >&2
+  exit 1
+fi
+printf '%s\n' "${candidate_image}" >"${POLICY_DIR}/candidate-image.id"
 docker image tag "${candidate_image}" "${IMAGE}:latest"
 
 echo "Starting the candidate and waiting for its health check..."
-if ! compose up -d --no-build --force-recreate --wait --wait-timeout 120 "${SERVICE}"; then
+if ! { compose up -d --no-build --force-recreate --wait --wait-timeout 120 "${SERVICE}" && verify_boundary; }; then
   echo "Marta's Health Lab verification failed; restoring the previous image." >&2
   docker container inspect "${CONTAINER}" \
-    --format 'candidate status={{.State.Status}} exit={{.State.ExitCode}} error={{.State.Error}}' >&2 || true
-  docker logs --tail 100 "${CONTAINER}" >&2 || true
+    --format 'candidate status={{.State.Status}} exit={{.State.ExitCode}}' >&2 || true
+  echo "Inspect app logs locally if needed; private app logs are not copied to CI." >&2
   if [[ -n "${previous_image}" ]]; then
     docker image tag "${previous_image}" "${IMAGE}:latest"
     compose up -d --no-build --force-recreate --wait --wait-timeout 120 "${SERVICE}"
+    verify_boundary
   fi
   docker image rm "${IMAGE}:candidate" >/dev/null 2>&1 || true
-  docker image rm "${candidate_image}" >/dev/null 2>&1 || true
   exit 1
 fi
 
 docker image rm "${IMAGE}:candidate" >/dev/null 2>&1 || true
-if [[ -n "${previous_rollback}" && "${previous_rollback}" != "${previous_image}" ]]; then
-  docker image rm "${previous_rollback}" >/dev/null 2>&1 || true
-fi
-docker image prune --force --filter "label=com.martas-health-lab.managed=true"
+# Retain previous image layers and policy directories for reviewed recovery.
 
 echo "Marta's Health Lab deployment complete from $(git rev-parse "${DEPLOY_REF}")."
 df -h "${PROJECT_DIR}"

@@ -20,8 +20,9 @@ async function getData(id: number) {
     return { client: client[0], history };
 }
 
-export default async function ClientPage({ params }: { params: { id: string } }) {
-    const id = parseInt(params.id);
+export default async function ClientPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id: routeId } = await params;
+    const id = parseInt(routeId);
     if (isNaN(id)) notFound();
 
     const data = await getData(id);
