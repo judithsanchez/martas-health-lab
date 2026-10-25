@@ -8,6 +8,10 @@ services:
     init: true
     # Match the Raspberry Pi host user so restored bind-mounted data stays writable.
     user: "1000:1000"
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+      - "seccomp:${HEALTH_LAB_SECCOMP_PROFILE:-./security/chromium-seccomp.json}"
     restart: unless-stopped
     ports:
       - "3000:3000"

@@ -51,12 +51,12 @@ export async function getRecord(id: number) {
 export async function createRecord(data: MeasurementData) {
     try {
         const result = await db.insert(measurements).values(data as any).returning();
-        await Logger.success(`Created measurement for client ID: ${data.clientId}`, { id: result[0].id }, "RECORD_ACTION");
+        await Logger.success("Measurement created", null, "RECORD_ACTION");
         revalidatePath("/");
         return result[0];
-    } catch (error: any) {
-        await Logger.error(`Failed to create measurement for client ID: ${data.clientId}`, { error: error.message }, "RECORD_ACTION");
-        throw error;
+    } catch {
+        await Logger.error("Measurement creation failed", null, "RECORD_ACTION");
+        throw new Error("Failed to create measurement.");
     }
 }
 
@@ -67,12 +67,12 @@ export async function updateRecord(id: number, data: Partial<MeasurementData>) {
             .where(eq(measurements.id, id))
             .returning();
 
-        await Logger.info(`Updated measurement ID: ${id}`, { changes: data }, "RECORD_ACTION");
+        await Logger.info("Measurement updated", null, "RECORD_ACTION");
         revalidatePath("/");
         return result[0];
-    } catch (error: any) {
-        await Logger.error(`Failed to update measurement ID: ${id}`, { error: error.message }, "RECORD_ACTION");
-        throw error;
+    } catch {
+        await Logger.error("Measurement update failed", null, "RECORD_ACTION");
+        throw new Error("Failed to update measurement.");
     }
 }
 
@@ -82,11 +82,11 @@ export async function deleteRecord(id: number) {
             .where(eq(measurements.id, id))
             .returning();
 
-        await Logger.success(`Deleted measurement ID: ${id}`, { id }, "RECORD_ACTION");
+        await Logger.success("Measurement deleted", null, "RECORD_ACTION");
         revalidatePath("/");
         return result[0];
-    } catch (error: any) {
-        await Logger.error(`Failed to delete measurement ID: ${id}`, { error: error.message }, "RECORD_ACTION");
-        throw error;
+    } catch {
+        await Logger.error("Measurement deletion failed", null, "RECORD_ACTION");
+        throw new Error("Failed to delete measurement.");
     }
 }

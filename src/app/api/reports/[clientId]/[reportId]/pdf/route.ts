@@ -5,12 +5,11 @@ import fs from 'fs';
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { clientId: string; reportId: string } }
+    { params }: { params: Promise<{ clientId: string; reportId: string }> }
 ) {
     let browser: Browser | undefined;
-
     try {
-        const { clientId, reportId } = params;
+        const { clientId, reportId } = await params;
 
         // Ensure we have a valid URL to visit
         // In production, this should be the full domain. For dev, localhost:3000 is fine.
@@ -18,7 +17,7 @@ export async function GET(
         const portMatch = host.match(/:(\d+)/);
         const port = portMatch ? portMatch[1] : (process.env.PORT || '3000');
 
-        console.log(`[PDF] Request received. Host: ${host}, Client: ${clientId}, Report: ${reportId}`);
+        console.log("[PDF] Generation requested");
 
         // FORCE LOCALHOST STRATEGY
         // The incoming host (e.g., 100.117.x.y) might not be reachable from inside the Docker container.
@@ -27,7 +26,6 @@ export async function GET(
         const protocol = 'http'; // Always http for localhost
         const reportUrl = `${protocol}://${localHost}/clients/${clientId}/reports/${reportId}`;
 
-        console.log(`[PDF] Puppeteer visiting: ${reportUrl}`);
 
         // Launch Puppeteer
         const executablePath = [
@@ -39,7 +37,6 @@ export async function GET(
         browser = await puppeteer.launch({
             headless: true,
             ...(executablePath ? { executablePath } : {}),
-            args: ['--no-sandbox', '--disable-setuid-sandbox'],
         });
         const page = await browser.newPage();
 
@@ -221,6 +218,7 @@ export async function GET(
             margin: { top: 0, right: 0, bottom: 0, left: 0 }
         });
 
+
         // Return PDF as response
         return new NextResponse(Buffer.from(pdfBuffer), {
             headers: {
@@ -229,18 +227,18 @@ export async function GET(
             },
         });
 
-    } catch (error) {
-        console.error('PDF Generation Error:', error);
+    } catch {
+        console.error('PDF generation failed');
         return NextResponse.json(
-            { error: 'Failed to generate PDF', details: error instanceof Error ? error.message : String(error) },
+            { error: 'Failed to generate PDF' },
             { status: 500 }
         );
     } finally {
         if (browser) {
             try {
                 await browser.close();
-            } catch (closeError) {
-                console.error('Failed to close PDF browser:', closeError);
+            } catch {
+                console.error('[PDF] Browser cleanup failed');
             }
         }
     }

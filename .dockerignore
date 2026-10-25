@@ -4,6 +4,8 @@ node_modules
 .github
 .vscode
 .env
+.env.*
+.pnpm-store
 .env.local
 .env.development.local
 .env.test.local
@@ -21,3 +23,16 @@ docker-compose.yml
 # Keep public
 # Keep package.json
 # Keep pnpm-lock.yaml (if it existed, but we'll fetch it)
+
+# Never embed application records or local inspection output in images.
+/data
+/uploads
+/migration-data
+/*.csv
+/*.xlsx
+/*.db
+/*.db-*
+/*.log
+/*.tsbuildinfo
+/.next
+/drizzle

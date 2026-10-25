@@ -1,4 +1,4 @@
-ARG NODE_VERSION=20
+ARG NODE_VERSION=22
 ARG PNPM_VERSION=10.28.2
 
 FROM node:${NODE_VERSION}-bookworm-slim AS builder
@@ -24,6 +24,7 @@ COPY . .
 
 ENV DATABASE_URL=file:/app/data/prod.db
 ENV NEXT_PHASE=phase-production-build
+ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN mkdir -p /app/data \
     && touch /app/data/prod.db \
@@ -40,6 +41,7 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         chromium \
         fonts-dejavu-core \
+        fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf \
         libxss1 \
     && rm -rf /var/lib/apt/lists/* /var/cache/apt/*
 

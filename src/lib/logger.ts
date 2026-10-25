@@ -28,8 +28,8 @@ export class Logger {
                 details: details ? JSON.stringify(details) : null,
                 source: source || "SYSTEM",
             });
-        } catch (error) {
-            console.error("[Logger] Failed to persist log to database:", error);
+        } catch {
+            console.error("[Logger] Failed to persist log to database");
         }
     }
 

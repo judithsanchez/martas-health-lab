@@ -31,10 +31,11 @@ async function getReportData(clientId: number, reportId: number) {
 export default async function ReportPage({
     params
 }: {
-    params: { id: string, reportId: string }
+    params: Promise<{ id: string, reportId: string }>
 }) {
-    const clientId = parseInt(params.id);
-    const reportId = parseInt(params.reportId);
+    const resolvedParams = await params;
+    const clientId = parseInt(resolvedParams.id);
+    const reportId = parseInt(resolvedParams.reportId);
 
     if (isNaN(clientId) || isNaN(reportId)) notFound();
 

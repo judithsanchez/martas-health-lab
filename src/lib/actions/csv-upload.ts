@@ -2,6 +2,7 @@
 
 import fs from "fs";
 import path from "path";
+import { randomUUID } from "crypto";
 import * as Papa from "papaparse";
 import * as XLSX from "xlsx";
 import { TanitaParser } from "../tanita-parser";
@@ -9,39 +10,51 @@ import { logger } from "../logger";
 
 export type CsvRecord = Record<string, any>;
 
+const MAX_UPLOAD_BYTES = 4 * 1024 * 1024;
+const ALLOWED_EXTENSIONS = new Set(["csv", "txt", "xls", "xlsx"]);
+class UploadValidationError extends Error {}
+
 export async function uploadCsv(formData: FormData) {
     try {
-        const file = formData.get("file") as File;
-        console.log(`[Upload DEBUG] Starting uploadCsv for file: ${file?.name}`);
+        const file = formData.get("file");
         if (!file) {
-            throw new Error("No file uploaded");
+            throw new UploadValidationError("No file uploaded");
         }
-
-        console.log(`[Upload DEBUG] File size: ${file.size}, type: ${file.type}`);
-        await logger.info(`Received file: ${file.name}, type: ${file.type}, size: ${file.size} bytes`, null, "uploadCsv");
-
+        if (typeof file === "string") {
+            throw new UploadValidationError("Please select a CSV, TXT, XLS or XLSX file.");
+        }
+        const extension = file.name.split(".").pop()?.toLowerCase() || "";
+        if (!ALLOWED_EXTENSIONS.has(extension)) {
+            throw new UploadValidationError("Unsupported file type. Use CSV, TXT, XLS or XLSX.");
+        }
+        if (file.size === 0 || file.size > MAX_UPLOAD_BYTES) {
+            throw new UploadValidationError("The file must contain data and be no larger than 4 MiB.");
+        }
         const bytes = await file.arrayBuffer();
-        console.log(`[Upload DEBUG] ArrayBuffer received, length: ${bytes.byteLength}`);
+        if (bytes.byteLength === 0 || bytes.byteLength > MAX_UPLOAD_BYTES) {
+            throw new UploadValidationError("The file must contain data and be no larger than 4 MiB.");
+        }
         const buffer = Buffer.from(bytes);
+        await logger.info("Received measurement upload", { extension, size: buffer.length }, "uploadCsv");
 
         // 1. Audit Storage
         const uploadsDir = path.join(process.cwd(), "data", "uploads");
-        const storedFileName = `${Date.now()}-${file.name}`;
+        // Never derive a filesystem path from the supplied filename.
+        const storedFileName = `${randomUUID()}.${extension}`;
 
         try {
             if (!fs.existsSync(uploadsDir)) {
-                fs.mkdirSync(uploadsDir, { recursive: true });
+                fs.mkdirSync(uploadsDir, { recursive: true, mode: 0o700 });
             }
             const filePath = path.join(uploadsDir, storedFileName);
-            fs.writeFileSync(filePath, buffer);
-            await logger.info(`Audit file saved to: ${filePath}`, { filePath }, "uploadCsv");
-        } catch (saveError) {
-            await logger.warn("Failed to save audit file, proceeding with parsing anyway", saveError, "uploadCsv");
+            fs.writeFileSync(filePath, buffer, { flag: "wx", mode: 0o600 });
+            await logger.info("Upload audit copy saved", null, "uploadCsv");
+        } catch {
+            await logger.warn("Failed to save audit file, proceeding with parsing anyway", null, "uploadCsv");
         }
 
         // 2. Multi-Format Parsing (CSV/XLSX)
         let rawRows: string[][] = [];
-        const extension = file.name.split(".").pop()?.toLowerCase();
 
         if (extension === "csv" || extension === "txt") {
             await logger.info(`Parsing ${extension.toUpperCase()} file using PapaParse`, { extension }, "uploadCsv");
@@ -72,7 +85,6 @@ export async function uploadCsv(formData: FormData) {
         }
 
         // 3. Transform & Validate
-        console.log(`[Upload] Total rows found: ${rawRows.length}`);
 
         // 3a. Detect Date Format across all rows
         let detectedFormat: 'auto' | 'DMY' | 'MDY' = 'auto';
@@ -97,27 +109,21 @@ export async function uploadCsv(formData: FormData) {
                 }
             }
         }
-        console.log(`[Upload] Detected date format: ${detectedFormat}`);
 
-        const data: CsvRecord[] = rawRows.map((rawRow, idx) => {
+        const data: CsvRecord[] = rawRows.map((rawRow) => {
             const split = TanitaParser.splitWrappedRow(rawRow);
             const parsed = TanitaParser.parseRawRow(split, detectedFormat);
-            console.log(`[Upload] Row ${idx}: rawLen=${rawRow.length}, splitLen=${split.length}, hasDate=${!!parsed.date}, hasWeight=${parsed.weight !== undefined}`);
-            if (idx === 0) {
-                console.log(`[Upload] Row 0 split sample: ${JSON.stringify(split.slice(0, 4))}`);
-            }
             return parsed;
         }).filter(record => record.date && record.weight !== undefined);
 
-        console.log(`[Upload] Successfully parsed ${data.length} valid records out of ${rawRows.length}`);
 
         if (data.length === 0) {
             const msg = `No valid measurement data found in the ${extension?.toUpperCase() || 'file'}. Please ensure it follows the Tanita export format.`;
             await logger.warn(msg, { extension, dataLength: data.length }, "uploadCsv");
-            throw new Error(msg);
+            throw new UploadValidationError(msg);
         }
 
-        await logger.success(`Successfully parsed ${data.length} records from ${file.name}`, { count: data.length }, "uploadCsv");
+        await logger.success(`Successfully parsed ${data.length} records`, { count: data.length }, "uploadCsv");
 
         return {
             success: true,
@@ -126,11 +132,13 @@ export async function uploadCsv(formData: FormData) {
             fileName: file.name
         };
 
-    } catch (error: any) {
-        await logger.error("CRITICAL ERROR during upload/parsing", { error: error.message, stack: error.stack }, "uploadCsv");
+    } catch (error: unknown) {
+        await logger.error("Upload rejected or could not be parsed", null, "uploadCsv");
         return {
             success: false,
-            message: error.message || "An unexpected error occurred during file processing."
+            message: error instanceof UploadValidationError
+                ? error.message
+                : "The file could not be processed. Please check its format and try again."
         };
     }
 }
